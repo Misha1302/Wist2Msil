@@ -7,7 +7,6 @@
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>default</LangVersion>
-        <NeutralLanguage></NeutralLanguage>
     </PropertyGroup>
 
     <ItemGroup>

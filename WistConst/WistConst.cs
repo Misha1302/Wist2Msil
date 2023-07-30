@@ -98,18 +98,4 @@ public readonly struct WistConst
     public override string ToString() => WistConstOperations.ToStr(this);
 
     public List<WistConst> GetList() => (List<WistConst>)((GCHandle)_handle!.Pointer).Target!;
-
-    public enum Capacity
-    {
-        C1 = 0b1,
-        C3 = 0b11,
-        C7 = 0b111,
-        C15 = 0b1111,
-        C31 = 0b11111,
-        C63 = 0b111111,
-        C127 = 0b1111111,
-        C255 = 0b11111111,
-        C511 = 0b111111111,
-        C1023 = 0b1111111111
-    }
 }

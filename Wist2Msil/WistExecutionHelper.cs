@@ -1,141 +1,119 @@
 namespace Wist2Msil;
 
-using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using WistConst;
 
 public sealed unsafe class WistExecutionHelper
 {
-    private const WistConst.Capacity Capacity = WistConst.Capacity.C31;
-    private readonly ImmutableArray<WistConst> _consts;
-    private WistStack<WistConst> _stack = new(Capacity);
+    private readonly WistConst[] _consts;
 
     public WistExecutionHelper(IEnumerable<WistConst> consts)
     {
-        _consts = consts.ToImmutableArray();
+        _consts = consts.ToArray();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void PushConst(int index) => _stack.Push(_consts[index]);
+    public static WistConst Add(WistConst a, WistConst b) => WistConstOperations.Add(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Add() => _stack.Push(WistConstOperations.Add(_stack.Pop(), _stack.Pop()));
+    public static WistConst Sub(WistConst a, WistConst b) => WistConstOperations.Sub(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Sub() => _stack.Push(WistConstOperations.Sub(_stack.Pop(), _stack.Pop()));
+    public static WistConst Mul(WistConst a, WistConst b) => WistConstOperations.Mul(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Mul() => _stack.Push(WistConstOperations.Mul(_stack.Pop(), _stack.Pop()));
+    public static WistConst Div(WistConst a, WistConst b) => WistConstOperations.Div(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Div() => _stack.Push(WistConstOperations.Div(_stack.Pop(), _stack.Pop()));
+    public static bool PopBool(WistConst a) => a.GetBool();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Rem() => _stack.Push(WistConstOperations.Rem(_stack.Pop(), _stack.Pop()));
+    public static WistConst Rem(WistConst a, WistConst b) => WistConstOperations.Rem(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Pow() => _stack.Push(WistConstOperations.Pow(_stack.Pop(), _stack.Pop()));
+    public static WistConst Pow(WistConst a, WistConst b) => WistConstOperations.Pow(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void LessThan() => _stack.Push(WistConstOperations.LessThan(_stack.Pop(), _stack.Pop()));
+    public static WistConst LessThan(WistConst a, WistConst b) => WistConstOperations.LessThan(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void LessThanOrEquals() => _stack.Push(WistConstOperations.LessThanOrEquals(_stack.Pop(), _stack.Pop()));
+    public static WistConst LessThanOrEquals(WistConst a, WistConst b) =>
+        WistConstOperations.LessThanOrEquals(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void GreaterThan() => _stack.Push(WistConstOperations.GreaterThan(_stack.Pop(), _stack.Pop()));
+    public static WistConst GreaterThan(WistConst a, WistConst b) => WistConstOperations.GreaterThan(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void GreaterThanOrEquals() =>
-        _stack.Push(WistConstOperations.GreaterThanOrEquals(_stack.Pop(), _stack.Pop()));
+    public static WistConst GreaterThanOrEquals(WistConst a, WistConst b) =>
+        WistConstOperations.GreaterThanOrEquals(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void IsEquals() => _stack.Push(WistConstOperations.Equals(_stack.Pop(), _stack.Pop()));
+    public static WistConst IsEquals(WistConst a, WistConst b) => WistConstOperations.Equals(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void IsNotEquals() => _stack.Push(WistConstOperations.NotEquals(_stack.Pop(), _stack.Pop()));
+    public static WistConst IsNotEquals(WistConst a, WistConst b) => WistConstOperations.NotEquals(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Drop() => _stack.Drop();
+    public static WistConst Cmp(WistConst a, WistConst b) => new(a == b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Dup() => _stack.Dup();
+    public static WistConst NegCmp(WistConst a, WistConst b) => new(a != b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    // ReSharper disable once EqualExpressionComparison
-    public void Cmp() => _stack.Push(new WistConst(_stack.Pop() == _stack.Pop()));
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    // ReSharper disable once EqualExpressionComparison
-    public void NegCmp() => _stack.Push(new WistConst(_stack.Pop() != _stack.Pop()));
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool PopBool() => _stack.Pop().GetBool();
-
-    public WistConst PushDefaultConst() => default;
+    public static WistConst PushDefaultConst() => default;
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Call0(int index)
+    public WistConst PushConst(int index) => _consts[index];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst Call0(WistConst ptr)
     {
-        var pointer = (delegate*<WistConst>)_consts[index].GetPointer();
-        _stack.Push(pointer());
+        var pointer = (delegate*<WistConst>)ptr.GetPointer();
+        return pointer();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Call1(int index)
+    public static WistConst Call1(WistConst a, WistConst ptr)
     {
-        var pointer = (delegate*<WistConst, WistConst>)_consts[index].GetPointer();
-        _stack.Push(pointer(_stack.Pop()));
+        var pointer = (delegate*<WistConst, WistConst>)ptr.GetPointer();
+        return pointer(a);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Call2(int index)
+    public static WistConst Call2(WistConst a, WistConst b, WistConst ptr)
     {
-        var pointer =
-            (delegate*<WistConst, WistConst, WistConst>)_consts[index].GetPointer();
-        _stack.Push(pointer(_stack.Pop(), _stack.Pop()));
+        var pointer = (delegate*<WistConst, WistConst, WistConst>)ptr.GetPointer();
+        return pointer(a, b);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Call3(int index)
+    public static WistConst Call3(WistConst a, WistConst b, WistConst c, WistConst ptr)
     {
-        var pointer =
-            (delegate*<WistConst, WistConst, WistConst, WistConst>)
-            _consts[index].GetPointer();
-        _stack.Push(pointer(_stack.Pop(), _stack.Pop(), _stack.Pop()));
+        var pointer = (delegate*<WistConst, WistConst, WistConst, WistConst>)ptr.GetPointer();
+        return pointer(a, b, c);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Call4(int index)
+    public static WistConst Call4(WistConst a, WistConst b, WistConst c, WistConst d, WistConst ptr)
     {
-        var pointer =
-            (delegate*<WistConst, WistConst, WistConst, WistConst,
-                WistConst>)_consts[index].GetPointer();
-        _stack.Push(pointer(_stack.Pop(), _stack.Pop(), _stack.Pop(), _stack.Pop()));
+        var pointer = (delegate*<WistConst, WistConst, WistConst, WistConst, WistConst>)ptr.GetPointer();
+        return pointer(a, b, c, d);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Call5(int index)
+    public static WistConst Call5(WistConst a, WistConst b, WistConst c, WistConst d, WistConst e, WistConst ptr)
+    {
+        var pointer = (delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst>)ptr.GetPointer();
+        return pointer(a, b, c, d, e);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst Call6(WistConst a, WistConst b, WistConst c, WistConst d, WistConst e, WistConst f, WistConst ptr)
     {
         var pointer =
-            (delegate*<WistConst, WistConst, WistConst, WistConst,
-                WistConst, WistConst>)_consts[index].GetPointer();
-        _stack.Push(pointer(_stack.Pop(), _stack.Pop(), _stack.Pop(), _stack.Pop(), _stack.Pop()));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Call6(int index)
-    {
-        var pointer =
-            (delegate*<WistConst, WistConst, WistConst, WistConst,
-                WistConst, WistConst, WistConst>)_consts[index]
-                .GetPointer();
-        _stack.Push(pointer(_stack.Pop(), _stack.Pop(), _stack.Pop(), _stack.Pop(), _stack.Pop(), _stack.Pop()));
-    }
-
-    public void Reset()
-    {
-        _stack = new WistStack<WistConst>(Capacity);
+            (delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistConst>)
+            ptr.GetPointer();
+        return pointer(a, b, c, d, e, f);
     }
 }

@@ -16,7 +16,7 @@ public sealed class WistCompiler
 
     static WistCompiler()
     {
-        foreach (var m in typeof(WistExecutionHelper).GetMethods(BindingFlags.Public | BindingFlags.Instance))
+        foreach (var m in typeof(WistExecutionHelper).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
             _methods.Add(m.Name, m);
     }
 
@@ -31,7 +31,6 @@ public sealed class WistCompiler
 
     private DynamicMethod Compile()
     {
-        _executionHelper.Reset();
         _labels = new Dictionary<string, GroboIL.Label>();
 
         var m = new DynamicMethod(
@@ -47,7 +46,6 @@ public sealed class WistCompiler
         {
             var inst = _image.Instructions[i];
             GroboIL.Label? label;
-            string? name;
             switch (inst.Op)
             {
                 case WistInstruction.Operation.PushConst:
@@ -56,60 +54,50 @@ public sealed class WistCompiler
                     il.Call(_methods["PushConst"]);
                     break;
                 case WistInstruction.Operation.Add:
-                    il.Ldarg(0);
                     il.Call(_methods["Add"]);
                     break;
                 case WistInstruction.Operation.Sub:
-                    il.Ldarg(0);
                     il.Call(_methods["Sub"]);
                     break;
                 case WistInstruction.Operation.Mul:
-                    il.Ldarg(0);
                     il.Call(_methods["Mul"]);
                     break;
                 case WistInstruction.Operation.Div:
-                    il.Ldarg(0);
                     il.Call(_methods["Div"]);
                     break;
                 case WistInstruction.Operation.Rem:
-                    il.Ldarg(0);
                     il.Call(_methods["Rem"]);
                     break;
                 case WistInstruction.Operation.Pow:
-                    il.Ldarg(0);
                     il.Call(_methods["Pow"]);
                     break;
                 case WistInstruction.Operation.IsEquals:
-                    il.Ldarg(0);
                     il.Call(_methods["IsEquals"]);
                     break;
                 case WistInstruction.Operation.IsNotEquals:
-                    il.Ldarg(0);
                     il.Call(_methods["IsNotEquals"]);
                     break;
                 case WistInstruction.Operation.LessThan:
-                    il.Ldarg(0);
                     il.Call(_methods["LessThan"]);
                     break;
                 case WistInstruction.Operation.GreaterThan:
-                    il.Ldarg(0);
                     il.Call(_methods["GreaterThan"]);
                     break;
                 case WistInstruction.Operation.LessThanOrEquals:
-                    il.Ldarg(0);
                     il.Call(_methods["LessThanOrEquals"]);
                     break;
                 case WistInstruction.Operation.GreaterThanOrEquals:
-                    il.Ldarg(0);
                     il.Call(_methods["GreaterThanOrEquals"]);
                     break;
                 case WistInstruction.Operation.Call:
                     il.Ldarg(0);
                     il.Ldc_I4(i);
+                    il.Call(_methods["PushConst"]);
+                    
                     il.Call(_methods[$"Call{_consts2[i].GetInternalInteger()}"]);
                     break;
                 case WistInstruction.Operation.SetLabel:
-                    name = _consts1[i].GetString();
+                    var name = _consts1[i].GetString();
                     if (!_labels.TryGetValue(name, out label))
                         _labels.Add(name, label = il.DefineLabel(name));
 
@@ -123,31 +111,25 @@ public sealed class WistCompiler
                 case WistInstruction.Operation.GotoIfFalse:
                     label = AddOrGetLabel(i);
 
-                    il.Ldarg(0);
                     il.Call(_methods["PopBool"]);
                     il.Brfalse(label);
                     break;
                 case WistInstruction.Operation.GotoIfTrue:
                     label = AddOrGetLabel(i);
 
-                    il.Ldarg(0);
                     il.Call(_methods["PopBool"]);
                     il.Brtrue(label);
                     break;
                 case WistInstruction.Operation.Drop:
-                    il.Ldarg(0);
-                    il.Call(_methods["Drop"]);
+                    il.Pop();
                     break;
                 case WistInstruction.Operation.Dup:
-                    il.Ldarg(0);
-                    il.Call(_methods["Dup"]);
+                    il.Dup();
                     break;
                 case WistInstruction.Operation.Cmp:
-                    il.Ldarg(0);
                     il.Call(_methods["Cmp"]);
                     break;
                 case WistInstruction.Operation.NegCmp:
-                    il.Ldarg(0);
                     il.Call(_methods["NegCmp"]);
                     break;
                 default:
@@ -155,7 +137,6 @@ public sealed class WistCompiler
             }
         }
 
-        il.Ldarg(0);
         il.Call(_methods["PushDefaultConst"]);
         il.Ret();
 
