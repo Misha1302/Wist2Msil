@@ -81,7 +81,9 @@ public readonly struct WistConst
     public override bool Equals(object? obj) => obj is WistConst c && c.GetHashCode() == GetHashCode();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool EqualsConsts(in WistConst obj) => (obj._valueL ^ (long)obj.Type) == ((long)Type ^ _valueL);
+    public bool EqualsConsts(in WistConst obj) => obj.Type != WistType.String
+        ? (obj._valueL ^ (byte)obj.Type) == (_valueL ^ (byte)Type)
+        : obj.GetString() == GetString();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode() => unchecked((int)_valueL ^ (int)(_valueL >> 32));

@@ -2,14 +2,17 @@ namespace Wist2Msil;
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using WistConst;
 using wInst = WistInstruction;
 
 public sealed class WistImage
 {
     private readonly List<WistInstruction> _instructions = new();
+    public readonly List<string> Locals = new();
+    public readonly HashSet<string> LocalsHashSet = new();
     public IReadOnlyList<WistInstruction> Instructions => _instructions;
 
-    public void PushConst(WistConst.WistConst c) =>
+    public void PushConst(WistConst c) =>
         _instructions.Add(new wInst(WistInstruction.Operation.PushConst, c));
 
     public void Add() => _instructions.Add(new wInst(WistInstruction.Operation.Add));
@@ -30,21 +33,23 @@ public sealed class WistImage
     public void Call(MethodInfo m)
     {
         RuntimeHelpers.PrepareMethod(m.MethodHandle);
-        _instructions.Add(new wInst(
-            WistInstruction.Operation.Call,
-            WistConst.WistConst.CreateInternalConst(m.MethodHandle.GetFunctionPointer()),
-            WistConst.WistConst.CreateInternalConst(m.GetParameters().Length
-            )));
+        _instructions.Add(
+            new wInst(
+                WistInstruction.Operation.Call,
+                WistConst.CreateInternalConst(m.MethodHandle.GetFunctionPointer()),
+                WistConst.CreateInternalConst(m.GetParameters().Length)
+            )
+        );
     }
 
     public void SetLabel(string labelName)
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.SetLabel, new WistConst.WistConst(labelName)));
+        _instructions.Add(new wInst(WistInstruction.Operation.SetLabel, new WistConst(labelName)));
     }
 
     public void Goto(string labelName)
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.Goto, new WistConst.WistConst(labelName)));
+        _instructions.Add(new wInst(WistInstruction.Operation.Goto, new WistConst(labelName)));
     }
 
     public void Drop()
@@ -74,11 +79,30 @@ public sealed class WistImage
 
     public void GotoIfFalse(string labelName)
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.GotoIfFalse, new WistConst.WistConst(labelName)));
+        _instructions.Add(new wInst(WistInstruction.Operation.GotoIfFalse, new WistConst(labelName)));
     }
 
     public void GotoIfTrue(string labelName)
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.GotoIfTrue, new WistConst.WistConst(labelName)));
+        _instructions.Add(new wInst(WistInstruction.Operation.GotoIfTrue, new WistConst(labelName)));
+    }
+
+    public void SetLocal(string locName)
+    {
+        TryAddLoc(locName);
+        _instructions.Add(new wInst(WistInstruction.Operation.SetLocal, new WistConst(locName)));
+    }
+
+    private void TryAddLoc(string locName)
+    {
+        if (LocalsHashSet.Contains(locName)) return;
+
+        LocalsHashSet.Add(locName);
+        Locals.Add(locName);
+    }
+
+    public void LoadLocal(string locName)
+    {
+        _instructions.Add(new wInst(WistInstruction.Operation.LoadLocal, new WistConst(locName)));
     }
 }

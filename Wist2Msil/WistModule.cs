@@ -11,13 +11,4 @@ public sealed class WistModule
         _wistFunctions.Add(f);
         return f;
     }
-
-    public WistImage GetImage()
-    {
-        var image = new WistImage();
-        foreach (var function in _wistFunctions)
-            image.Unite(function.Image);
-
-        return image;
-    }
 }

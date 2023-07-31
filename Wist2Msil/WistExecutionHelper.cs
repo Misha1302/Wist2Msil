@@ -1,15 +1,37 @@
 namespace Wist2Msil;
 
+using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using WistConst;
 
 public sealed unsafe class WistExecutionHelper
 {
-    private readonly WistConst[] _consts;
+    public readonly DynamicMethod DynamicMethod;
+    public WistConst[] Consts;
 
-    public WistExecutionHelper(IEnumerable<WistConst> consts)
+    public WistExecutionHelper(IEnumerable<WistConst> consts, DynamicMethod dynamicMethod)
     {
-        _consts = consts.ToArray();
+        Consts = consts.ToArray();
+        DynamicMethod = dynamicMethod;
+    }
+
+    public WistConst Run(out long executionTime)
+    {
+        var fp = GetMethodRuntimeHandle(DynamicMethod).GetFunctionPointer();
+        executionTime = WistTimer.MeasureExecutionTime(() => ((delegate*<WistExecutionHelper, WistConst>)fp)(this),
+            out var result);
+        return result;
+    }
+
+
+    private static RuntimeMethodHandle GetMethodRuntimeHandle(DynamicMethod method)
+    {
+        var getMethodDescriptorInfo = typeof(DynamicMethod).GetMethod("GetMethodDescriptor",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        var handle = (RuntimeMethodHandle)getMethodDescriptorInfo!.Invoke(method, null)!;
+
+        return handle;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -62,10 +84,6 @@ public sealed unsafe class WistExecutionHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst PushDefaultConst() => default;
 
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistConst PushConst(int index) => _consts[index];
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst Call0(WistConst ptr)
     {
@@ -109,7 +127,8 @@ public sealed unsafe class WistExecutionHelper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Call6(WistConst a, WistConst b, WistConst c, WistConst d, WistConst e, WistConst f, WistConst ptr)
+    public static WistConst Call6(WistConst a, WistConst b, WistConst c, WistConst d, WistConst e, WistConst f,
+        WistConst ptr)
     {
         var pointer =
             (delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistConst>)

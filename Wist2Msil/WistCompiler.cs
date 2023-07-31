@@ -8,50 +8,60 @@ using WistConst;
 public sealed class WistCompiler
 {
     private static readonly Dictionary<string, MethodInfo> _methods = new();
-    private readonly List<WistConst> _consts1;
-    private readonly List<WistConst> _consts2;
-    private readonly WistExecutionHelper _executionHelper;
-    private readonly WistImage _image;
-    private Dictionary<string, GroboIL.Label> _labels = new();
+    private static readonly FieldInfo _constsField;
+    private readonly WistModule _module;
 
     static WistCompiler()
     {
-        foreach (var m in typeof(WistExecutionHelper).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+        foreach (var m in typeof(WistExecutionHelper).GetMethods(BindingFlags.Public | BindingFlags.Static))
             _methods.Add(m.Name, m);
+
+        _constsField = typeof(WistExecutionHelper).GetField(nameof(WistExecutionHelper.Consts),
+                           BindingFlags.Public | BindingFlags.Instance) ??
+                       throw new NullReferenceException();
     }
 
     public WistCompiler(WistModule module)
     {
-        _image = module.GetImage();
-
-        _executionHelper = new WistExecutionHelper(_image.Instructions.Select(x => x.Constant));
-        _consts2 = _image.Instructions.Select(x => x.Constant2).ToList();
-        _consts1 = _image.Instructions.Select(x => x.Constant).ToList();
+        _module = module;
     }
 
-    private DynamicMethod Compile()
+    private List<WistExecutionHelper> Compile() => _module.WistFunctions.Select(CompileFunction).ToList();
+
+    private static WistExecutionHelper CompileFunction(WistFunction wistFunction)
     {
-        _labels = new Dictionary<string, GroboIL.Label>();
+        var labels = new Dictionary<string, GroboIL.Label>();
+
+        var consts1 = wistFunction.Image.Instructions.Select(x => x.Constant).ToArray();
+        var consts2 = wistFunction.Image.Instructions.Select(x => x.Constant2).ToArray();
 
         var m = new DynamicMethod(
-            "WistExecutionMethod",
+            wistFunction.Name,
             typeof(WistConst),
             new[] { typeof(WistExecutionHelper) },
             typeof(WistExecutionHelper),
             true
         );
 
+        var executionHelper = new WistExecutionHelper(consts1, m);
+
         using var il = new GroboIL(m);
-        for (var i = 0; i < _image.Instructions.Count; i++)
+
+        var locals = wistFunction.Image.Locals
+            .Select(local => il.DeclareLocal(typeof(WistConst), local, appendUniquePrefix: false))
+            .ToDictionary(x => x.Name);
+
+        for (var i = 0; i < wistFunction.Image.Instructions.Count; i++)
         {
-            var inst = _image.Instructions[i];
+            var inst = wistFunction.Image.Instructions[i];
             GroboIL.Label? label;
             switch (inst.Op)
             {
                 case WistInstruction.Operation.PushConst:
                     il.Ldarg(0);
+                    il.Ldfld(_constsField);
                     il.Ldc_I4(i);
-                    il.Call(_methods["PushConst"]);
+                    il.Ldelem(typeof(WistConst));
                     break;
                 case WistInstruction.Operation.Add:
                     il.Call(_methods["Add"]);
@@ -91,15 +101,15 @@ public sealed class WistCompiler
                     break;
                 case WistInstruction.Operation.Call:
                     il.Ldarg(0);
+                    il.Ldfld(_constsField);
                     il.Ldc_I4(i);
-                    il.Call(_methods["PushConst"]);
-                    
-                    il.Call(_methods[$"Call{_consts2[i].GetInternalInteger()}"]);
+                    il.Ldelem(typeof(WistConst));
+                    il.Call(_methods[$"Call{consts2[i].GetInternalInteger()}"]);
                     break;
                 case WistInstruction.Operation.SetLabel:
-                    var name = _consts1[i].GetString();
-                    if (!_labels.TryGetValue(name, out label))
-                        _labels.Add(name, label = il.DefineLabel(name));
+                    var name = consts1[i].GetString();
+                    if (!labels.TryGetValue(name, out label))
+                        labels.Add(name, label = il.DefineLabel(name));
 
                     il.MarkLabel(label);
                     break;
@@ -132,6 +142,12 @@ public sealed class WistCompiler
                 case WistInstruction.Operation.NegCmp:
                     il.Call(_methods["NegCmp"]);
                     break;
+                case WistInstruction.Operation.LoadLocal:
+                    il.Ldloc(locals[consts1[i].GetString()]);
+                    break;
+                case WistInstruction.Operation.SetLocal:
+                    il.Stloc(locals[consts1[i].GetString()]);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -140,37 +156,22 @@ public sealed class WistCompiler
         il.Call(_methods["PushDefaultConst"]);
         il.Ret();
 
-        return m;
-        
-        
+        return executionHelper;
+
+
         GroboIL.Label AddOrGetLabel(int i)
         {
-            var name = _consts1[i].GetString();
-            if (!_labels.TryGetValue(name, out var label))
-                _labels.Add(name, label = il.DefineLabel(name));
+            var name = consts1[i].GetString();
+            if (!labels.TryGetValue(name, out var label))
+                labels.Add(name, label = il.DefineLabel(name));
             return label;
         }
     }
 
-    public unsafe WistConst Run(out long compilationTime, out long executionTime)
+    public WistConst Run(out long compilationTime, out long executionTime)
     {
-        compilationTime = WistTimer.MeasureExecutionTime(Compile, out var dynamicMethod);
+        compilationTime = WistTimer.MeasureExecutionTime(Compile, out var executionHelpers);
 
-        var handle = GetMethodRuntimeHandle(dynamicMethod);
-        var fp = handle.GetFunctionPointer();
-        executionTime = WistTimer.MeasureExecutionTime(
-            () => ((delegate*<WistExecutionHelper, WistConst>)fp)(_executionHelper),
-            out var result);
-
-        return result;
-    }
-
-    private static RuntimeMethodHandle GetMethodRuntimeHandle(DynamicMethod method)
-    {
-        var getMethodDescriptorInfo = typeof(DynamicMethod).GetMethod("GetMethodDescriptor",
-            BindingFlags.NonPublic | BindingFlags.Instance);
-        var handle = (RuntimeMethodHandle)getMethodDescriptorInfo!.Invoke(method, null)!;
-
-        return handle;
+        return executionHelpers.First(x => x.DynamicMethod.Name == "Start").Run(out executionTime);
     }
 }

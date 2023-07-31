@@ -37,6 +37,8 @@ public struct WistInstruction
         Cmp,
         GotoIfFalse,
         GotoIfTrue,
-        NegCmp
+        NegCmp,
+        LoadLocal,
+        SetLocal
     }
 }

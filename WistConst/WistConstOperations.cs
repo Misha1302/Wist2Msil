@@ -49,7 +49,10 @@ public static class WistConstOperations
     public static WistConst Rem(in WistConst b, in WistConst a) => new(a.GetNumber() % b.GetNumber());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Add(in WistConst b, in WistConst a) => new(a.GetNumber() + b.GetNumber());
+    public static WistConst Add(in WistConst b, in WistConst a) =>
+        a.Type == WistType.Number
+            ? new WistConst(a.GetNumber() + b.GetNumber())
+            : new WistConst(a.GetString() + b.GetString());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst Sub(in WistConst b, in WistConst a) => new(a.GetNumber() - b.GetNumber());
