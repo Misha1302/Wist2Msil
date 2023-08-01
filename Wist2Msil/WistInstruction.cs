@@ -18,7 +18,7 @@ public struct WistInstruction
     {
         PushConst,
         Add,
-        Call,
+        CSharpCall,
         Sub,
         Mul,
         Div,
@@ -39,6 +39,9 @@ public struct WistInstruction
         GotoIfTrue,
         NegCmp,
         LoadLocal,
-        SetLocal
+        SetLocal,
+        WistCall,
+        LoadArg,
+        Ret
     }
 }

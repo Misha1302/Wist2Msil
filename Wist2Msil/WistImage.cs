@@ -35,7 +35,7 @@ public sealed class WistImage
         RuntimeHelpers.PrepareMethod(m.MethodHandle);
         _instructions.Add(
             new wInst(
-                WistInstruction.Operation.Call,
+                WistInstruction.Operation.CSharpCall,
                 WistConst.CreateInternalConst(m.MethodHandle.GetFunctionPointer()),
                 WistConst.CreateInternalConst(m.GetParameters().Length)
             )
@@ -104,5 +104,31 @@ public sealed class WistImage
     public void LoadLocal(string locName)
     {
         _instructions.Add(new wInst(WistInstruction.Operation.LoadLocal, new WistConst(locName)));
+    }
+
+    public void Call(WistFunction square)
+    {
+        _instructions.Add(
+            new wInst(
+                WistInstruction.Operation.WistCall,
+                default,
+                new WistConst(square.Name)
+            )
+        );
+    }
+
+    public void Ret()
+    {
+        _instructions.Add(new wInst(WistInstruction.Operation.Ret));
+    }
+
+    public void LoadArg(string argName)
+    {
+        _instructions.Add(
+            new wInst(
+                WistInstruction.Operation.LoadArg,
+                new WistConst(argName)
+            )
+        );
     }
 }

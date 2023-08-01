@@ -8,12 +8,14 @@ using WistConst;
 public sealed unsafe class WistExecutionHelper
 {
     public readonly DynamicMethod DynamicMethod;
+    public WistExecutionHelper[] WistExecutionHelpers;
     public WistConst[] Consts;
 
-    public WistExecutionHelper(IEnumerable<WistConst> consts, DynamicMethod dynamicMethod)
+    public WistExecutionHelper(IEnumerable<WistConst> consts, DynamicMethod dynamicMethod, WistExecutionHelper[] wistExecutionHelpers)
     {
         Consts = consts.ToArray();
         DynamicMethod = dynamicMethod;
+        WistExecutionHelpers = wistExecutionHelpers;
     }
 
     public WistConst Run(out long executionTime)
@@ -25,7 +27,7 @@ public sealed unsafe class WistExecutionHelper
     }
 
 
-    private static RuntimeMethodHandle GetMethodRuntimeHandle(DynamicMethod method)
+    public static RuntimeMethodHandle GetMethodRuntimeHandle(DynamicMethod method)
     {
         var getMethodDescriptorInfo = typeof(DynamicMethod).GetMethod("GetMethodDescriptor",
             BindingFlags.NonPublic | BindingFlags.Instance);
@@ -85,49 +87,49 @@ public sealed unsafe class WistExecutionHelper
     public static WistConst PushDefaultConst() => default;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Call0(WistConst ptr)
+    public static WistConst CSharpCall0(WistConst ptr)
     {
         var pointer = (delegate*<WistConst>)ptr.GetPointer();
         return pointer();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Call1(WistConst a, WistConst ptr)
+    public static WistConst CSharpCall1(WistConst a, WistConst ptr)
     {
         var pointer = (delegate*<WistConst, WistConst>)ptr.GetPointer();
         return pointer(a);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Call2(WistConst a, WistConst b, WistConst ptr)
+    public static WistConst CSharpCall2(WistConst a, WistConst b, WistConst ptr)
     {
         var pointer = (delegate*<WistConst, WistConst, WistConst>)ptr.GetPointer();
         return pointer(a, b);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Call3(WistConst a, WistConst b, WistConst c, WistConst ptr)
+    public static WistConst CSharpCall3(WistConst a, WistConst b, WistConst c, WistConst ptr)
     {
         var pointer = (delegate*<WistConst, WistConst, WistConst, WistConst>)ptr.GetPointer();
         return pointer(a, b, c);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Call4(WistConst a, WistConst b, WistConst c, WistConst d, WistConst ptr)
+    public static WistConst CSharpCall4(WistConst a, WistConst b, WistConst c, WistConst d, WistConst ptr)
     {
         var pointer = (delegate*<WistConst, WistConst, WistConst, WistConst, WistConst>)ptr.GetPointer();
         return pointer(a, b, c, d);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Call5(WistConst a, WistConst b, WistConst c, WistConst d, WistConst e, WistConst ptr)
+    public static WistConst CSharpCall5(WistConst a, WistConst b, WistConst c, WistConst d, WistConst e, WistConst ptr)
     {
         var pointer = (delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst>)ptr.GetPointer();
         return pointer(a, b, c, d, e);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Call6(WistConst a, WistConst b, WistConst c, WistConst d, WistConst e, WistConst f,
+    public static WistConst CSharpCall6(WistConst a, WistConst b, WistConst c, WistConst d, WistConst e, WistConst f,
         WistConst ptr)
     {
         var pointer =

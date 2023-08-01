@@ -7,39 +7,50 @@ public static class WistProgram
     public static void Main()
     {
         var wistModule = new WistModule();
-        var wistFunc = wistModule.MakeFunction("Start");
-        var image = wistFunc.Image;
+        var start = wistModule.MakeFunction("Start");
+        var cube = wistModule.MakeFunction("Cube", new[] { "n" });
 
-        image.PushConst(new WistConst(0));
-        image.SetLocal("i");
+        start.Image.PushConst(new WistConst(0));
+        start.Image.SetLocal("i");
+        start.Image.SetLabel("loopStart");
 
-        image.SetLabel("label");
+        start.Image.LoadLocal("i");
+        start.Image.PushConst(new WistConst(100_000_000));
+        start.Image.LessThan();
+        start.Image.GotoIfFalse("loopEnd");
+        
+        start.Image.LoadLocal("i");
+        start.Image.Call(cube);
+        // start.Image.Call(typeof(WistProgram).GetMethod(nameof(PrintWistConst))!);
+        start.Image.Drop();
+        
+        start.Image.LoadLocal("i");
+        start.Image.PushConst(new WistConst(1));
+        start.Image.Add();
+        start.Image.SetLocal("i");
+        start.Image.Goto("loopStart");
+        
+        start.Image.SetLabel("loopEnd");
 
-        image.LoadLocal("i");
-        image.PushConst(new WistConst(1));
-        image.Add();
-        image.SetLocal("i");
-
-        // image.LoadLocal("i");
-        // image.Call(typeof(WistProgram).GetMethod(nameof(PrintWistConst))!);
-        // image.Drop();
-
-        image.LoadLocal("i");
-        image.PushConst(new WistConst(100_000_000));
-        image.NegCmp();
-
-        image.GotoIfTrue("label");
+        
+        
+        cube.Image.LoadArg("n");
+        cube.Image.LoadArg("n");
+        cube.Image.LoadArg("n");
+        cube.Image.Mul();
+        cube.Image.Mul();
+        cube.Image.Ret();
 
         var executionTimes = new List<long>();
         var compiler = new WistCompiler(wistModule);
-        for (var i = 0; i < 10; i++)
+        for (var i = 0; i < 1; i++)
         {
             compiler.Run(out var compilationTime, out var executionTime);
             executionTimes.Add(executionTime);
             Console.WriteLine($"exe time: {executionTime}; comp time: {compilationTime}");
         }
 
-        Console.WriteLine(executionTimes.Average());
+        Console.WriteLine($"average exe time: {executionTimes.Average()}");
     }
 
     public static WistConst PrintWistConst(WistConst c)
