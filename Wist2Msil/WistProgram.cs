@@ -8,48 +8,37 @@ public static class WistProgram
     {
         var wistModule = new WistModule();
         var start = wistModule.MakeFunction("Start");
-        var cube = wistModule.MakeFunction("Cube", new[] { "n" });
 
-        start.Image.PushConst(new WistConst(0));
-        start.Image.SetLocal("i");
-        start.Image.SetLabel("loopStart");
+        start.Image.PushConst(new WistConst("qwerty"));
+        start.Image.PushConst(new WistConst("uiop"));
+        start.Image.Add();
+        start.Image.PushConst(new WistConst("qqq"));
+        start.Image.Add();
 
-        start.Image.LoadLocal("i");
-        start.Image.PushConst(new WistConst(50_000_000));
-        start.Image.LessThan();
-        start.Image.GotoIfFalse("loopEnd");
-
-        start.Image.LoadLocal("i");
-        start.Image.Call(cube);
-        // start.Image.Call(typeof(WistProgram).GetMethod(nameof(PrintWistConst))!);
+        start.Image.Dup();
+        start.Image.Call(typeof(WistProgram).GetMethod(nameof(PrintWistConst))!);
         start.Image.Drop();
 
-        start.Image.LoadLocal("i");
-        start.Image.PushConst(new WistConst(1));
-        start.Image.Add();
-        start.Image.SetLocal("i");
-        start.Image.Goto("loopStart");
-
-        start.Image.SetLabel("loopEnd");
-
-
-        cube.Image.LoadArg("n");
-        cube.Image.LoadArg("n");
-        cube.Image.LoadArg("n");
-        cube.Image.Mul();
-        cube.Image.Mul();
-        cube.Image.Ret();
+        start.Image.Call(typeof(WistProgram).GetMethod(nameof(InputString))!);
+        start.Image.Sub();
+        start.Image.Call(typeof(WistProgram).GetMethod(nameof(PrintWistConst))!);
+        start.Image.Drop();
 
         var executionTimes = new List<long>();
         var compiler = new WistCompiler(wistModule);
-        for (var i = 0; i < 10; i++)
+        const int repeatCount = 1;
+        for (var i = 0; i < repeatCount; i++)
         {
             compiler.Run(out var compilationTime, out var executionTime);
             executionTimes.Add(executionTime);
             Console.WriteLine($"exe time: {executionTime}; comp time: {compilationTime}");
         }
 
-        Console.WriteLine($"average exe time: {executionTimes.Average()}");
+        // ReSharper disable once HeuristicUnreachableCode
+#pragma warning disable CS0162
+        if (repeatCount > 1)
+            Console.WriteLine($"average exe time: {executionTimes.Average()}");
+#pragma warning restore CS0162
     }
 
     public static WistConst PrintWistConst(WistConst c)
@@ -57,4 +46,6 @@ public static class WistProgram
         Console.WriteLine(c);
         return default;
     }
+
+    public static WistConst InputString() => new(Console.ReadLine() ?? "\n");
 }

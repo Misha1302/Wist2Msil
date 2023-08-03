@@ -7,16 +7,16 @@ using WistConst;
 
 public sealed class WistCompiler
 {
-    private static readonly Dictionary<string, MethodInfo> _methods = new();
+    private static readonly IReadOnlyDictionary<string, MethodInfo> _methods;
     private static readonly FieldInfo _constsField;
     private static readonly FieldInfo _executionHelpersField;
-    private readonly List<WistExecutionHelper> _executionHelpers = new();
     private readonly WistModule _module;
+    private List<WistExecutionHelper> _executionHelpers = null!;
 
     static WistCompiler()
     {
-        foreach (var m in typeof(WistExecutionHelper).GetMethods(BindingFlags.Public | BindingFlags.Static))
-            _methods.Add(m.Name, m);
+        _methods = typeof(WistExecutionHelper).GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .ToDictionary(m => m.Name);
 
         _constsField = typeof(WistExecutionHelper).GetField(nameof(WistExecutionHelper.Consts),
                            BindingFlags.Public | BindingFlags.Instance) ??
@@ -34,6 +34,8 @@ public sealed class WistCompiler
 
     private void Compile()
     {
+        _executionHelpers = new List<WistExecutionHelper>();
+
         foreach (var wistFunction in _module.WistFunctions)
             DeclareFunction(wistFunction);
 
@@ -70,9 +72,7 @@ public sealed class WistCompiler
         var consts1 = wistFunc.Image.Instructions.Select(x => x.Constant).ToArray();
         var consts2 = wistFunc.Image.Instructions.Select(x => x.Constant2).ToArray();
 
-        var m = _executionHelpers.Find(x => x.DynamicMethod.Name == wistFunc.Name)!.DynamicMethod;
-
-        using var il = new GroboIL(m);
+        using var il = new GroboIL(_executionHelpers.Find(x => x.DynamicMethod.Name == wistFunc.Name)!.DynamicMethod);
 
         var locals = wistFunc.Image.Locals
             .Select(local => il.DeclareLocal(typeof(WistConst), local, appendUniquePrefix: false))

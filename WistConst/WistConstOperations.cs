@@ -55,7 +55,10 @@ public static class WistConstOperations
             : new WistConst(a.GetString() + b.GetString());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Sub(in WistConst a, in WistConst b) => new(a.GetNumber() - b.GetNumber());
+    public static WistConst Sub(in WistConst a, in WistConst b) =>
+        a.Type == WistType.Number
+            ? new WistConst(a.GetNumber() - b.GetNumber())
+            : new WistConst(Replace(a.GetString(), b.GetString(), string.Empty));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst Mul(in WistConst a, in WistConst b) => new(a.GetNumber() * b.GetNumber());
@@ -87,4 +90,15 @@ public static class WistConstOperations
 
     private static string NumberToString(double number) =>
         number.ToString(Math.Abs(number) < 1e10 ? "0.########" : "e", CultureInfo.InvariantCulture);
+
+    private static string Replace(string src, string tar, string value)
+    {
+        var srcInternal = src;
+        
+        var index = 0;
+        while ((index = srcInternal.IndexOf(tar, index, StringComparison.Ordinal)) != -1)
+            srcInternal = srcInternal.Remove(index, tar.Length).Insert(index, value);
+
+        return srcInternal;
+    }
 }

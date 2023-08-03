@@ -3,6 +3,7 @@
 public sealed class WistModule
 {
     private readonly List<WistFunction> _wistFunctions = new();
+    // ReSharper disable once ReturnTypeCanBeEnumerable.Global
     public IReadOnlyList<WistFunction> WistFunctions => _wistFunctions;
 
     public WistFunction MakeFunction(string name, string[]? strings = null)
