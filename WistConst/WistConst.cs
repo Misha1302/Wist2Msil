@@ -19,6 +19,11 @@ public readonly struct WistConst
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(string v)
     {
+        Unsafe.SkipInit(out _valueN);
+        Unsafe.SkipInit(out _valueL);
+        Unsafe.SkipInit(out _valueI);
+        Unsafe.SkipInit(out _valueB);
+        Unsafe.SkipInit(out _valueR);
         _handle = new WistGcHandleProvider(v);
         Type = WistType.String;
     }
@@ -26,6 +31,10 @@ public readonly struct WistConst
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(double v)
     {
+        Unsafe.SkipInit(out _valueN);
+        Unsafe.SkipInit(out _valueL);
+        Unsafe.SkipInit(out _valueI);
+        Unsafe.SkipInit(out _valueB);
         _valueR = v;
         Type = WistType.Number;
     }
@@ -53,6 +62,10 @@ public readonly struct WistConst
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(bool b)
     {
+        Unsafe.SkipInit(out _valueN);
+        Unsafe.SkipInit(out _valueL);
+        Unsafe.SkipInit(out _valueI);
+        Unsafe.SkipInit(out _valueR);
         _valueB = b;
         Type = WistType.Bool;
     }
@@ -60,6 +73,11 @@ public readonly struct WistConst
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(List<WistConst> wistConsts)
     {
+        Unsafe.SkipInit(out _valueN);
+        Unsafe.SkipInit(out _valueL);
+        Unsafe.SkipInit(out _valueI);
+        Unsafe.SkipInit(out _valueB);
+        Unsafe.SkipInit(out _valueR);
         _handle = new WistGcHandleProvider(wistConsts);
         Type = WistType.List;
     }
@@ -78,15 +96,15 @@ public readonly struct WistConst
     public string GetString() => (string)((GCHandle)_handle!.Pointer).Target!;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object? obj) => obj is WistConst c && c.GetHashCode() == GetHashCode();
+    public override bool Equals(object? obj) => obj is WistConst c && c.EqualsConsts(this);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool EqualsConsts(in WistConst obj) => obj.Type != WistType.String
+    private bool EqualsConsts(in WistConst obj) => obj.Type != WistType.String
         ? (obj._valueL ^ (byte)obj.Type) == (_valueL ^ (byte)Type)
         : obj.GetString() == GetString();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode() => unchecked((int)_valueL ^ (int)(_valueL >> 32));
+    public override int GetHashCode() => "hello".GetHashCode();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(in WistConst left, in WistConst right) => left.EqualsConsts(right);

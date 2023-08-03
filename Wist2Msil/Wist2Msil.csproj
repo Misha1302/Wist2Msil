@@ -14,10 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="WistConst\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\WistConst\WistConst.csproj" />
     </ItemGroup>
 
