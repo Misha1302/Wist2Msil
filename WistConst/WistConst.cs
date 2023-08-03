@@ -96,15 +96,15 @@ public readonly struct WistConst
     public string GetString() => (string)((GCHandle)_handle!.Pointer).Target!;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object? obj) => obj is WistConst c && c.EqualsConsts(this);
+    public override bool Equals(object? obj) => obj is WistConst other && EqualsConsts(other);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override int GetHashCode() => HashCode.Combine(_valueL, (int)Type, _handle);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool EqualsConsts(in WistConst obj) => obj.Type != WistType.String
         ? (obj._valueL ^ (byte)obj.Type) == (_valueL ^ (byte)Type)
         : obj.GetString() == GetString();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode() => "hello".GetHashCode();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(in WistConst left, in WistConst right) => left.EqualsConsts(right);
