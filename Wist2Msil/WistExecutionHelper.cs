@@ -11,7 +11,8 @@ public sealed unsafe class WistExecutionHelper
     public WistExecutionHelper[] WistExecutionHelpers;
     public WistConst[] Consts;
 
-    public WistExecutionHelper(IEnumerable<WistConst> consts, DynamicMethod dynamicMethod, WistExecutionHelper[] wistExecutionHelpers)
+    public WistExecutionHelper(IEnumerable<WistConst> consts, DynamicMethod dynamicMethod,
+        WistExecutionHelper[] wistExecutionHelpers)
     {
         Consts = consts.ToArray();
         DynamicMethod = dynamicMethod;
@@ -85,6 +86,14 @@ public sealed unsafe class WistExecutionHelper
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst PushDefaultConst() => default;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void SetField(WistConst wistStruct, WistConst constValue, int key) =>
+        wistStruct.GetStruct().SetField(key, constValue);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst GetField(WistConst wistStruct, int key) =>
+        wistStruct.GetStruct().GetField(key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CSharpCall0(WistConst ptr)

@@ -42,6 +42,9 @@ public struct WistInstruction
         SetLocal,
         WistCall,
         LoadArg,
-        Ret
+        Ret,
+        Instantiate,
+        SetField,
+        PushField
     }
 }

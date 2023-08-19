@@ -8,21 +8,33 @@ public static class WistProgram
     {
         var wistModule = new WistModule();
         var start = wistModule.MakeFunction("Start");
+        var mStruct = wistModule.MakeStruct("mStruct", new[] { "a", "b", "c" }, new string[] { });
 
-        start.Image.PushConst(new WistConst("qwerty"));
-        start.Image.PushConst(new WistConst("uiop"));
-        start.Image.Add();
-        start.Image.PushConst(new WistConst("qqq"));
-        start.Image.Add();
+        start.Image.Instantiate(mStruct);
+        start.Image.SetLocal("struct");
 
-        start.Image.Dup();
+        start.Image.LoadLocal("struct");
+        start.Image.PushConst(new WistConst(5));
+        start.Image.SetField("a");
+
+        start.Image.LoadLocal("struct");
+        start.Image.PushConst(new WistConst(-5));
+        start.Image.SetField("b");
+
+        start.Image.LoadLocal("struct");
+        start.Image.PushConst(new WistConst("hi"));
+        start.Image.SetField("c");
+
+        start.Image.LoadLocal("struct");
+        start.Image.PushField("b");
+        start.Image.LoadLocal("struct");
+        start.Image.PushField("a");
+        start.Image.Mul();
         start.Image.Call(typeof(WistProgram).GetMethod(nameof(PrintWistConst))!);
         start.Image.Drop();
 
-        start.Image.Call(typeof(WistProgram).GetMethod(nameof(InputString))!);
-        start.Image.Sub();
-        start.Image.Call(typeof(WistProgram).GetMethod(nameof(PrintWistConst))!);
-        start.Image.Drop();
+        // start.Image.Call(typeof(WistProgram).GetMethod(nameof(PrintWistConst))!);
+        // start.Image.Call(typeof(WistProgram).GetMethod(nameof(InputString))!);
 
         var executionTimes = new List<long>();
         var compiler = new WistCompiler(wistModule);

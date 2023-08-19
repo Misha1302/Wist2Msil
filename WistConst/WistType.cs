@@ -8,5 +8,7 @@ public enum WistType : byte
     Bool,
     List,
     InternalInteger,
-    Pointer
+    Pointer,
+    Struct,
+    StructInternal
 }

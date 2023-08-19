@@ -2,9 +2,10 @@ namespace WistConst;
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Wist2Msil;
 
 [StructLayout(LayoutKind.Explicit)]
-public readonly struct WistConst
+public readonly struct WistConst : IEquatable<WistConst>
 {
     [FieldOffset(0)] private readonly nint _valueN;
     [FieldOffset(0)] private readonly double _valueR;
@@ -82,6 +83,28 @@ public readonly struct WistConst
         Type = WistType.List;
     }
 
+    public WistConst(WistStruct s)
+    {
+        Unsafe.SkipInit(out _valueN);
+        Unsafe.SkipInit(out _valueL);
+        Unsafe.SkipInit(out _valueI);
+        Unsafe.SkipInit(out _valueB);
+        Unsafe.SkipInit(out _valueR);
+        _handle = new WistGcHandleProvider(s);
+        Type = WistType.Struct;
+    }
+
+    public WistConst(WistCompilationStruct mCompilationStruct)
+    {
+        Unsafe.SkipInit(out _valueN);
+        Unsafe.SkipInit(out _valueL);
+        Unsafe.SkipInit(out _valueI);
+        Unsafe.SkipInit(out _valueB);
+        Unsafe.SkipInit(out _valueR);
+        _handle = new WistGcHandleProvider(mCompilationStruct);
+        Type = WistType.StructInternal;
+    }
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double GetNumber() => _valueR;
@@ -94,6 +117,9 @@ public readonly struct WistConst
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string GetString() => (string)((GCHandle)_handle!.Pointer).Target!;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Equals(WistConst obj) => EqualsConsts(obj);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object? obj) => obj is WistConst other && EqualsConsts(other);
@@ -115,7 +141,15 @@ public readonly struct WistConst
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public nint GetPointer() => _valueN;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString() => WistConstOperations.ToStr(this);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public List<WistConst> GetList() => (List<WistConst>)((GCHandle)_handle!.Pointer).Target!;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public WistStruct GetStruct() => (WistStruct)((GCHandle)_handle!.Pointer).Target!;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public WistCompilationStruct GetStructInternal() => (WistCompilationStruct)((GCHandle)_handle!.Pointer).Target!;
 }

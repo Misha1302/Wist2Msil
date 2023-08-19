@@ -72,7 +72,8 @@ public sealed class WistCompiler
         var consts1 = wistFunc.Image.Instructions.Select(x => x.Constant).ToArray();
         var consts2 = wistFunc.Image.Instructions.Select(x => x.Constant2).ToArray();
 
-        using var il = new GroboIL(_executionHelpers.Find(x => x.DynamicMethod.Name == wistFunc.Name)!.DynamicMethod);
+        var curExeHelper = _executionHelpers.Find(x => x.DynamicMethod.Name == wistFunc.Name)!;
+        using var il = new GroboIL(curExeHelper.DynamicMethod);
 
         var locals = wistFunc.Image.Locals
             .Select(local => il.DeclareLocal(typeof(WistConst), local, appendUniquePrefix: false))
@@ -85,10 +86,7 @@ public sealed class WistCompiler
             switch (inst.Op)
             {
                 case WistInstruction.Operation.PushConst:
-                    il.Ldarg(0);
-                    il.Ldfld(_constsField);
-                    il.Ldc_I4(i);
-                    il.Ldelem(typeof(WistConst));
+                    Push(il, i);
                     break;
                 case WistInstruction.Operation.Add:
                     il.Call(_methods["Add"]);
@@ -192,6 +190,31 @@ public sealed class WistCompiler
                 case WistInstruction.Operation.Ret:
                     il.Ret();
                     break;
+                case WistInstruction.Operation.Instantiate:
+                    var src = consts1[i].GetStructInternal();
+                    var s = new WistStruct(src.Name);
+                    foreach (var field in src.Fields)
+                        s.SetField(WistHashCode.WistHashCode.Instance.GetHashCode(field), default);
+                    foreach (var method in src.Methods)
+                        s.SetMethod(
+                            WistHashCode.WistHashCode.Instance.GetHashCode(method),
+                            _executionHelpers.Find(x => x.DynamicMethod.Name == method)!.DynamicMethod
+                        );
+                    curExeHelper.Consts[i] = new WistConst(s);
+
+                    Push(il, i);
+                    break;
+                case WistInstruction.Operation.SetField:
+                    // wistConst (struct)
+                    // constValue
+                    // --- setField "name"
+                    il.Ldc_I4(consts1[i].GetString().GetHashCode());
+                    il.Call(_methods["SetField"]);
+                    break;
+                case WistInstruction.Operation.PushField:
+                    il.Ldc_I4(consts1[i].GetString().GetHashCode());
+                    il.Call(_methods["GetField"]);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -208,6 +231,14 @@ public sealed class WistCompiler
                 labels.Add(name, label = il.DefineLabel(name));
             return label;
         }
+    }
+
+    private static void Push(GroboIL il, int i)
+    {
+        il.Ldarg(0);
+        il.Ldfld(_constsField);
+        il.Ldc_I4(i);
+        il.Ldelem(typeof(WistConst));
     }
 
     public WistConst Run(out long compilationTime, out long executionTime)

@@ -131,4 +131,34 @@ public sealed class WistImage
             )
         );
     }
+
+    public void Instantiate(WistCompilationStruct mCompilationStruct)
+    {
+        _instructions.Add(
+            new wInst(
+                WistInstruction.Operation.Instantiate,
+                new WistConst(mCompilationStruct)
+            )
+        );
+    }
+
+    public void SetField(string fieldName)
+    {
+        _instructions.Add(
+            new wInst(
+                WistInstruction.Operation.SetField,
+                new WistConst(fieldName)
+            )
+        );
+    }
+
+    public void PushField(string fieldName)
+    {
+        _instructions.Add(
+            new wInst(
+                WistInstruction.Operation.PushField,
+                new WistConst(fieldName)
+            )
+        );
+    }
 }
