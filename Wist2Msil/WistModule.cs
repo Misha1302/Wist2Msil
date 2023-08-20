@@ -5,10 +5,11 @@ public sealed class WistModule
     private readonly List<WistFunction> _wistFunctions = new();
     private readonly List<WistCompilationStruct> _wistStructs = new();
 
+    public readonly WistHashCode.WistHashCode WistHashCode = new();
+
     // ReSharper disable once ReturnTypeCanBeEnumerable.Global
     public IReadOnlyList<WistFunction> WistFunctions => _wistFunctions;
 
-    // ReSharper disable once ReturnTypeCanBeEnumerable.Global
     public IReadOnlyList<WistCompilationStruct> WistStructs => _wistStructs;
 
     public WistFunction MakeFunction(string name, string[]? strings = null)

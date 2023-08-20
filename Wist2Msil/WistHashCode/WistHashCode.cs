@@ -6,10 +6,7 @@ using System.Text;
 
 public sealed class WistHashCode
 {
-    private static WistHashCode? _instance;
     private readonly Dictionary<string, int> _hashes = new();
-
-    public static WistHashCode Instance => _instance ??= new WistHashCode();
 
     public string GetSourceString(int hash)
     {

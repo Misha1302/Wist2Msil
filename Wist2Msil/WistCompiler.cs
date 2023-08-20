@@ -3,6 +3,7 @@ namespace Wist2Msil;
 using System.Reflection;
 using System.Reflection.Emit;
 using GrEmit;
+using Wist2Msil.WistHashCode;
 using WistConst;
 
 public sealed class WistCompiler
@@ -194,10 +195,10 @@ public sealed class WistCompiler
                     var src = consts1[i].GetStructInternal();
                     var s = new WistStruct(src.Name);
                     foreach (var field in src.Fields)
-                        s.SetField(WistHashCode.WistHashCode.Instance.GetHashCode(field), default);
+                        s.SetField(_module.WistHashCode.GetHashCode(field), default);
                     foreach (var method in src.Methods)
                         s.SetMethod(
-                            WistHashCode.WistHashCode.Instance.GetHashCode(method),
+                            _module.WistHashCode.GetHashCode(method),
                             _executionHelpers.Find(x => x.DynamicMethod.Name == method)!.DynamicMethod
                         );
                     curExeHelper.Consts[i] = new WistConst(s);
@@ -205,18 +206,15 @@ public sealed class WistCompiler
                     Push(il, i);
                     break;
                 case WistInstruction.Operation.SetField:
-                    // wistConst (struct)
-                    // constValue
-                    // --- setField "name"
-                    il.Ldc_I4(consts1[i].GetString().GetHashCode());
+                    il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
                     il.Call(_methods["SetField"]);
                     break;
                 case WistInstruction.Operation.PushField:
-                    il.Ldc_I4(consts1[i].GetString().GetHashCode());
+                    il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
                     il.Call(_methods["GetField"]);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(inst.Op.ToString());
             }
         }
 

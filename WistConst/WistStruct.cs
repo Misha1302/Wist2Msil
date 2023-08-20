@@ -2,7 +2,7 @@
 
 using System.Reflection.Emit;
 
-public class WistStruct
+public sealed class WistStruct
 {
     private readonly SortedList<int, WistConst> _sortedFields = new();
     private readonly SortedList<int, DynamicMethod> _sortedMethods = new();
