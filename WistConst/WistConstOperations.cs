@@ -94,7 +94,7 @@ public static class WistConstOperations
     private static string Replace(string src, string tar, string value)
     {
         var srcInternal = src;
-        
+
         var index = 0;
         while ((index = srcInternal.IndexOf(tar, index, StringComparison.Ordinal)) != -1)
             srcInternal = srcInternal.Remove(index, tar.Length).Insert(index, value);

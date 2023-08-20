@@ -1,12 +1,14 @@
 namespace Wist2Msil;
 
+using WistConst;
+
 public struct WistInstruction
 {
     public readonly Operation Op;
-    public WistConst.WistConst Constant;
-    public WistConst.WistConst Constant2;
+    public WistConst Constant;
+    public WistConst Constant2;
 
-    public WistInstruction(Operation op, WistConst.WistConst constant = default, WistConst.WistConst constant2 = default)
+    public WistInstruction(Operation op, WistConst constant = default, WistConst constant2 = default)
     {
         Op = op;
         Constant = constant;

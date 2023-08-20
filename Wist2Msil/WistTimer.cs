@@ -11,7 +11,7 @@ public static class WistTimer
         sw.Stop();
         return sw.ElapsedMilliseconds;
     }
-    
+
     public static long MeasureExecutionTime(this Action action)
     {
         var sw = Stopwatch.StartNew();
