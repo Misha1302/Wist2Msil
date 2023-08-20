@@ -15,7 +15,7 @@ public static class WistProgram
 
         start.Image.LoadLocal("struct");
         start.Image.PushConst(new WistConst(5));
-        start.Image.SetField("aqgrwge");
+        start.Image.SetField("a");
 
         start.Image.LoadLocal("struct");
         start.Image.PushConst(new WistConst(-5));

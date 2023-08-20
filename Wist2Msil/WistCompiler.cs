@@ -195,9 +195,9 @@ public sealed class WistCompiler
                     var src = consts1[i].GetStructInternal();
                     var s = new WistStruct(src.Name);
                     foreach (var field in src.Fields)
-                        s.SetField(_module.WistHashCode.GetHashCode(field), default);
+                        s.AddField(_module.WistHashCode.GetHashCode(field), default);
                     foreach (var method in src.Methods)
-                        s.SetMethod(
+                        s.AddMethod(
                             _module.WistHashCode.GetHashCode(method),
                             _executionHelpers.Find(x => x.DynamicMethod.Name == method)!.DynamicMethod
                         );
