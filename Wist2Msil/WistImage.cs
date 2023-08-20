@@ -161,4 +161,15 @@ public sealed class WistImage
             )
         );
     }
+
+    public void Call(string mName, int argsLen)
+    {
+        _instructions.Add(
+            new wInst(
+                WistInstruction.Operation.CallStructMethod,
+                new WistConst(mName),
+                WistConst.CreateInternalConst(argsLen)
+            )
+        );
+    }
 }

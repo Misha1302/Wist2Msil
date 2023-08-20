@@ -45,6 +45,7 @@ public struct WistInstruction
         Ret,
         Instantiate,
         SetField,
-        PushField
+        PushField,
+        CallStructMethod
     }
 }

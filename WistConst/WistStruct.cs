@@ -22,6 +22,5 @@ public sealed class WistStruct
 
 
     public DynamicMethod GetMethod(int key) => _sortedMethods.GetByIndex(_sortedMethods.IndexOfKey(key));
-    public void SetMethod(int key, DynamicMethod m) => _sortedMethods.SetByIndex(_sortedMethods.IndexOfKey(key), m);
     public void AddMethod(int key, DynamicMethod m) => _sortedMethods.Add(key, m);
 }

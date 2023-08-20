@@ -8,22 +8,16 @@ public static class WistProgram
     {
         var wistModule = new WistModule();
         var start = wistModule.MakeFunction("Start");
-        var mStruct = wistModule.MakeStruct("mStruct", new[] { "a", "b", "c" }, new string[] { });
+        var init = wistModule.MakeFunction("init", new[] { "exeHelper", "struct" });
+        var mStruct = wistModule.MakeStruct("mStruct", new[] { "a", "b", "c" }, new[] { "init" });
 
         start.Image.Instantiate(mStruct);
         start.Image.SetLocal("struct");
 
-        start.Image.LoadLocal("struct");
-        start.Image.PushConst(new WistConst(5));
-        start.Image.SetField("a");
-
-        start.Image.LoadLocal("struct");
-        start.Image.PushConst(new WistConst(-5));
-        start.Image.SetField("b");
-
-        start.Image.LoadLocal("struct");
-        start.Image.PushConst(new WistConst("hi"));
-        start.Image.SetField("c");
+        start.Image.LoadLocal("struct"); // method owner
+        start.Image.LoadLocal("struct"); // method arg
+        start.Image.Call("init", 1);
+        start.Image.Drop();
 
         start.Image.LoadLocal("struct");
         start.Image.PushField("b");
@@ -35,6 +29,15 @@ public static class WistProgram
 
         // start.Image.Call(typeof(WistProgram).GetMethod(nameof(PrintWistConst))!);
         // start.Image.Call(typeof(WistProgram).GetMethod(nameof(InputString))!);
+
+        init.Image.LoadArg("struct");
+        init.Image.PushConst(new WistConst(5));
+        init.Image.SetField("a");
+
+        init.Image.LoadArg("struct");
+        init.Image.PushConst(new WistConst(-6));
+        init.Image.SetField("b");
+
 
         var executionTimes = new List<long>();
         var compiler = new WistCompiler(wistModule);

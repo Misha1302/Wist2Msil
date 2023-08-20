@@ -49,8 +49,8 @@ public sealed class WistCompiler
 
     private void DeclareFunction(WistFunction wistFunc)
     {
-        var parameterTypes = wistFunc.Parameters.Select(_ => typeof(WistConst))
-            .Append(typeof(WistExecutionHelper)).ToArray();
+        var parameterTypes =
+            new[] { typeof(WistExecutionHelper) }.Union(wistFunc.Parameters.Select(_ => typeof(WistConst))).ToArray();
 
         var executionHelper = new WistExecutionHelper(wistFunc.Image.Instructions.Select(x => x.Constant),
             new DynamicMethod(
@@ -84,6 +84,7 @@ public sealed class WistCompiler
         {
             var inst = wistFunc.Image.Instructions[i];
             GroboIL.Label? label;
+            int ind;
             switch (inst.Op)
             {
                 case WistInstruction.Operation.PushConst:
@@ -133,7 +134,7 @@ public sealed class WistCompiler
                     il.Call(_methods[$"CSharpCall{consts2[i].GetInternalInteger()}"]);
                     break;
                 case WistInstruction.Operation.WistCall:
-                    var ind = _executionHelpers.FindIndex(
+                    ind = _executionHelpers.FindIndex(
                         x => x.DynamicMethod.Name == consts2[i].GetString()
                     );
 
@@ -212,6 +213,19 @@ public sealed class WistCompiler
                 case WistInstruction.Operation.PushField:
                     il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
                     il.Call(_methods["GetField"]);
+                    break;
+                case WistInstruction.Operation.CallStructMethod:
+                    ind = _executionHelpers.FindIndex(
+                        x => x.DynamicMethod.Name == consts1[i].GetString()
+                    );
+
+                    il.Ldarg(0);
+                    il.Ldfld(_executionHelpersField);
+                    il.Ldc_I4(ind);
+                    il.Ldelem(typeof(WistExecutionHelper));
+
+                    il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
+                    il.Call(_methods[$"CallStructMethod{consts2[i].GetInternalInteger()}"]);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(inst.Op.ToString());
