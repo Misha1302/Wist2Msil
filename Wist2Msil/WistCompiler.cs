@@ -183,7 +183,7 @@ public sealed class WistCompiler
                     break;
                 case WistInstruction.Operation.LoadLocal:
                     var argLocalName = consts1[i].GetString();
-                    
+
                     if (locals.Any(x => x.Key == argLocalName))
                         il.Ldloc(locals[argLocalName]);
                     else
