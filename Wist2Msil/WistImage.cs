@@ -30,8 +30,11 @@ public sealed class WistImage
     public void LessThanOrEquals() => _instructions.Add(new wInst(WistInstruction.Operation.LessThanOrEquals));
 
 
-    public void Call(MethodInfo m)
+    public void Call(MethodInfo? m)
     {
+        if (m is null)
+            throw new InvalidOperationException();
+
         RuntimeHelpers.PrepareMethod(m.MethodHandle);
         _instructions.Add(
             new wInst(

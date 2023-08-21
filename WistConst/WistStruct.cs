@@ -1,7 +1,6 @@
 ﻿namespace WistConst;
 
 using System.Reflection.Emit;
-using Wist2Msil;
 
 public sealed class WistStruct
 {

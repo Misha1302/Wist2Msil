@@ -3,6 +3,7 @@ namespace WistConst;
 public enum WistType : byte
 {
     None,
+    Null,
     Number,
     String,
     Bool,

@@ -2,7 +2,6 @@ namespace WistConst;
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Wist2Msil;
 
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct WistConst : IEquatable<WistConst>
@@ -105,6 +104,17 @@ public readonly struct WistConst : IEquatable<WistConst>
         Type = WistType.StructInternal;
     }
 
+    private WistConst(WistType type)
+    {
+        Unsafe.SkipInit(out _valueN);
+        Unsafe.SkipInit(out _valueL);
+        Unsafe.SkipInit(out _valueI);
+        Unsafe.SkipInit(out _valueB);
+        Unsafe.SkipInit(out _valueR);
+        Unsafe.SkipInit(out _handle);
+        Type = type;
+    }
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double GetNumber() => _valueR;
@@ -152,4 +162,7 @@ public readonly struct WistConst : IEquatable<WistConst>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistCompilationStruct GetStructInternal() => (WistCompilationStruct)((GCHandle)_handle!.Pointer).Target!;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst CreateNull() => new(WistType.Null);
 }

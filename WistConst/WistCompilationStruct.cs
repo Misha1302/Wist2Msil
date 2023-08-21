@@ -1,4 +1,4 @@
-﻿namespace Wist2Msil;
+﻿namespace WistConst;
 
 public sealed class WistCompilationStruct
 {

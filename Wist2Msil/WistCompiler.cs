@@ -49,8 +49,8 @@ public sealed class WistCompiler
 
     private void DeclareFunction(WistFunction wistFunc)
     {
-        var parameterTypes =
-            new[] { typeof(WistExecutionHelper) }.Union(wistFunc.Parameters.Select(_ => typeof(WistConst))).ToArray();
+        var parameterTypes = wistFunc.Parameters.Select(_ => typeof(WistConst)).Append(typeof(WistExecutionHelper))
+            .ToArray();
 
         var executionHelper = new WistExecutionHelper(wistFunc.Image.Instructions.Select(x => x.Constant),
             new DynamicMethod(
@@ -68,6 +68,7 @@ public sealed class WistCompiler
 
     private void CompileFunction(WistFunction wistFunc)
     {
+        var exeHelperArgIndex = wistFunc.Parameters.Length;
         var labels = new Dictionary<string, GroboIL.Label>();
 
         var consts1 = wistFunc.Image.Instructions.Select(x => x.Constant).ToArray();
@@ -88,7 +89,7 @@ public sealed class WistCompiler
             switch (inst.Op)
             {
                 case WistInstruction.Operation.PushConst:
-                    Push(il, i);
+                    Push(il, i, exeHelperArgIndex);
                     break;
                 case WistInstruction.Operation.Add:
                     il.Call(_methods["Add"]);
@@ -127,7 +128,7 @@ public sealed class WistCompiler
                     il.Call(_methods["GreaterThanOrEquals"]);
                     break;
                 case WistInstruction.Operation.CSharpCall:
-                    il.Ldarg(0);
+                    il.Ldarg(exeHelperArgIndex);
                     il.Ldfld(_constsField);
                     il.Ldc_I4(i);
                     il.Ldelem(typeof(WistConst));
@@ -138,7 +139,7 @@ public sealed class WistCompiler
                         x => x.DynamicMethod.Name == consts2[i].GetString()
                     );
 
-                    il.Ldarg(0);
+                    il.Ldarg(exeHelperArgIndex);
                     il.Ldfld(_executionHelpersField);
                     il.Ldc_I4(ind);
                     il.Ldelem(typeof(WistExecutionHelper));
@@ -181,13 +182,16 @@ public sealed class WistCompiler
                     il.Call(_methods["NegCmp"]);
                     break;
                 case WistInstruction.Operation.LoadLocal:
-                    il.Ldloc(locals[consts1[i].GetString()]);
+                    var argLocalName = consts1[i].GetString();
+                    
+                    if (locals.Any(x => x.Key == argLocalName))
+                        il.Ldloc(locals[argLocalName]);
+                    else
+                        il.Ldarg(Array.IndexOf(wistFunc.Parameters, consts1[i].GetString()));
+
                     break;
                 case WistInstruction.Operation.SetLocal:
                     il.Stloc(locals[consts1[i].GetString()]);
-                    break;
-                case WistInstruction.Operation.LoadArg:
-                    il.Ldarg(Array.IndexOf(wistFunc.Parameters, consts1[i].GetString()));
                     break;
                 case WistInstruction.Operation.Ret:
                     il.Ret();
@@ -204,7 +208,7 @@ public sealed class WistCompiler
                         );
                     curExeHelper.Consts[i] = new WistConst(s);
 
-                    Push(il, i);
+                    Push(il, i, exeHelperArgIndex);
                     break;
                 case WistInstruction.Operation.SetField:
                     il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
@@ -219,7 +223,7 @@ public sealed class WistCompiler
                         x => x.DynamicMethod.Name == consts1[i].GetString()
                     );
 
-                    il.Ldarg(0);
+                    il.Ldarg(exeHelperArgIndex);
                     il.Ldfld(_executionHelpersField);
                     il.Ldc_I4(ind);
                     il.Ldelem(typeof(WistExecutionHelper));
@@ -245,9 +249,9 @@ public sealed class WistCompiler
         }
     }
 
-    private static void Push(GroboIL il, int i)
+    private static void Push(GroboIL il, int i, int exeHelperArgIndex)
     {
-        il.Ldarg(0);
+        il.Ldarg(exeHelperArgIndex);
         il.Ldfld(_constsField);
         il.Ldc_I4(i);
         il.Ldelem(typeof(WistConst));

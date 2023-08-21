@@ -1,5 +1,7 @@
 ﻿namespace Wist2Msil;
 
+using WistConst;
+
 public sealed class WistModule
 {
     private readonly List<WistFunction> _wistFunctions = new();
@@ -17,6 +19,11 @@ public sealed class WistModule
         var f = new WistFunction(name, new WistImage(), strings ?? Array.Empty<string>());
         _wistFunctions.Add(f);
         return f;
+    }
+
+    public void AddFunction(WistFunction wistFunction)
+    {
+        _wistFunctions.Add(wistFunction);
     }
 
     public WistCompilationStruct MakeStruct(string name, string[] strings, string[] methods)

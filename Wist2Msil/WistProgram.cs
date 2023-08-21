@@ -24,7 +24,7 @@ public static class WistProgram
         start.Image.LoadLocal("struct");
         start.Image.PushField("a");
         start.Image.Mul();
-        start.Image.Call(typeof(WistProgram).GetMethod(nameof(PrintWistConst))!);
+        start.Image.Call(typeof(BuildInFunctions).GetMethod(nameof(BuildInFunctions.Print))!);
         start.Image.Drop();
 
         // start.Image.Call(typeof(WistProgram).GetMethod(nameof(PrintWistConst))!);
@@ -55,12 +55,4 @@ public static class WistProgram
             Console.WriteLine($"average exe time: {executionTimes.Average()}");
 #pragma warning restore CS0162
     }
-
-    public static WistConst PrintWistConst(WistConst c)
-    {
-        Console.WriteLine(c);
-        return default;
-    }
-
-    public static WistConst InputString() => new(Console.ReadLine() ?? "\n");
 }
