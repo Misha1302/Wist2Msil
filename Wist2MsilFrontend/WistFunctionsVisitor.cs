@@ -7,15 +7,27 @@ using Wist2MsilFrontend.Content;
 public sealed class WistFunctionsVisitor : WistGrammarBaseVisitor<object?>
 {
     private readonly List<WistFunction> _list = new();
+    private string? _curStructName;
 
     public List<WistFunction> GetAllFunctions(IParseTree parseTree) =>
         (List<WistFunction>)Visit(parseTree);
+
+    public override object? VisitStructDecl(WistGrammarParser.StructDeclContext context)
+    {
+        _curStructName = context.IDENTIFIER(0).GetText();
+        Visit(context.block());
+        _curStructName = null;
+        return null;
+    }
 
     public override object VisitFuncDecl(WistGrammarParser.FuncDeclContext context)
     {
         var name = context.IDENTIFIER(0).GetText();
         var args = context.IDENTIFIER().Skip(1).Select(x => x.GetText()).ToArray();
 
+        if (_curStructName != null)
+            name += $"<>{_curStructName}";
+        
         _list.Add(new WistFunction(name, new WistImage(), args));
         return _list;
     }

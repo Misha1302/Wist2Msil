@@ -8,6 +8,7 @@ public sealed class WistStructsVisitor : WistGrammarBaseVisitor<object?>
 {
     private readonly List<WistCompilationStruct> _list = new();
     private List<string>? _methods;
+    private string? _curStructName;
 
     public List<WistCompilationStruct> GetAllStructs(IParseTree parseTree) =>
         (List<WistCompilationStruct>)Visit(parseTree);
@@ -18,7 +19,9 @@ public sealed class WistStructsVisitor : WistGrammarBaseVisitor<object?>
         var fields = context.IDENTIFIER().Skip(1).Select(x => x.GetText()).ToArray();
 
         _methods = new List<string>();
+        _curStructName = name;
         Visit(context.block());
+        _curStructName = null;
         _list.Add(new WistCompilationStruct(name, fields, _methods.ToArray()));
         _methods = null;
         return null;
@@ -26,7 +29,7 @@ public sealed class WistStructsVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitFuncDecl(WistGrammarParser.FuncDeclContext context)
     {
-        _methods?.Add(context.IDENTIFIER(0).GetText());
+        _methods?.Add(context.IDENTIFIER(0).GetText() + $"<>{_curStructName}");
         return null;
     }
 

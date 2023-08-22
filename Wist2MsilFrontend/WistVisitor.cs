@@ -15,6 +15,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
     private WistFunction _curFunc = null!;
     private int _saveResultLevel;
     private bool _initialized;
+    private string? _curStructName;
 
     public override object? Visit(IParseTree tree)
     {
@@ -107,6 +108,9 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
     public override object? VisitFuncDecl(WistGrammarParser.FuncDeclContext context)
     {
         var name = context.IDENTIFIER(0).GetText();
+        if (_curStructName != null)
+            name += $"<>{_curStructName}";
+        
         var wistFunction = _wistFunctions.Find(x => x.Name == name)!;
         _wistModule.AddFunction(wistFunction);
         _curFunc = wistFunction;
@@ -245,9 +249,13 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         var wistStruct = _wistStructs.Find(x => x.Name == context.IDENTIFIER(0).GetText());
         if (wistStruct is null)
             throw new InvalidOperationException();
-
+        
         _wistModule.AddStruct(wistStruct);
+        
+        _curStructName = wistStruct.Name;
         Visit(context.block());
+        _curStructName = null;
+        
         return null;
     }
 

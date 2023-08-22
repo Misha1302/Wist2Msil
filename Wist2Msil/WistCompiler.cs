@@ -205,8 +205,10 @@ public sealed class WistCompiler
                     foreach (var method in src.Methods)
                     {
                         var wistExecutionHelper = _executionHelpers.Find(x => x.DynamicMethod.Name == method);
+                        var indexOf = method.IndexOf("<>", StringComparison.Ordinal);
+                        if (indexOf == -1) indexOf = method.Length;
                         s.AddMethod(
-                            _module.WistHashCode.GetHashCode(method),
+                            _module.WistHashCode.GetHashCode(method[..indexOf]),
                             wistExecutionHelper!.DynamicMethod,
                             wistExecutionHelper
                         );
