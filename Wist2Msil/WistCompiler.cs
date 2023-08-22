@@ -229,7 +229,7 @@ public sealed class WistCompiler
                     il.Ldelem(typeof(WistExecutionHelper));
 
                     il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
-                    il.Call(_methods[$"CallStructMethod{consts2[i].GetInternalInteger()}"]);
+                    il.Call(_methods[$"CallStructMethod{consts2[i].GetInternalInteger() + 1}"]);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(inst.Op.ToString());

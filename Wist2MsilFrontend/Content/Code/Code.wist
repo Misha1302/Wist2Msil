@@ -1,14 +1,23 @@
 func Start() {
-    a = 1
+    a = new Vector3().Constructor()
+    a.WriteSelf()
     
-startLabel:
-    Write(a, a + 1, a + 2)
-    a = a + 3
-    
-    if a <= 100:
-        jmp startLabel
-    
-    ret 0
+    ret a.x * a.y * a.z
 }
 
-func Write(a, b, c): Print(ToStr(a) + " " + ToStr(b) + " " + ToStr(c))
+func Write(a, b, c): 
+    Print(ToStr(a) + " " + ToStr(b) + " " + ToStr(c))
+
+
+struct Vector3(x, y, z) {
+    func Constructor(self) {
+        self.x = -1
+        self.y = -2
+        self.z = -3
+        
+        ret self
+    }
+
+    func WriteSelf(self):
+        Print(ToStr(self.x) + " " + ToStr(self.y) + " " + ToStr(self.z))
+}

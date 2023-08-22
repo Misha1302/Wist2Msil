@@ -31,4 +31,9 @@ public sealed class WistModule
         _wistStructs.Add(new WistCompilationStruct(name, strings, methods));
         return _wistStructs[^1];
     }
+
+    public void AddStruct(WistCompilationStruct wistStruct)
+    {
+        _wistStructs.Add(wistStruct);
+    }
 }

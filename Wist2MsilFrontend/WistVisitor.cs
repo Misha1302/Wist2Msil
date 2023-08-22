@@ -10,6 +10,7 @@ using WistError;
 public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 {
     private readonly WistModule _wistModule = new();
+    private List<WistCompilationStruct> _wistStructs = null!;
     private List<WistFunction> _wistFunctions = null!;
     private WistFunction _curFunc = null!;
     private int _saveResultLevel;
@@ -21,6 +22,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         {
             _initialized = true;
             _wistFunctions = new WistFunctionsVisitor().GetAllFunctions(tree);
+            _wistStructs = new WistStructsVisitor().GetAllStructs(tree);
         }
 
         base.Visit(tree);
@@ -76,11 +78,12 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitIdentifierExpression(WistGrammarParser.IdentifierExpressionContext context)
     {
-        _curFunc.Image.LoadLocal(context.IDENTIFIER().GetText());
+        var locName = context.IDENTIFIER().GetText();
+        _curFunc.Image.LoadLocal(locName);
         return null;
     }
 
-    public override object? VisitFuncCall(WistGrammarParser.FuncCallContext context)
+    public override object? VisitFuncCallExpression(WistGrammarParser.FuncCallExpressionContext context)
     {
         _saveResultLevel++;
         foreach (var expr in context.expression())
@@ -115,7 +118,9 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitRet(WistGrammarParser.RetContext context)
     {
+        _saveResultLevel++;
         Visit(context.expression());
+        _saveResultLevel--;
         _curFunc.Image.Ret();
 
         return null;
@@ -220,6 +225,63 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
         _curFunc.Image.SetLabel(endElseLabelName);
 
+        return null;
+    }
+
+    public override object? VisitNewStruct(WistGrammarParser.NewStructContext context)
+    {
+        var wistStruct = _wistStructs.Find(x => x.Name == context.IDENTIFIER().GetText());
+        if (wistStruct is null)
+            throw new InvalidOperationException();
+
+        if (_saveResultLevel != 0)
+            _curFunc.Image.Instantiate(wistStruct);
+
+        return null;
+    }
+
+    public override object? VisitStructDecl(WistGrammarParser.StructDeclContext context)
+    {
+        var wistStruct = _wistStructs.Find(x => x.Name == context.IDENTIFIER(0).GetText());
+        if (wistStruct is null)
+            throw new InvalidOperationException();
+
+        _wistModule.AddStruct(wistStruct);
+        Visit(context.block());
+        return null;
+    }
+
+    public override object? VisitStructFuncCallExpression(WistGrammarParser.StructFuncCallExpressionContext context)
+    {
+        _saveResultLevel++;
+        Visit(context.expression(0));
+        _curFunc.Image.Dup();
+        _saveResultLevel--;
+
+        _curFunc.Image.Call(context.IDENTIFIER().GetText(), context.expression().Length - 1);
+
+        if (_saveResultLevel == 0)
+            _curFunc.Image.Drop();
+
+        return null;
+    }
+
+    public override object? VisitStructFieldExpression(WistGrammarParser.StructFieldExpressionContext context)
+    {
+        _saveResultLevel++;
+        Visit(context.expression());
+        _saveResultLevel--;
+        _curFunc.Image.PushField(context.IDENTIFIER().GetText());
+        return null;
+    }
+
+    public override object? VisitStructFieldAssigment(WistGrammarParser.StructFieldAssigmentContext context)
+    {
+        _saveResultLevel++;
+        Visit(context.expression(0));
+        Visit(context.expression(1));
+        _saveResultLevel--;
+        _curFunc.Image.SetField(context.IDENTIFIER().GetText());
         return null;
     }
 

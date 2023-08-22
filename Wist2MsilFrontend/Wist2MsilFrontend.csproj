@@ -12,18 +12,18 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Antlr4.Runtime" Version="4.6.6"/>
+        <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="Content\WistGrammar.g4"/>
+        <None Include="Content\WistGrammar.g4" />
         <None Update="Content\Code\Code.wist">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Wist2Msil\Wist2Msil.csproj"/>
+        <ProjectReference Include="..\Wist2Msil\Wist2Msil.csproj" />
     </ItemGroup>
 
 </Project>

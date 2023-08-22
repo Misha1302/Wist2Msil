@@ -1,39 +1,46 @@
 ﻿grammar WistGrammar;
 
 program: line* EOF;
-line: endOfLine* (statement | declaration | funcCall) endOfLine*;
+line: endOfLine* (statement | declaration | expression) endOfLine*;
 
-declaration: funcDecl | labelDecl;
+declaration: funcDecl | labelDecl | structDecl;
 statement: simpleStatement (';' simpleStatement)*;
-simpleStatement: assigment | ret | jmp | ifBlock;
+simpleStatement: assigment | ret | jmp | ifBlock | newStruct;
 
 ret: 'ret' expression;
 jmp: 'jmp' IDENTIFIER;
 ifBlock: 'if' expression block elseBlock?;
 elseBlock: 'else' block;
 
-assigment: varAssigment;
+assigment: varAssigment | structFieldAssigment;
 varAssigment: IDENTIFIER '=' expression;
+structFieldAssigment: expression '.' IDENTIFIER '=' expression;
 
+structDecl: 'struct' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
 funcDecl: 'func' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
 labelDecl: IDENTIFIER ':';
 
 block: endOfLine* (('{' line* '}') | (':') line) endOfLine*;
 
 expression
-    : constant                              #constantExpression
-    | IDENTIFIER                            #identifierExpression
-    | '(' expression ')'                    #parenthesizedExpression
-    | '!' expression                        #notExpression
-    | funcCall                              #funcCallExpressio
-    | expression REM_OP expression          #remExpression
-    | expression MUL_OP expression          #mulExpression
-    | expression ADD_OP expression          #addExpression
-    | expression CMP_OP expression          #cmpExpression
-    | expression BOOL_OP expression         #boolExpression
+    : constant                                                                          #constantExpression
+    | '!' expression                                                                    #notExpression
+    | newStruct                                                                         #newStructExpression
+    | IDENTIFIER '(' (expression (',' expression)*)? ')'                                #funcCallExpression
+    | expression '.' IDENTIFIER '(' (expression (',' expression)*)? ')'                 #structFuncCallExpression
+    | expression '.' IDENTIFIER                                                         #structFieldExpression
+    | expression REM_OP expression                                                      #remExpression
+    | expression MUL_OP expression                                                      #mulExpression
+    | expression ADD_OP expression                                                      #addExpression
+    | expression CMP_OP expression                                                      #cmpExpression
+    | expression BOOL_OP expression                                                     #boolExpression
+    | '(' expression ')'                                                                #parenthesizedExpression
+    | IDENTIFIER                                                                        #identifierExpression
     ;
-
-funcCall: IDENTIFIER '(' (expression (',' expression)*)? ')';
+    
+    
+     
+newStruct: 'new' IDENTIFIER '(' ')';
 
 constant: NUMBER | STRING | BOOL | NULL;
 
