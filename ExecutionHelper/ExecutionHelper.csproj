@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\WistError\WistError.csproj" />
-        <ProjectReference Include="..\WistTimer\WistTimer.csproj" />
+      <ProjectReference Include="..\WistConst\WistConst.csproj" />
+      <ProjectReference Include="..\WistTimer\WistTimer.csproj" />
     </ItemGroup>
 
 </Project>

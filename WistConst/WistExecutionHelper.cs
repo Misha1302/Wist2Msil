@@ -1,9 +1,9 @@
-namespace Wist2Msil;
+namespace WistConst;
 
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using WistConst;
+using WistTimer;
 
 public sealed unsafe class WistExecutionHelper
 {
@@ -96,40 +96,36 @@ public sealed unsafe class WistExecutionHelper
         wistStruct.GetStruct().GetField(key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CallStructMethod0(WistConst wistStruct, WistExecutionHelper executionHelper, int key) =>
-        (WistConst)wistStruct.GetStruct().GetMethod(key).Invoke(null, new object?[] { executionHelper })!;
+    public static WistConst CallStructMethod0(WistConst wistStruct, int key) =>
+        wistStruct.GetStruct().CallMethod(key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CallStructMethod1(WistConst wistStruct, WistConst a, WistExecutionHelper executionHelper,
+    public static WistConst CallStructMethod1(WistConst wistStruct, WistConst a,
         int key) =>
-        (WistConst)wistStruct.GetStruct().GetMethod(key).Invoke(null, new object?[] { a, executionHelper })!;
+        wistStruct.GetStruct().CallMethod(key, a);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CallStructMethod2(WistConst wistStruct, WistConst a, WistConst b,
-        WistExecutionHelper executionHelper, int key) =>
-        (WistConst)wistStruct.GetStruct().GetMethod(key).Invoke(null, new object?[] { a, b, executionHelper })!;
+    public static WistConst CallStructMethod2(WistConst wistStruct, WistConst a, WistConst b, int key) =>
+        wistStruct.GetStruct().CallMethod(key, a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CallStructMethod3(WistConst wistStruct, WistConst a, WistConst b, WistConst c,
-        WistExecutionHelper executionHelper, int key) =>
-        (WistConst)wistStruct.GetStruct().GetMethod(key).Invoke(null, new object?[] { a, b, c, executionHelper })!;
+    public static WistConst CallStructMethod3(WistConst wistStruct, WistConst a, WistConst b, WistConst c, int key) =>
+        wistStruct.GetStruct().CallMethod(key, a, b, c);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod4(WistConst wistStruct, WistConst a, WistConst b, WistConst c,
-        WistConst d, WistExecutionHelper executionHelper, int key) =>
-        (WistConst)wistStruct.GetStruct().GetMethod(key).Invoke(null, new object?[] { a, b, c, d, executionHelper })!;
+        WistConst d, int key) =>
+        wistStruct.GetStruct().CallMethod(key, a, b, c, d);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod5(WistConst wistStruct, WistConst a, WistConst b, WistConst c,
-        WistConst d, WistConst e, WistExecutionHelper executionHelper, int key) =>
-        (WistConst)wistStruct.GetStruct().GetMethod(key)
-            .Invoke(null, new object?[] { a, b, c, d, e, executionHelper })!;
+        WistConst d, WistConst e, int key) =>
+        wistStruct.GetStruct().CallMethod(key, a, b, c, d, e);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod6(WistConst wistStruct, WistConst a, WistConst b, WistConst c,
-        WistConst d, WistConst e, WistConst f, WistExecutionHelper executionHelper, int key) =>
-        (WistConst)wistStruct.GetStruct().GetMethod(key)
-            .Invoke(null, new object?[] { a, b, c, d, e, f, executionHelper })!;
+        WistConst d, WistConst e, WistConst f, int key) =>
+        wistStruct.GetStruct().CallMethod(key, a, b, c, d, e, f);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CSharpCall0(WistConst ptr)

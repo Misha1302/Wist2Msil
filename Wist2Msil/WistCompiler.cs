@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using GrEmit;
 using Wist2Msil.WistHashCode;
 using WistConst;
+using WistTimer;
 
 public sealed class WistCompiler
 {
@@ -202,10 +203,15 @@ public sealed class WistCompiler
                     foreach (var field in src.Fields)
                         s.AddField(_module.WistHashCode.GetHashCode(field), default);
                     foreach (var method in src.Methods)
+                    {
+                        var wistExecutionHelper = _executionHelpers.Find(x => x.DynamicMethod.Name == method);
                         s.AddMethod(
                             _module.WistHashCode.GetHashCode(method),
-                            _executionHelpers.Find(x => x.DynamicMethod.Name == method)!.DynamicMethod
+                            wistExecutionHelper!.DynamicMethod,
+                            wistExecutionHelper
                         );
+                    }
+
                     curExeHelper.Consts[i] = new WistConst(s);
 
                     Push(il, i, exeHelperArgIndex);
@@ -219,15 +225,6 @@ public sealed class WistCompiler
                     il.Call(_methods["GetField"]);
                     break;
                 case WistInstruction.Operation.CallStructMethod:
-                    ind = _executionHelpers.FindIndex(
-                        x => x.DynamicMethod.Name == consts1[i].GetString()
-                    );
-
-                    il.Ldarg(exeHelperArgIndex);
-                    il.Ldfld(_executionHelpersField);
-                    il.Ldc_I4(ind);
-                    il.Ldelem(typeof(WistExecutionHelper));
-
                     il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
                     il.Call(_methods[$"CallStructMethod{consts2[i].GetInternalInteger() + 1}"]);
                     break;

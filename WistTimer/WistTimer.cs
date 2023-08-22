@@ -1,4 +1,4 @@
-﻿namespace Wist2Msil;
+﻿namespace WistTimer;
 
 using System.Diagnostics;
 
