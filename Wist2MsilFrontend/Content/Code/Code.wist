@@ -1,21 +1,30 @@
-func Start() {
-    a = new Vector3().Constructor()
+﻿func Start() {
+    c = 0
+
+label:
+    a = new Vector3()
     a.Write()
     
-    b = new Vector2().Constructor()
-    b.Write()
+    a.Constructor()
     
+    c = c + 1
+    if c != 5:
+        jmp label
+        
+        
     a.x = -3.1415926
     Write(a.x, a.y, a.z)
+    a.Write2()
+    a.Write3()
+    a.Write()
     
-    ret a.x * a.y * b.x * b.y
+    ret a.x * a.y * a.z
 }
 
 func Write(a, b, c): 
     Print(ToStr(a) + " " + ToStr(b) + " " + ToStr(c))
 
-
-struct Vector3(x, y, z) {
+struct Vector3(z) : Vector2 {
     func Constructor(self) {
         self.x = -1
         self.y = -2
@@ -23,6 +32,9 @@ struct Vector3(x, y, z) {
         
         ret self
     }
+
+    func Write3(self):
+        Print("[" + ToStr(self.x) + ", " + ToStr(self.y) + ", " + ToStr(self.z) + "]")
 
     func Write(self):
         Print("[" + ToStr(self.x) + ", " + ToStr(self.y) + ", " + ToStr(self.z) + "]")
@@ -35,6 +47,9 @@ struct Vector2(x, y) {
         
         ret self
     }
+
+    func Write2(self):
+        Print("[" + ToStr(self.x) + ", " + ToStr(self.y) + "]")
 
     func Write(self):
         Print("[" + ToStr(self.x) + ", " + ToStr(self.y) + "]")

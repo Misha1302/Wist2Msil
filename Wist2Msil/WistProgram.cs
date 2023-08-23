@@ -1,11 +1,11 @@
 ﻿namespace Wist2Msil;
 
-using WistConst;
-
 public static class WistProgram
 {
     public static void Main()
     {
+        Console.WriteLine("Obsolete");
+        /*
         var wistModule = new WistModule();
         var start = wistModule.MakeFunction("Start");
         var init = wistModule.MakeFunction("init", new[] { "exeHelper", "struct" });
@@ -53,6 +53,6 @@ public static class WistProgram
 #pragma warning disable CS0162
         if (repeatCount > 1)
             Console.WriteLine($"average exe time: {executionTimes.Average()}");
-#pragma warning restore CS0162
+#pragma warning restore CS0162*/
     }
 }

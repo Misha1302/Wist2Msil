@@ -3,7 +3,7 @@
 using System.Reflection;
 using Antlr4.Runtime.Tree;
 using Wist2Msil;
-using Wist2MsilFrontend.Content.Code;
+using Wist2MsilFrontend.Content;
 using WistConst;
 using WistError;
 

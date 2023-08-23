@@ -12,8 +12,10 @@ public sealed class WistCompiler
     private static readonly IReadOnlyDictionary<string, MethodInfo> _methods;
     private static readonly FieldInfo _constsField;
     private static readonly FieldInfo _executionHelpersField;
+    private static readonly MethodInfo _copyWistStructMethod;
     private readonly WistModule _module;
     private List<WistExecutionHelper> _executionHelpers = null!;
+    private readonly List<WistStruct> _wistStructures = new();
 
     static WistCompiler()
     {
@@ -27,6 +29,10 @@ public sealed class WistCompiler
         _executionHelpersField = typeof(WistExecutionHelper).GetField(nameof(WistExecutionHelper.WistExecutionHelpers),
                                      BindingFlags.Public | BindingFlags.Instance) ??
                                  throw new NullReferenceException();
+
+        _copyWistStructMethod =
+            typeof(WistConst).GetMethod(nameof(WistConst.CopyStruct), BindingFlags.Instance | BindingFlags.Public) ??
+            throw new NullReferenceException();
     }
 
     public WistCompiler(WistModule module)
@@ -43,9 +49,44 @@ public sealed class WistCompiler
 
         foreach (var exeHelper in _executionHelpers)
             exeHelper.WistExecutionHelpers = _executionHelpers.ToArray();
+        
+        foreach (var wistStruct in _module.WistStructs)
+            DeclareStruct(wistStruct);
+
+        foreach (var wistStruct in _module.WistStructs)
+            InitStruct(wistStruct);
 
         foreach (var wistFunction in _module.WistFunctions)
             CompileFunction(wistFunction);
+    }
+
+    private void InitStruct(WistCompilationStruct wistStruct)
+    {
+        var src = wistStruct;
+        var s = _wistStructures.Find(x => x.Name == src.Name)!;
+
+        foreach (var field in src.Fields)
+            s.AddField(_module.WistHashCode.GetHashCode(field), default);
+
+        foreach (var method in src.Methods)
+        {
+            var wistExecutionHelper = _executionHelpers.Find(x => x.DynamicMethod.Name == method);
+            var indexOf = method.IndexOf("<>", StringComparison.Ordinal);
+            if (indexOf == -1) indexOf = method.Length;
+            s.AddMethod(
+                _module.WistHashCode.GetHashCode(method[..indexOf]),
+                wistExecutionHelper!.DynamicMethod,
+                wistExecutionHelper
+            );
+        }
+
+        foreach (var inheritance in src.Inheritances)
+            s.AddInheritance(_wistStructures.Find(x => x.Name == inheritance)!);
+    }
+
+    private void DeclareStruct(WistCompilationStruct wistStruct)
+    {
+        _wistStructures.Add(new WistStruct(wistStruct.Name, new List<WistStruct>()));
     }
 
     private void DeclareFunction(WistFunction wistFunc)
@@ -86,7 +127,6 @@ public sealed class WistCompiler
         {
             var inst = wistFunc.Image.Instructions[i];
             GroboIL.Label? label;
-            int ind;
             switch (inst.Op)
             {
                 case WistInstruction.Operation.PushConst:
@@ -136,7 +176,7 @@ public sealed class WistCompiler
                     il.Call(_methods[$"CSharpCall{consts2[i].GetInternalInteger()}"]);
                     break;
                 case WistInstruction.Operation.WistCall:
-                    ind = _executionHelpers.FindIndex(
+                    var ind = _executionHelpers.FindIndex(
                         x => x.DynamicMethod.Name == consts2[i].GetString()
                     );
 
@@ -199,24 +239,16 @@ public sealed class WistCompiler
                     break;
                 case WistInstruction.Operation.Instantiate:
                     var src = consts1[i].GetStructInternal();
-                    var s = new WistStruct(src.Name);
-                    foreach (var field in src.Fields)
-                        s.AddField(_module.WistHashCode.GetHashCode(field), default);
-                    foreach (var method in src.Methods)
-                    {
-                        var wistExecutionHelper = _executionHelpers.Find(x => x.DynamicMethod.Name == method);
-                        var indexOf = method.IndexOf("<>", StringComparison.Ordinal);
-                        if (indexOf == -1) indexOf = method.Length;
-                        s.AddMethod(
-                            _module.WistHashCode.GetHashCode(method[..indexOf]),
-                            wistExecutionHelper!.DynamicMethod,
-                            wistExecutionHelper
-                        );
-                    }
+                    var s = _wistStructures.Find(x => x.Name == src.Name)!;
 
                     curExeHelper.Consts[i] = new WistConst(s);
 
-                    Push(il, i, exeHelperArgIndex);
+                    il.Ldarg(exeHelperArgIndex);
+                    il.Ldfld(_constsField);
+                    il.Ldc_I4(i);
+                    il.Ldelema(typeof(WistConst));
+                    
+                    il.Call(_copyWistStructMethod);
                     break;
                 case WistInstruction.Operation.SetField:
                     il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));

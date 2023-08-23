@@ -2,7 +2,7 @@
 
 using Antlr4.Runtime.Tree;
 using Wist2Msil;
-using Wist2MsilFrontend.Content.Code;
+using Wist2MsilFrontend.Content;
 
 public sealed class WistFunctionsVisitor : WistGrammarBaseVisitor<object?>
 {

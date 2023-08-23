@@ -26,9 +26,9 @@ public sealed class WistModule
         _wistFunctions.Add(wistFunction);
     }
 
-    public WistCompilationStruct MakeStruct(string name, string[] strings, string[] methods)
+    public WistCompilationStruct MakeStruct(string name, string[] strings, string[] methods, string[] inheritances)
     {
-        _wistStructs.Add(new WistCompilationStruct(name, strings, methods));
+        _wistStructs.Add(new WistCompilationStruct(name, strings, methods, inheritances));
         return _wistStructs[^1];
     }
 

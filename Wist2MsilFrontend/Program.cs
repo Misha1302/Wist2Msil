@@ -1,7 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Wist2Msil;
 using Wist2MsilFrontend;
-using Wist2MsilFrontend.Content.Code;
+using Wist2MsilFrontend.Content;
 
 const string dir = @"Content\Code";
 const string path = @$"{dir}\Code.wist";

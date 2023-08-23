@@ -1,7 +1,7 @@
 ﻿namespace Wist2MsilFrontend;
 
 using Antlr4.Runtime.Tree;
-using Wist2MsilFrontend.Content.Code;
+using Wist2MsilFrontend.Content;
 using WistConst;
 
 public sealed class WistStructsVisitor : WistGrammarBaseVisitor<object?>
@@ -18,13 +18,22 @@ public sealed class WistStructsVisitor : WistGrammarBaseVisitor<object?>
         var name = context.IDENTIFIER(0).GetText();
         var fields = context.IDENTIFIER().Skip(1).Select(x => x.GetText()).ToArray();
 
+        List<string> inheritances = new();
+        if (context.inheritance() != null)
+            inheritances = (List<string>)VisitInheritance(context.inheritance());
+
         _methods = new List<string>();
         _curStructName = name;
         Visit(context.block());
         _curStructName = null;
-        _list.Add(new WistCompilationStruct(name, fields, _methods.ToArray()));
+        _list.Add(new WistCompilationStruct(name, fields, _methods.ToArray(), inheritances.ToArray()));
         _methods = null;
         return null;
+    }
+
+    public override object VisitInheritance(WistGrammarParser.InheritanceContext context)
+    {
+        return new List<string>(context.IDENTIFIER().Select(x => x.GetText()));
     }
 
     public override object? VisitFuncDecl(WistGrammarParser.FuncDeclContext context)

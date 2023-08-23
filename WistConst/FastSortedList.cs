@@ -6,6 +6,15 @@ public sealed class FastSortedList<TValue>
 {
     private readonly List<KeyValuePair<int, TValue>> _list = new();
 
+    private FastSortedList(IEnumerable<KeyValuePair<int, TValue>> list)
+    {
+        _list = list.ToList();
+    }
+
+    public FastSortedList()
+    {
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(int key, TValue value)
     {
@@ -62,4 +71,6 @@ public sealed class FastSortedList<TValue>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static int GetMedian(int lo, int hi) => lo + (hi - lo) / 2;
+
+    public FastSortedList<TValue> Copy() => new(_list);
 }

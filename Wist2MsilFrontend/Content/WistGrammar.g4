@@ -16,7 +16,9 @@ assigment: varAssigment | structFieldAssigment;
 varAssigment: IDENTIFIER '=' expression;
 structFieldAssigment: expression '.' IDENTIFIER '=' expression;
 
-structDecl: 'struct' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
+structDecl: 'struct' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' inheritance? block;
+inheritance: (':' IDENTIFIER (IDENTIFIER (',' IDENTIFIER)*)?);
+
 funcDecl: 'func' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
 labelDecl: IDENTIFIER ':';
 
