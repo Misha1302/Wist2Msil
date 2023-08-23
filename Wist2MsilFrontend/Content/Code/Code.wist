@@ -1,4 +1,6 @@
-﻿func Start() {
+﻿include "WistMath.dll"
+
+func Start() {
     c = 0
 
 label:
@@ -16,7 +18,8 @@ label:
     Write(a.x, a.y, a.z)
     a.Write2()
     a.Write3()
-    a.Write()
+    
+    a.Sin().Write()
     
     ret a.x * a.y * a.z
 }
@@ -38,6 +41,14 @@ struct Vector3(z) : Vector2 {
 
     func Write(self):
         Print("[" + ToStr(self.x) + ", " + ToStr(self.y) + ", " + ToStr(self.z) + "]")
+
+    func Sin(self) {
+        self.x = Sin(self.x)
+        self.y = Sin(self.y)
+        self.z = Sin(self.z)
+        
+        ret self
+    }
 }
 
 struct Vector2(x, y) {

@@ -1,6 +1,5 @@
 ﻿namespace Wist2MsilFrontend;
 
-using System.Reflection;
 using Antlr4.Runtime.Tree;
 using Wist2Msil;
 using Wist2MsilFrontend.Content;
@@ -16,6 +15,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
     private int _saveResultLevel;
     private bool _initialized;
     private string? _curStructName;
+    private WistLibraryManager _wistLibraryManager = null!;
 
     public override object? Visit(IParseTree tree)
     {
@@ -24,6 +24,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
             _initialized = true;
             _wistFunctions = new WistFunctionsVisitor().GetAllFunctions(tree);
             _wistStructs = new WistStructsVisitor().GetAllStructs(tree);
+            _wistLibraryManager = new WistLibraryManager();
+            new WistLibraryVisitor().SetLibManager(_wistLibraryManager).Visit(tree);
         }
 
         base.Visit(tree);
@@ -97,7 +99,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         if (wistFunction != null)
             _curFunc.Image.Call(wistFunction);
         else
-            _curFunc.Image.Call(typeof(BuildInFunctions).GetMethod(text, BindingFlags.Public | BindingFlags.Static));
+            _curFunc.Image.Call(_wistLibraryManager.GetMethod(text));
 
         if (_saveResultLevel == 0)
             _curFunc.Image.Drop();

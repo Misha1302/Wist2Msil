@@ -5,12 +5,14 @@ line: endOfLine* (statement | declaration | expression) endOfLine*;
 
 declaration: funcDecl | labelDecl | structDecl;
 statement: simpleStatement (';' simpleStatement)*;
-simpleStatement: assigment | ret | jmp | ifBlock | newStruct;
+simpleStatement: assigment | ret | jmp | ifBlock | newStruct | include;
 
 ret: 'ret' expression;
 jmp: 'jmp' IDENTIFIER;
 ifBlock: 'if' expression block elseBlock?;
 elseBlock: 'else' block;
+
+include: 'include' STRING; 
 
 assigment: varAssigment | structFieldAssigment;
 varAssigment: IDENTIFIER '=' expression;

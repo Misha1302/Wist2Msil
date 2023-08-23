@@ -10,12 +10,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="GrEmit" Version="3.4.10"/>
+        <PackageReference Include="GrEmit" Version="3.4.10" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ExecutionHelper\ExecutionHelper.csproj"/>
-        <ProjectReference Include="..\WistConst\WistConst.csproj"/>
+        <ProjectReference Include="..\ExecutionHelper\ExecutionHelper.csproj" />
+        <ProjectReference Include="..\WistConst\WistConst.csproj" />
     </ItemGroup>
 
 </Project>
