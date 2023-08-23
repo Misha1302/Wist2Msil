@@ -12,7 +12,7 @@ public sealed class WistLibraryManager
     {
         AddBuildInFunctions();
     }
-    
+
     public MethodInfo? GetMethod(string name)
     {
         return _methods.Find(x => x.Name == name);

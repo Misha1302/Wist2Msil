@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Wist2MsilFrontend\Wist2MsilFrontend.csproj" />
-      <ProjectReference Include="..\WistConst\WistConst.csproj" />
+        <ProjectReference Include="..\Wist2MsilFrontend\Wist2MsilFrontend.csproj"/>
+        <ProjectReference Include="..\WistConst\WistConst.csproj"/>
     </ItemGroup>
 
 </Project>
