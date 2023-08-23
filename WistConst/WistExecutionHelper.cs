@@ -100,8 +100,7 @@ public sealed unsafe class WistExecutionHelper
         wistStruct.GetStruct().CallMethod(key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CallStructMethod1(WistConst wistStruct, WistConst a,
-        int key) =>
+    public static WistConst CallStructMethod1(WistConst wistStruct, WistConst a, int key) =>
         wistStruct.GetStruct().CallMethod(key, a);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

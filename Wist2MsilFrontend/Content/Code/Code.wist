@@ -5,6 +5,9 @@ func Start() {
     b = new Vector2().Constructor()
     b.Write()
     
+    a.x = -3.1415926
+    Write(a.x, a.y, a.z)
+    
     ret a.x * a.y * b.x * b.y
 }
 

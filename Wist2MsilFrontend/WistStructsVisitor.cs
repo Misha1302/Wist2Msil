@@ -1,7 +1,7 @@
 ﻿namespace Wist2MsilFrontend;
 
 using Antlr4.Runtime.Tree;
-using Wist2MsilFrontend.Content;
+using Wist2MsilFrontend.Content.Code;
 using WistConst;
 
 public sealed class WistStructsVisitor : WistGrammarBaseVisitor<object?>

@@ -44,7 +44,7 @@ newStruct: 'new' IDENTIFIER '(' ')';
 
 constant: NUMBER | STRING | BOOL | NULL;
 
-endOfLine: ( '\r'? '\n' | '\r' | '\f' | ';' );
+endOfLine: ( '\r'? '\n' | '\r' | ';' );
 
 
 NUMBER: [-]? [0-9] [0-9_]* ('.' [0-9_]*)? ('e' ('+' | '-')? [0-9_]*)?;

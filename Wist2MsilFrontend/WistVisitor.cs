@@ -3,7 +3,7 @@
 using System.Reflection;
 using Antlr4.Runtime.Tree;
 using Wist2Msil;
-using Wist2MsilFrontend.Content;
+using Wist2MsilFrontend.Content.Code;
 using WistConst;
 using WistError;
 
@@ -110,7 +110,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         var name = context.IDENTIFIER(0).GetText();
         if (_curStructName != null)
             name += $"<>{_curStructName}";
-        
+
         var wistFunction = _wistFunctions.Find(x => x.Name == name)!;
         _wistModule.AddFunction(wistFunction);
         _curFunc = wistFunction;
@@ -249,13 +249,13 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         var wistStruct = _wistStructs.Find(x => x.Name == context.IDENTIFIER(0).GetText());
         if (wistStruct is null)
             throw new InvalidOperationException();
-        
+
         _wistModule.AddStruct(wistStruct);
-        
+
         _curStructName = wistStruct.Name;
         Visit(context.block());
         _curStructName = null;
-        
+
         return null;
     }
 

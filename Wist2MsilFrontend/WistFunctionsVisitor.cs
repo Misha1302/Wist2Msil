@@ -2,7 +2,7 @@
 
 using Antlr4.Runtime.Tree;
 using Wist2Msil;
-using Wist2MsilFrontend.Content;
+using Wist2MsilFrontend.Content.Code;
 
 public sealed class WistFunctionsVisitor : WistGrammarBaseVisitor<object?>
 {
@@ -27,7 +27,7 @@ public sealed class WistFunctionsVisitor : WistGrammarBaseVisitor<object?>
 
         if (_curStructName != null)
             name += $"<>{_curStructName}";
-        
+
         _list.Add(new WistFunction(name, new WistImage(), args));
         return _list;
     }
