@@ -49,7 +49,7 @@ public sealed class WistCompiler
 
         foreach (var exeHelper in _executionHelpers)
             exeHelper.WistExecutionHelpers = _executionHelpers.ToArray();
-        
+
         foreach (var wistStruct in _module.WistStructs)
             DeclareStruct(wistStruct);
 
@@ -247,7 +247,7 @@ public sealed class WistCompiler
                     il.Ldfld(_constsField);
                     il.Ldc_I4(i);
                     il.Ldelema(typeof(WistConst));
-                    
+
                     il.Call(_copyWistStructMethod);
                     break;
                 case WistInstruction.Operation.SetField:
