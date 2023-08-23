@@ -10,7 +10,7 @@ label:
     a.Constructor()
     
     c = c + 1
-    if c != 5:
+    if c != 3:
         jmp label
         
         
@@ -19,7 +19,7 @@ label:
     a.Write2()
     a.Write3()
     
-    a.Sin().Write()
+    a.Sin(100.0074).Sin().Write()
     
     ret a.x * a.y * a.z
 }
@@ -46,6 +46,14 @@ struct Vector3(z) : Vector2 {
         self.x = Sin(self.x)
         self.y = Sin(self.y)
         self.z = Sin(self.z)
+        
+        ret self
+    }
+
+    func Sin(self, mul) {
+        self.x = Sin(self.x) * mul
+        self.y = Sin(self.y) * mul
+        self.z = Sin(self.z) * mul
         
         ret self
     }

@@ -5,8 +5,8 @@ using System.Runtime.CompilerServices;
 
 public sealed class WistStruct
 {
-    private readonly FastSortedList<WistConst> _sortedFields = new();
-    private readonly FastSortedList<WistMethod?> _sortedMethods = new();
+    private readonly WistFastSortedList<WistConst> _sortedFields = new();
+    private readonly WistFastSortedList<WistMethod?> _sortedMethods = new();
     public readonly string Name;
     private readonly List<WistStruct> _inheritances;
 
@@ -17,7 +17,8 @@ public sealed class WistStruct
         _inheritances = inheritances;
     }
 
-    private WistStruct(string name, FastSortedList<WistConst> sortedFields, FastSortedList<WistMethod?> sortedMethods,
+    private WistStruct(string name, WistFastSortedList<WistConst> sortedFields,
+        WistFastSortedList<WistMethod?> sortedMethods,
         List<WistStruct> inheritances)
     {
         Name = name;
@@ -64,7 +65,7 @@ public sealed class WistStruct
         {
             var inheritance = _inheritances[index];
             indexOfKey = inheritance._sortedFields.IndexOfKey(key);
-            if (indexOfKey == -1) continue;
+            if (indexOfKey < 0) continue;
 
             inheritance._sortedFields.SetByIndex(indexOfKey, value);
             return;
@@ -93,7 +94,7 @@ public sealed class WistStruct
         {
             var inheritance = _inheritances[index];
             indexOfKey = inheritance._sortedMethods.IndexOfKey(key);
-            if (indexOfKey == -1) continue;
+            if (indexOfKey < 0) continue;
 
             wistMethod = inheritance._sortedMethods.GetByIndex(indexOfKey);
             goto end;

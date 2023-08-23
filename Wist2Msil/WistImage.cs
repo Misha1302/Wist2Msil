@@ -13,21 +13,24 @@ public sealed class WistImage
     public IReadOnlyList<WistInstruction> Instructions => _instructions;
 
     public void PushConst(WistConst c) =>
-        _instructions.Add(new wInst(WistInstruction.Operation.PushConst, c));
+        _instructions.Add(new wInst(WistInstruction.WistOperation.PushConst, c));
 
-    public void Add() => _instructions.Add(new wInst(WistInstruction.Operation.Add));
-    public void Sub() => _instructions.Add(new wInst(WistInstruction.Operation.Sub));
-    public void Mul() => _instructions.Add(new wInst(WistInstruction.Operation.Mul));
-    public void Div() => _instructions.Add(new wInst(WistInstruction.Operation.Div));
-    public void Rem() => _instructions.Add(new wInst(WistInstruction.Operation.Rem));
-    public void Pow() => _instructions.Add(new wInst(WistInstruction.Operation.Pow));
+    public void Add() => _instructions.Add(new wInst(WistInstruction.WistOperation.Add));
+    public void Sub() => _instructions.Add(new wInst(WistInstruction.WistOperation.Sub));
+    public void Mul() => _instructions.Add(new wInst(WistInstruction.WistOperation.Mul));
+    public void Div() => _instructions.Add(new wInst(WistInstruction.WistOperation.Div));
+    public void Rem() => _instructions.Add(new wInst(WistInstruction.WistOperation.Rem));
+    public void Pow() => _instructions.Add(new wInst(WistInstruction.WistOperation.Pow));
 
-    public void IsEquals() => _instructions.Add(new wInst(WistInstruction.Operation.IsEquals));
-    public void IsNotEquals() => _instructions.Add(new wInst(WistInstruction.Operation.IsNotEquals));
-    public void GreaterThan() => _instructions.Add(new wInst(WistInstruction.Operation.GreaterThan));
-    public void GreaterThanOrEquals() => _instructions.Add(new wInst(WistInstruction.Operation.GreaterThanOrEquals));
-    public void LessThan() => _instructions.Add(new wInst(WistInstruction.Operation.LessThan));
-    public void LessThanOrEquals() => _instructions.Add(new wInst(WistInstruction.Operation.LessThanOrEquals));
+    public void IsEquals() => _instructions.Add(new wInst(WistInstruction.WistOperation.IsEquals));
+    public void IsNotEquals() => _instructions.Add(new wInst(WistInstruction.WistOperation.IsNotEquals));
+    public void GreaterThan() => _instructions.Add(new wInst(WistInstruction.WistOperation.GreaterThan));
+
+    public void GreaterThanOrEquals() =>
+        _instructions.Add(new wInst(WistInstruction.WistOperation.GreaterThanOrEquals));
+
+    public void LessThan() => _instructions.Add(new wInst(WistInstruction.WistOperation.LessThan));
+    public void LessThanOrEquals() => _instructions.Add(new wInst(WistInstruction.WistOperation.LessThanOrEquals));
 
 
     public void Call(MethodInfo? m)
@@ -38,7 +41,7 @@ public sealed class WistImage
         RuntimeHelpers.PrepareMethod(m.MethodHandle);
         _instructions.Add(
             new wInst(
-                WistInstruction.Operation.CSharpCall,
+                WistInstruction.WistOperation.CSharpCall,
                 WistConst.CreateInternalConst(m.MethodHandle.GetFunctionPointer()),
                 WistConst.CreateInternalConst(m.GetParameters().Length)
             )
@@ -47,17 +50,17 @@ public sealed class WistImage
 
     public void SetLabel(string labelName)
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.SetLabel, new WistConst(labelName)));
+        _instructions.Add(new wInst(WistInstruction.WistOperation.SetLabel, new WistConst(labelName)));
     }
 
     public void Goto(string labelName)
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.Goto, new WistConst(labelName)));
+        _instructions.Add(new wInst(WistInstruction.WistOperation.Goto, new WistConst(labelName)));
     }
 
     public void Drop()
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.Drop));
+        _instructions.Add(new wInst(WistInstruction.WistOperation.Drop));
     }
 
     public void Unite(WistImage anotherImage)
@@ -67,33 +70,33 @@ public sealed class WistImage
 
     public void Dup()
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.Dup));
+        _instructions.Add(new wInst(WistInstruction.WistOperation.Dup));
     }
 
     public void Cmp()
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.Cmp));
+        _instructions.Add(new wInst(WistInstruction.WistOperation.Cmp));
     }
 
     public void NegCmp()
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.NegCmp));
+        _instructions.Add(new wInst(WistInstruction.WistOperation.NegCmp));
     }
 
     public void GotoIfFalse(string labelName)
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.GotoIfFalse, new WistConst(labelName)));
+        _instructions.Add(new wInst(WistInstruction.WistOperation.GotoIfFalse, new WistConst(labelName)));
     }
 
     public void GotoIfTrue(string labelName)
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.GotoIfTrue, new WistConst(labelName)));
+        _instructions.Add(new wInst(WistInstruction.WistOperation.GotoIfTrue, new WistConst(labelName)));
     }
 
     public void SetLocal(string locName)
     {
         TryAddLoc(locName);
-        _instructions.Add(new wInst(WistInstruction.Operation.SetLocal, new WistConst(locName)));
+        _instructions.Add(new wInst(WistInstruction.WistOperation.SetLocal, new WistConst(locName)));
     }
 
     private void TryAddLoc(string locName)
@@ -106,30 +109,30 @@ public sealed class WistImage
 
     public void LoadLocal(string locName)
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.LoadLocal, new WistConst(locName)));
+        _instructions.Add(new wInst(WistInstruction.WistOperation.LoadLocal, new WistConst(locName)));
     }
 
     public void Call(WistFunction square)
     {
         _instructions.Add(
             new wInst(
-                WistInstruction.Operation.WistCall,
+                WistInstruction.WistOperation.Call,
                 default,
-                new WistConst(square.Name)
+                new WistConst(square.Name.FullName)
             )
         );
     }
 
     public void Ret()
     {
-        _instructions.Add(new wInst(WistInstruction.Operation.Ret));
+        _instructions.Add(new wInst(WistInstruction.WistOperation.Ret));
     }
 
     public void LoadArg(string argName)
     {
         _instructions.Add(
             new wInst(
-                WistInstruction.Operation.LoadArg,
+                WistInstruction.WistOperation.LoadArg,
                 new WistConst(argName)
             )
         );
@@ -139,7 +142,7 @@ public sealed class WistImage
     {
         _instructions.Add(
             new wInst(
-                WistInstruction.Operation.Instantiate,
+                WistInstruction.WistOperation.Instantiate,
                 new WistConst(mCompilationStruct)
             )
         );
@@ -149,7 +152,7 @@ public sealed class WistImage
     {
         _instructions.Add(
             new wInst(
-                WistInstruction.Operation.SetField,
+                WistInstruction.WistOperation.SetField,
                 new WistConst(fieldName)
             )
         );
@@ -159,7 +162,7 @@ public sealed class WistImage
     {
         _instructions.Add(
             new wInst(
-                WistInstruction.Operation.PushField,
+                WistInstruction.WistOperation.PushField,
                 new WistConst(fieldName)
             )
         );
@@ -169,7 +172,7 @@ public sealed class WistImage
     {
         _instructions.Add(
             new wInst(
-                WistInstruction.Operation.CallStructMethod,
+                WistInstruction.WistOperation.CallStructMethod,
                 new WistConst(mName),
                 WistConst.CreateInternalConst(argsLen)
             )

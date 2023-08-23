@@ -4,11 +4,11 @@ using WistConst;
 
 public struct WistInstruction
 {
-    public readonly Operation Op;
+    public readonly WistOperation Op;
     public WistConst Constant;
     public WistConst Constant2;
 
-    public WistInstruction(Operation op, WistConst constant = default, WistConst constant2 = default)
+    public WistInstruction(WistOperation op, WistConst constant = default, WistConst constant2 = default)
     {
         Op = op;
         Constant = constant;
@@ -16,7 +16,7 @@ public struct WistInstruction
     }
 
 
-    public enum Operation
+    public enum WistOperation
     {
         PushConst,
         Add,
@@ -42,7 +42,7 @@ public struct WistInstruction
         NegCmp,
         LoadLocal,
         SetLocal,
-        WistCall,
+        Call,
         LoadArg,
         Ret,
         Instantiate,

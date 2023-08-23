@@ -27,6 +27,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Wist2Msil\Wist2Msil.csproj"/>
+        <ProjectReference Include="..\WistFuncName\WistFuncName.csproj"/>
     </ItemGroup>
 
 </Project>

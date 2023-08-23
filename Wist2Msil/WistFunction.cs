@@ -1,12 +1,16 @@
 ﻿namespace Wist2Msil;
 
+using System.Diagnostics;
+using WistFuncName;
+
+[DebuggerDisplay("{Name}")]
 public sealed class WistFunction
 {
     public readonly WistImage Image;
-    public readonly string Name;
+    public readonly WistFuncName Name;
     public readonly string[] Parameters;
 
-    public WistFunction(string name, WistImage image, string[] parameters)
+    public WistFunction(WistFuncName name, WistImage image, string[] parameters)
     {
         Name = name;
         Image = image;

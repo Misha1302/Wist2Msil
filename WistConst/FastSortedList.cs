@@ -2,16 +2,16 @@
 
 using System.Runtime.CompilerServices;
 
-public sealed class FastSortedList<TValue>
+public sealed class WistFastSortedList<TValue>
 {
     private readonly List<KeyValuePair<int, TValue>> _list = new();
 
-    private FastSortedList(IEnumerable<KeyValuePair<int, TValue>> list)
+    private WistFastSortedList(IEnumerable<KeyValuePair<int, TValue>> list)
     {
         _list = list.ToList();
     }
 
-    public FastSortedList()
+    public WistFastSortedList()
     {
     }
 
@@ -72,5 +72,5 @@ public sealed class FastSortedList<TValue>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static int GetMedian(int lo, int hi) => lo + (hi - lo) / 2;
 
-    public FastSortedList<TValue> Copy() => new(_list);
+    public WistFastSortedList<TValue> Copy() => new(_list);
 }

@@ -7,33 +7,26 @@ public sealed class WistModule
     private readonly List<WistFunction> _wistFunctions = new();
     private readonly List<WistCompilationStruct> _wistStructs = new();
 
-    public readonly WistHashCode.WistHashCode WistHashCode = new();
+    public readonly WistHashCode.WistHashCode HashCode = new();
 
     // ReSharper disable once ReturnTypeCanBeEnumerable.Global
-    public IReadOnlyList<WistFunction> WistFunctions => _wistFunctions;
+    public IReadOnlyList<WistFunction> Functions => _wistFunctions;
 
-    public IReadOnlyList<WistCompilationStruct> WistStructs => _wistStructs;
-
-    public WistFunction MakeFunction(string name, string[]? strings = null)
-    {
-        var f = new WistFunction(name, new WistImage(), strings ?? Array.Empty<string>());
-        _wistFunctions.Add(f);
-        return f;
-    }
+    public IReadOnlyList<WistCompilationStruct> Structs => _wistStructs;
 
     public void AddFunction(WistFunction wistFunction)
     {
-        _wistFunctions.Add(wistFunction);
-    }
+        if (wistFunction is null)
+            throw new InvalidOperationException();
 
-    public WistCompilationStruct MakeStruct(string name, string[] strings, string[] methods, string[] inheritances)
-    {
-        _wistStructs.Add(new WistCompilationStruct(name, strings, methods, inheritances));
-        return _wistStructs[^1];
+        _wistFunctions.Add(wistFunction);
     }
 
     public void AddStruct(WistCompilationStruct wistStruct)
     {
+        if (wistStruct is null)
+            throw new InvalidOperationException();
+
         _wistStructs.Add(wistStruct);
     }
 }

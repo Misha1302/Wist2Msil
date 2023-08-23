@@ -2,7 +2,7 @@ namespace Wist2Msil;
 
 using System.Globalization;
 
-public static class NumberParser
+public static class WistNumberParser
 {
     private static readonly CultureInfo _dotCulture = new("en") { NumberFormat = { NumberDecimalSeparator = "." } };
 

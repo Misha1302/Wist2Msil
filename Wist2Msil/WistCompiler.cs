@@ -26,7 +26,7 @@ public sealed class WistCompiler
                            BindingFlags.Public | BindingFlags.Instance) ??
                        throw new NullReferenceException();
 
-        _executionHelpersField = typeof(WistExecutionHelper).GetField(nameof(WistExecutionHelper.WistExecutionHelpers),
+        _executionHelpersField = typeof(WistExecutionHelper).GetField(nameof(WistExecutionHelper.ExecutionHelpers),
                                      BindingFlags.Public | BindingFlags.Instance) ??
                                  throw new NullReferenceException();
 
@@ -44,19 +44,19 @@ public sealed class WistCompiler
     {
         _executionHelpers = new List<WistExecutionHelper>();
 
-        foreach (var wistFunction in _module.WistFunctions)
+        foreach (var wistFunction in _module.Functions)
             DeclareFunction(wistFunction);
 
         foreach (var exeHelper in _executionHelpers)
-            exeHelper.WistExecutionHelpers = _executionHelpers.ToArray();
+            exeHelper.ExecutionHelpers = _executionHelpers.ToArray();
 
-        foreach (var wistStruct in _module.WistStructs)
+        foreach (var wistStruct in _module.Structs)
             DeclareStruct(wistStruct);
 
-        foreach (var wistStruct in _module.WistStructs)
+        foreach (var wistStruct in _module.Structs)
             InitStruct(wistStruct);
 
-        foreach (var wistFunction in _module.WistFunctions)
+        foreach (var wistFunction in _module.Functions)
             CompileFunction(wistFunction);
     }
 
@@ -66,15 +66,13 @@ public sealed class WistCompiler
         var s = _wistStructures.Find(x => x.Name == src.Name)!;
 
         foreach (var field in src.Fields)
-            s.AddField(_module.WistHashCode.GetHashCode(field), default);
+            s.AddField(_module.HashCode.GetHashCode(field), default);
 
         foreach (var method in src.Methods)
         {
-            var wistExecutionHelper = _executionHelpers.Find(x => x.DynamicMethod.Name == method);
-            var indexOf = method.IndexOf("<>", StringComparison.Ordinal);
-            if (indexOf == -1) indexOf = method.Length;
+            var wistExecutionHelper = _executionHelpers.Find(x => x.DynamicMethod.Name == method.FullName);
             s.AddMethod(
-                _module.WistHashCode.GetHashCode(method[..indexOf]),
+                _module.HashCode.GetHashCode(method.NameWithoutOwner),
                 wistExecutionHelper!.DynamicMethod,
                 wistExecutionHelper
             );
@@ -96,7 +94,7 @@ public sealed class WistCompiler
 
         var executionHelper = new WistExecutionHelper(wistFunc.Image.Instructions.Select(x => x.Constant),
             new DynamicMethod(
-                wistFunc.Name,
+                wistFunc.Name.FullName,
                 typeof(WistConst),
                 parameterTypes,
                 typeof(WistExecutionHelper),
@@ -116,7 +114,7 @@ public sealed class WistCompiler
         var consts1 = wistFunc.Image.Instructions.Select(x => x.Constant).ToArray();
         var consts2 = wistFunc.Image.Instructions.Select(x => x.Constant2).ToArray();
 
-        var curExeHelper = _executionHelpers.Find(x => x.DynamicMethod.Name == wistFunc.Name)!;
+        var curExeHelper = _executionHelpers.Find(x => x.DynamicMethod.Name == wistFunc.Name.FullName)!;
         using var il = new GroboIL(curExeHelper.DynamicMethod);
 
         var locals = wistFunc.Image.Locals
@@ -129,53 +127,53 @@ public sealed class WistCompiler
             GroboIL.Label? label;
             switch (inst.Op)
             {
-                case WistInstruction.Operation.PushConst:
+                case WistInstruction.WistOperation.PushConst:
                     Push(il, i, exeHelperArgIndex);
                     break;
-                case WistInstruction.Operation.Add:
+                case WistInstruction.WistOperation.Add:
                     il.Call(_methods["Add"]);
                     break;
-                case WistInstruction.Operation.Sub:
+                case WistInstruction.WistOperation.Sub:
                     il.Call(_methods["Sub"]);
                     break;
-                case WistInstruction.Operation.Mul:
+                case WistInstruction.WistOperation.Mul:
                     il.Call(_methods["Mul"]);
                     break;
-                case WistInstruction.Operation.Div:
+                case WistInstruction.WistOperation.Div:
                     il.Call(_methods["Div"]);
                     break;
-                case WistInstruction.Operation.Rem:
+                case WistInstruction.WistOperation.Rem:
                     il.Call(_methods["Rem"]);
                     break;
-                case WistInstruction.Operation.Pow:
+                case WistInstruction.WistOperation.Pow:
                     il.Call(_methods["Pow"]);
                     break;
-                case WistInstruction.Operation.IsEquals:
+                case WistInstruction.WistOperation.IsEquals:
                     il.Call(_methods["IsEquals"]);
                     break;
-                case WistInstruction.Operation.IsNotEquals:
+                case WistInstruction.WistOperation.IsNotEquals:
                     il.Call(_methods["IsNotEquals"]);
                     break;
-                case WistInstruction.Operation.LessThan:
+                case WistInstruction.WistOperation.LessThan:
                     il.Call(_methods["LessThan"]);
                     break;
-                case WistInstruction.Operation.GreaterThan:
+                case WistInstruction.WistOperation.GreaterThan:
                     il.Call(_methods["GreaterThan"]);
                     break;
-                case WistInstruction.Operation.LessThanOrEquals:
+                case WistInstruction.WistOperation.LessThanOrEquals:
                     il.Call(_methods["LessThanOrEquals"]);
                     break;
-                case WistInstruction.Operation.GreaterThanOrEquals:
+                case WistInstruction.WistOperation.GreaterThanOrEquals:
                     il.Call(_methods["GreaterThanOrEquals"]);
                     break;
-                case WistInstruction.Operation.CSharpCall:
+                case WistInstruction.WistOperation.CSharpCall:
                     il.Ldarg(exeHelperArgIndex);
                     il.Ldfld(_constsField);
                     il.Ldc_I4(i);
                     il.Ldelem(typeof(WistConst));
                     il.Call(_methods[$"CSharpCall{consts2[i].GetInternalInteger()}"]);
                     break;
-                case WistInstruction.Operation.WistCall:
+                case WistInstruction.WistOperation.Call:
                     var ind = _executionHelpers.FindIndex(
                         x => x.DynamicMethod.Name == consts2[i].GetString()
                     );
@@ -186,43 +184,43 @@ public sealed class WistCompiler
                     il.Ldelem(typeof(WistExecutionHelper));
                     il.Call(_executionHelpers[ind].DynamicMethod);
                     break;
-                case WistInstruction.Operation.SetLabel:
+                case WistInstruction.WistOperation.SetLabel:
                     var name = consts1[i].GetString();
                     if (!labels.TryGetValue(name, out label))
                         labels.Add(name, label = il.DefineLabel(name));
 
                     il.MarkLabel(label);
                     break;
-                case WistInstruction.Operation.Goto:
+                case WistInstruction.WistOperation.Goto:
                     label = AddOrGetLabel(i);
 
                     il.Br(label);
                     break;
-                case WistInstruction.Operation.GotoIfFalse:
+                case WistInstruction.WistOperation.GotoIfFalse:
                     label = AddOrGetLabel(i);
 
                     il.Call(_methods["PopBool"]);
                     il.Brfalse(label);
                     break;
-                case WistInstruction.Operation.GotoIfTrue:
+                case WistInstruction.WistOperation.GotoIfTrue:
                     label = AddOrGetLabel(i);
 
                     il.Call(_methods["PopBool"]);
                     il.Brtrue(label);
                     break;
-                case WistInstruction.Operation.Drop:
+                case WistInstruction.WistOperation.Drop:
                     il.Pop();
                     break;
-                case WistInstruction.Operation.Dup:
+                case WistInstruction.WistOperation.Dup:
                     il.Dup();
                     break;
-                case WistInstruction.Operation.Cmp:
+                case WistInstruction.WistOperation.Cmp:
                     il.Call(_methods["Cmp"]);
                     break;
-                case WistInstruction.Operation.NegCmp:
+                case WistInstruction.WistOperation.NegCmp:
                     il.Call(_methods["NegCmp"]);
                     break;
-                case WistInstruction.Operation.LoadLocal:
+                case WistInstruction.WistOperation.LoadLocal:
                     var argLocalName = consts1[i].GetString();
 
                     if (locals.Any(x => x.Key == argLocalName))
@@ -231,13 +229,13 @@ public sealed class WistCompiler
                         il.Ldarg(Array.IndexOf(wistFunc.Parameters, consts1[i].GetString()));
 
                     break;
-                case WistInstruction.Operation.SetLocal:
+                case WistInstruction.WistOperation.SetLocal:
                     il.Stloc(locals[consts1[i].GetString()]);
                     break;
-                case WistInstruction.Operation.Ret:
+                case WistInstruction.WistOperation.Ret:
                     il.Ret();
                     break;
-                case WistInstruction.Operation.Instantiate:
+                case WistInstruction.WistOperation.Instantiate:
                     var src = consts1[i].GetStructInternal();
                     var s = _wistStructures.Find(x => x.Name == src.Name)!;
 
@@ -250,15 +248,15 @@ public sealed class WistCompiler
 
                     il.Call(_copyWistStructMethod);
                     break;
-                case WistInstruction.Operation.SetField:
+                case WistInstruction.WistOperation.SetField:
                     il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
                     il.Call(_methods["SetField"]);
                     break;
-                case WistInstruction.Operation.PushField:
+                case WistInstruction.WistOperation.PushField:
                     il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
                     il.Call(_methods["GetField"]);
                     break;
-                case WistInstruction.Operation.CallStructMethod:
+                case WistInstruction.WistOperation.CallStructMethod:
                     il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
                     il.Call(_methods[$"CallStructMethod{consts2[i].GetInternalInteger() + 1}"]);
                     break;
@@ -292,7 +290,7 @@ public sealed class WistCompiler
     {
         compilationTime = WistTimer.MeasureExecutionTime(Compile);
 
-        var wistExecutionHelper = _executionHelpers.First(x => x.DynamicMethod.Name == "Start");
+        var wistExecutionHelper = _executionHelpers.First(x => x.DynamicMethod.Name == "Start0");
         var wistConst = wistExecutionHelper.Run(out executionTime);
         return wistConst;
     }

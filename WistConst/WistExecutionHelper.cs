@@ -8,7 +8,7 @@ using WistTimer;
 public sealed unsafe class WistExecutionHelper
 {
     public readonly DynamicMethod DynamicMethod;
-    public WistExecutionHelper[] WistExecutionHelpers;
+    public WistExecutionHelper[] ExecutionHelpers;
     public WistConst[] Consts;
 
     public WistExecutionHelper(IEnumerable<WistConst> consts, DynamicMethod dynamicMethod,
@@ -16,7 +16,7 @@ public sealed unsafe class WistExecutionHelper
     {
         Consts = consts.ToArray();
         DynamicMethod = dynamicMethod;
-        WistExecutionHelpers = wistExecutionHelpers;
+        ExecutionHelpers = wistExecutionHelpers;
     }
 
     public WistConst Run(out long executionTime)

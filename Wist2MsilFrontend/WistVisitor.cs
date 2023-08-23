@@ -5,6 +5,7 @@ using Wist2Msil;
 using Wist2MsilFrontend.Content;
 using WistConst;
 using WistError;
+using WistFuncName;
 
 public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 {
@@ -94,12 +95,13 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         _saveResultLevel--;
 
         var text = context.IDENTIFIER().GetText();
-        var wistFunction = _wistFunctions.Find(x => x.Name == text);
+        var fullName = WistFuncName.CreateFullName(text, context.expression().Length, null);
+        var wistFunction = _wistFunctions.Find(x => x.Name.FullName == fullName);
 
         if (wistFunction != null)
             _curFunc.Image.Call(wistFunction);
         else
-            _curFunc.Image.Call(_wistLibraryManager.GetMethod(text));
+            _curFunc.Image.Call(_wistLibraryManager.GetMethod(fullName));
 
         if (_saveResultLevel == 0)
             _curFunc.Image.Drop();
@@ -110,10 +112,10 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
     public override object? VisitFuncDecl(WistGrammarParser.FuncDeclContext context)
     {
         var name = context.IDENTIFIER(0).GetText();
-        if (_curStructName != null)
-            name += $"<>{_curStructName}";
+        var argsCount = context.IDENTIFIER().Length - 1;
 
-        var wistFunction = _wistFunctions.Find(x => x.Name == name)!;
+        var wistFunction =
+            _wistFunctions.Find(x => x.Name.FullName == WistFuncName.CreateFullName(name, argsCount, _curStructName))!;
         _wistModule.AddFunction(wistFunction);
         _curFunc = wistFunction;
 
@@ -268,7 +270,14 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         _curFunc.Image.Dup();
         _saveResultLevel--;
 
-        _curFunc.Image.Call(context.IDENTIFIER().GetText(), context.expression().Length - 1);
+        for (var index = 1; index < context.expression().Length; index++)
+        {
+            Visit(context.expression(index));
+        }
+
+        var argsCount = context.expression().Length;
+        var fullName = WistFuncName.CreateFullName(context.IDENTIFIER().GetText(), argsCount, null);
+        _curFunc.Image.Call(fullName, argsCount - 1);
 
         if (_saveResultLevel == 0)
             _curFunc.Image.Drop();

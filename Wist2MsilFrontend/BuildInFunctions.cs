@@ -1,10 +1,10 @@
-﻿namespace Wist2Msil;
+﻿namespace Wist2MsilFrontend;
 
-using Wist2MsilFrontend;
+using Wist2Msil;
 using WistConst;
 
 [WistLibrary]
-public static class BuildInFunctions
+public static class WistBuildInFunctions
 {
     [WistFunction]
     public static WistConst Print(WistConst c)

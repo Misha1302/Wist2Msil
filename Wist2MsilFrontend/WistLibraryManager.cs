@@ -1,7 +1,6 @@
 ﻿namespace Wist2MsilFrontend;
 
 using System.Reflection;
-using Wist2Msil;
 
 public sealed class WistLibraryManager
 {
@@ -15,8 +14,10 @@ public sealed class WistLibraryManager
 
     public MethodInfo? GetMethod(string name)
     {
-        return _methods.Find(x => x.Name == name);
+        return _methods.Find(x => CreateName(x) == name);
     }
+
+    private static string CreateName(MethodBase methodInfo) => methodInfo.Name + methodInfo.GetParameters().Length;
 
     public void AddLibrary(string path, int index = 0)
     {
@@ -46,7 +47,7 @@ public sealed class WistLibraryManager
 
     public void AddBuildInFunctions()
     {
-        var methodInfos = typeof(BuildInFunctions).GetMethods()
+        var methodInfos = typeof(WistBuildInFunctions).GetMethods()
             .Where(y => y.GetCustomAttributesData()
                 .Any(z => z.AttributeType == typeof(WistFunctionAttribute))
             );

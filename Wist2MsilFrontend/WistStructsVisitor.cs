@@ -3,11 +3,12 @@
 using Antlr4.Runtime.Tree;
 using Wist2MsilFrontend.Content;
 using WistConst;
+using WistFuncName;
 
 public sealed class WistStructsVisitor : WistGrammarBaseVisitor<object?>
 {
     private readonly List<WistCompilationStruct> _list = new();
-    private List<string>? _methods;
+    private List<WistFuncName>? _methods;
     private string? _curStructName;
 
     public List<WistCompilationStruct> GetAllStructs(IParseTree parseTree) =>
@@ -22,7 +23,7 @@ public sealed class WistStructsVisitor : WistGrammarBaseVisitor<object?>
         if (context.inheritance() != null)
             inheritances = (List<string>)VisitInheritance(context.inheritance());
 
-        _methods = new List<string>();
+        _methods = new List<WistFuncName>();
         _curStructName = name;
         Visit(context.block());
         _curStructName = null;
@@ -38,7 +39,9 @@ public sealed class WistStructsVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitFuncDecl(WistGrammarParser.FuncDeclContext context)
     {
-        _methods?.Add(context.IDENTIFIER(0).GetText() + $"<>{_curStructName}");
+        var text = context.IDENTIFIER(0).GetText();
+        var funcName = new WistFuncName(text, context.IDENTIFIER().Length - 1, _curStructName!);
+        _methods?.Add(funcName);
         return null;
     }
 
