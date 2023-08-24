@@ -1,75 +1,28 @@
 ﻿include "WistMath.dll"
 
 func Start() {
+    // WhileLoop()
+    ForLoop()
+}
+
+func ForLoop() {
+    for c = 0; c < 10; c = c + 1 {
+        if c < 2: continue
+    
+        Print(c)
+        
+        if c > 6: break
+    }
+}
+
+func WhileLoop() {
     c = 0
-
-label:
-    a = new Vector3()
-    a.Write()
-    
-    a.Constructor()
-    
-    c = c + 1
-    if c != 3:
-        jmp label
+    while true {
+        Print(c) 
+        c = c + 1
+        if c != 5: continue
         
-        
-    a.x = -3.1415926
-    Write(a.x, a.y, a.z)
-    a.Write2()
-    a.Write3()
-    
-    a.Sin(100.0074).Sin().Write()
-    
-    ret a.x * a.y * a.z
-}
-
-func Write(a, b, c): 
-    Print(ToStr(a) + " " + ToStr(b) + " " + ToStr(c))
-
-struct Vector3(z) : Vector2 {
-    func Constructor(self) {
-        self.x = -1
-        self.y = -2
-        self.z = -3
-        
-        ret self
+        Print("c is five!!!")
+        if c == 5: break
     }
-
-    func Write3(self):
-        Print("[" + ToStr(self.x) + ", " + ToStr(self.y) + ", " + ToStr(self.z) + "]")
-
-    func Write(self):
-        Print("[" + ToStr(self.x) + ", " + ToStr(self.y) + ", " + ToStr(self.z) + "]")
-
-    func Sin(self) {
-        self.x = Sin(self.x)
-        self.y = Sin(self.y)
-        self.z = Sin(self.z)
-        
-        ret self
-    }
-
-    func Sin(self, mul) {
-        self.x = Sin(self.x) * mul
-        self.y = Sin(self.y) * mul
-        self.z = Sin(self.z) * mul
-        
-        ret self
-    }
-}
-
-struct Vector2(x, y) {
-    func Constructor(self) {
-        self.x = 1
-        self.y = 2
-        
-        ret self
-    }
-
-    func Write2(self):
-        Print("[" + ToStr(self.x) + ", " + ToStr(self.y) + "]")
-
-    func Write(self):
-        Print("[" + ToStr(self.x) + ", " + ToStr(self.y) + "]")
 }

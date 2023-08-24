@@ -17,6 +17,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
     private bool _initialized;
     private string? _curStructName;
     private WistLibraryManager _wistLibraryManager = null!;
+    private (string startLoopLabel, string endLoopLabel, string lastAssigmentLabel) _loopLabels;
 
     public override object? Visit(IParseTree tree)
     {
@@ -217,8 +218,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         Visit(context.expression());
         _saveResultLevel--;
 
-        var elseLabelName = GenerateElseLabelName();
-        var endElseLabelName = GenerateEndElseLabelName();
+        var elseLabelName = WistLabelsManager.ElseStartLabelName();
+        var endElseLabelName = WistLabelsManager.ElseEndLabelName();
         _curFunc.Image.GotoIfFalse(elseLabelName);
 
         // if block
@@ -283,6 +284,69 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         return null;
     }
 
+    public override object? VisitBreak(WistGrammarParser.BreakContext context)
+    {
+        _curFunc.Image.Goto(_loopLabels.endLoopLabel);
+        return null;
+    }
+
+    public override object? VisitContinue(WistGrammarParser.ContinueContext context)
+    {
+        _curFunc.Image.Goto(
+            string.IsNullOrEmpty(_loopLabels.lastAssigmentLabel)
+                ? _loopLabels.startLoopLabel
+                : _loopLabels.lastAssigmentLabel
+        );
+        return null;
+    }
+
+    public override object? VisitWhileLoop(WistGrammarParser.WhileLoopContext context)
+    {
+        var whileStartLabelName = WistLabelsManager.WhileStartLabelName();
+        var whileEndLabelName = WistLabelsManager.WhileEndLabelName();
+
+        _loopLabels = (whileStartLabelName, whileEndLabelName, string.Empty);
+
+        _curFunc.Image.SetLabel(whileStartLabelName);
+
+        Visit(context.expression());
+        _curFunc.Image.GotoIfFalse(whileEndLabelName);
+
+        Visit(context.block());
+
+        _curFunc.Image.Goto(whileStartLabelName);
+        _curFunc.Image.SetLabel(whileEndLabelName);
+
+        return null;
+    }
+
+    public override object? VisitForLoop(WistGrammarParser.ForLoopContext context)
+    {
+        var forStartLabelName = WistLabelsManager.ForStartLabelName();
+        var forEndLabelName = WistLabelsManager.ForEndLabelName();
+        var forLastAssigmentLabelName = WistLabelsManager.ForLastAssigmentLabelName();
+
+        _loopLabels = (forStartLabelName, forEndLabelName, forLastAssigmentLabelName);
+
+        Visit(context.assigment(0));
+
+        _curFunc.Image.SetLabel(forStartLabelName);
+
+        Visit(context.expression());
+        _curFunc.Image.GotoIfFalse(forEndLabelName);
+
+        Visit(context.block());
+
+        
+        _curFunc.Image.SetLabel(forLastAssigmentLabelName);
+        Visit(context.assigment(1));
+
+        _curFunc.Image.Goto(forStartLabelName);
+        _curFunc.Image.SetLabel(forEndLabelName);
+
+        return null;
+    }
+
     public override object? VisitStructFieldExpression(WistGrammarParser.StructFieldExpressionContext context)
     {
         _saveResultLevel++;
@@ -301,7 +365,4 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         _curFunc.Image.SetField(context.IDENTIFIER().GetText());
         return null;
     }
-
-    private static string GenerateElseLabelName() => $"else_{Guid.NewGuid()}";
-    private static string GenerateEndElseLabelName() => $"end_else_{Guid.NewGuid()}";
 }

@@ -5,7 +5,7 @@ line: endOfLine* (statement | declaration | expression) endOfLine*;
 
 declaration: funcDecl | labelDecl | structDecl;
 statement: simpleStatement (';' simpleStatement)*;
-simpleStatement: assigment | ret | jmp | ifBlock | newStruct | include;
+simpleStatement: assigment | ret | jmp | ifBlock | newStruct | include | break | continue | loops;
 
 ret: 'ret' expression;
 jmp: 'jmp' IDENTIFIER;
@@ -17,6 +17,14 @@ include: 'include' STRING;
 assigment: varAssigment | structFieldAssigment;
 varAssigment: IDENTIFIER '=' expression;
 structFieldAssigment: expression '.' IDENTIFIER '=' expression;
+
+loops: whileLoop | forLoop;
+
+break: 'break' endOfLine;
+continue: 'continue' endOfLine;
+
+whileLoop: 'while' expression block;
+forLoop: 'for' assigment? endOfLine expression? endOfLine assigment? block;
 
 structDecl: 'struct' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' inheritance? block;
 inheritance: (':' IDENTIFIER (IDENTIFIER (',' IDENTIFIER)*)?);
