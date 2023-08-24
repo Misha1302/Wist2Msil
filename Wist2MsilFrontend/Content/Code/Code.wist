@@ -1,17 +1,21 @@
-﻿include "WistMath.dll"
+﻿include "WistTime.dll"
 
 func Start() {
-    // WhileLoop()
+    WhileLoop()
+    
+    Print('')
+    Print('')
+    
     ForLoop()
 }
 
 func ForLoop() {
-    for c = 0; c < 10; c = c + 1 {
-        if c < 2: continue
-    
-        Print(c)
-        
-        if c > 6: break
+    // it's so slow...
+    // maybe i can change i type to int for the best speed?
+    for i = 0; i < 100; i = i + 1 {
+        t = GetTimeInMs()
+        for c = 0; c < 100_000_000; c = c + 1 { }
+        Print(GetTimeInMs() - t)
     }
 }
 
