@@ -13,7 +13,7 @@ public sealed class WistFunction
     public WistFunction(WistFuncName name, WistImage image, string[] parameters)
     {
         Name = name;
-        Image = image;
+        Image = image.SetFunction(this);
         Parameters = parameters;
     }
 }

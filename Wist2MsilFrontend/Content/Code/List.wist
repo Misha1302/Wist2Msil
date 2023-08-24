@@ -1,0 +1,29 @@
+include "WistList.dll"
+
+struct List(_lst) {
+    func Constructor(self, lst) {
+        self._lst = lst
+        
+        ret self
+    }
+    
+    func Add(self, elem) {
+        ListAdd(self._lst, elem)
+    }
+    
+    func Remove(self, elem) {
+        ListRemove(self._lst, elem)
+    }
+    
+    func RemoveAt(self, ind) { // we count from 1!
+        ListRemoveAt(self._lst, ind - 1) 
+    }
+    
+    func Insert(self, ind, elem) { // we count from 1!
+        ListInsert(self._lst, ind - 1, elem)
+    }
+    
+    func ToString(self) {
+        ret ToStr(self._lst)
+    }
+}

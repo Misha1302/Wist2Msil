@@ -17,7 +17,7 @@ var simpleParser = new WistGrammarParser(commonTokenStream);
 // simpleParser.AddErrorListener(new WistThrowingErrorListener());
 
 var program = simpleParser.program();
-var visitor = new WistVisitor();
+var visitor = new WistVisitor(dir);
 visitor.Visit(program);
 
 var module = visitor.GetModule();

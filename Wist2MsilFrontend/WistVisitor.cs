@@ -18,6 +18,28 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
     private string? _curStructName;
     private WistLibraryManager _wistLibraryManager = null!;
     private (string startLoopLabel, string endLoopLabel, string lastAssigmentLabel) _loopLabels;
+    private readonly string _path;
+
+    public WistVisitor(string path)
+    {
+        _path = path;
+    }
+
+    public WistVisitor(string path, List<WistFunction> wistFunctions, List<WistCompilationStruct> wistStructs,
+        WistLibraryManager wistLibraryManager, IParseTree tree)
+    {
+        _path = path;
+        wistFunctions.AddRange(new WistFunctionsVisitor().GetAllFunctions(tree));
+        wistStructs.AddRange(new WistStructsVisitor().GetAllStructs(tree));
+        new WistLibraryVisitor(path, wistFunctions, wistStructs, wistLibraryManager).SetLibManager(wistLibraryManager)
+            .Visit(tree);
+
+        _wistFunctions = wistFunctions;
+        _wistStructs = wistStructs;
+        _wistLibraryManager = wistLibraryManager;
+        
+        _initialized = true;
+    }
 
     public override object? Visit(IParseTree tree)
     {
@@ -27,10 +49,17 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
             _wistFunctions = new WistFunctionsVisitor().GetAllFunctions(tree);
             _wistStructs = new WistStructsVisitor().GetAllStructs(tree);
             _wistLibraryManager = new WistLibraryManager();
-            new WistLibraryVisitor().SetLibManager(_wistLibraryManager).Visit(tree);
+            new WistLibraryVisitor(_path, _wistFunctions, _wistStructs, _wistLibraryManager)
+                .SetLibManager(_wistLibraryManager).Visit(tree);
         }
 
         base.Visit(tree);
+
+        foreach (var wistStruct in _wistStructs)
+            _wistModule.AddStruct(wistStruct);
+        foreach (var wistFunction in _wistFunctions)
+            _wistModule.AddFunction(wistFunction);
+
         return null;
     }
 
@@ -88,6 +117,20 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         return null;
     }
 
+    public override object? VisitListExpression(WistGrammarParser.ListExpressionContext context)
+    {
+        _curFunc.Image.InstantiateList();
+        foreach (var expression in context.expression())
+        {
+            _curFunc.Image.Dup();
+            Visit(expression);
+            _curFunc.Image.Call(typeof(WistBuildInFunctions).GetMethod(nameof(WistBuildInFunctions.AddToList)));
+            _curFunc.Image.Drop();
+        }
+
+        return null;
+    }
+
     public override object? VisitFuncCallExpression(WistGrammarParser.FuncCallExpressionContext context)
     {
         _saveResultLevel++;
@@ -117,7 +160,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
         var wistFunction =
             _wistFunctions.Find(x => x.Name.FullName == WistFuncName.CreateFullName(name, argsCount, _curStructName))!;
-        _wistModule.AddFunction(wistFunction);
+        
         _curFunc = wistFunction;
 
         Visit(context.block());
@@ -255,8 +298,6 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         if (wistStruct is null)
             throw new InvalidOperationException();
 
-        _wistModule.AddStruct(wistStruct);
-
         _curStructName = wistStruct.Name;
         Visit(context.block());
         _curStructName = null;
@@ -337,7 +378,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
         Visit(context.block());
 
-        
+
         _curFunc.Image.SetLabel(forLastAssigmentLabelName);
         Visit(context.assigment(1));
 

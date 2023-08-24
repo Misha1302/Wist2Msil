@@ -1,12 +1,19 @@
 ﻿include "WistTime.dll"
+include "List.wist"
 
 func Start() {
-    WhileLoop()
+    lst = new List().Constructor([1,2])
     
-    Print('')
-    Print('')
+    lst.Add(5)
+    lst.Add(2)
+    lst.Add(1233)
     
-    ForLoop()
+    Print(lst.ToString())
+
+    lst.Remove(2)
+    lst.RemoveAt(1) // first element. Like an element at zero index
+
+    Print(lst.ToString())
 }
 
 func ForLoop() {
@@ -19,14 +26,8 @@ func ForLoop() {
     }
 }
 
-func WhileLoop() {
-    c = 0
-    while true {
-        Print(c) 
-        c = c + 1
-        if c != 5: continue
-        
-        Print("c is five!!!")
-        if c == 5: break
-    }
-}
+
+
+//struct Extensions() ~ List {
+//    func Print(list): Print(ToStr(list._lst))
+//}

@@ -1,7 +1,9 @@
 namespace Wist2Msil;
 
+using System.Diagnostics;
 using WistConst;
 
+[DebuggerDisplay("{Op}:{Constant}")]
 public struct WistInstruction
 {
     public readonly WistOperation Op;
@@ -48,6 +50,7 @@ public struct WistInstruction
         Instantiate,
         SetField,
         PushField,
-        CallStructMethod
+        CallStructMethod,
+        InstantiateList
     }
 }

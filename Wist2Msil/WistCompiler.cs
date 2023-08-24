@@ -13,6 +13,7 @@ public sealed class WistCompiler
     private static readonly FieldInfo _constsField;
     private static readonly FieldInfo _executionHelpersField;
     private static readonly MethodInfo _copyWistStructMethod;
+    private static readonly MethodInfo _copyListMethod;
     private readonly WistModule _module;
     private List<WistExecutionHelper> _executionHelpers = null!;
     private readonly List<WistStruct> _wistStructures = new();
@@ -32,6 +33,10 @@ public sealed class WistCompiler
 
         _copyWistStructMethod =
             typeof(WistConst).GetMethod(nameof(WistConst.CopyStruct), BindingFlags.Instance | BindingFlags.Public) ??
+            throw new NullReferenceException();
+
+        _copyListMethod =
+            typeof(WistConst).GetMethod(nameof(WistConst.CopyList), BindingFlags.Instance | BindingFlags.Public) ??
             throw new NullReferenceException();
     }
 
@@ -125,6 +130,7 @@ public sealed class WistCompiler
         {
             var inst = wistFunc.Image.Instructions[i];
             GroboIL.Label? label;
+            string? name;
             switch (inst.Op)
             {
                 case WistInstruction.WistOperation.PushConst:
@@ -185,7 +191,7 @@ public sealed class WistCompiler
                     il.Call(_executionHelpers[ind].DynamicMethod);
                     break;
                 case WistInstruction.WistOperation.SetLabel:
-                    var name = consts1[i].GetString();
+                    name = consts1[i].GetString();
                     if (!labels.TryGetValue(name, out label))
                         labels.Add(name, label = il.DefineLabel(name));
 
@@ -225,12 +231,20 @@ public sealed class WistCompiler
 
                     if (locals.Any(x => x.Key == argLocalName))
                         il.Ldloc(locals[argLocalName]);
-                    else
+                    else if (wistFunc.Parameters.Any(x => x == argLocalName))
                         il.Ldarg(Array.IndexOf(wistFunc.Parameters, consts1[i].GetString()));
+                    else throw new InvalidOperationException();
 
                     break;
                 case WistInstruction.WistOperation.SetLocal:
-                    il.Stloc(locals[consts1[i].GetString()]);
+                    name = consts1[i].GetString();
+
+                    if (locals.Any(x => x.Key == name))
+                        il.Stloc(locals[name]);
+                    else if (wistFunc.Parameters.Any(x => x == name))
+                        il.Starg(Array.IndexOf(wistFunc.Parameters, consts1[i].GetString()));
+                    else throw new InvalidOperationException();
+
                     break;
                 case WistInstruction.WistOperation.Ret:
                     il.Ret();
@@ -239,6 +253,9 @@ public sealed class WistCompiler
                     var src = consts1[i].GetStructInternal();
                     var s = _wistStructures.Find(x => x.Name == src.Name)!;
 
+                    if (s is null)
+                        throw new InvalidOperationException();
+                    
                     curExeHelper.Consts[i] = new WistConst(s);
 
                     il.Ldarg(exeHelperArgIndex);
@@ -259,6 +276,16 @@ public sealed class WistCompiler
                 case WistInstruction.WistOperation.CallStructMethod:
                     il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
                     il.Call(_methods[$"CallStructMethod{consts2[i].GetInternalInteger() + 1}"]);
+                    break;
+                case WistInstruction.WistOperation.InstantiateList:
+                    curExeHelper.Consts[i] = new WistConst(new List<WistConst>());
+
+                    il.Ldarg(exeHelperArgIndex);
+                    il.Ldfld(_constsField);
+                    il.Ldc_I4(i);
+                    il.Ldelema(typeof(WistConst));
+
+                    il.Call(_copyListMethod);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(inst.Op.ToString());

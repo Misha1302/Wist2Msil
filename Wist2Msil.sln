@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WistFuncName", "WistFuncNam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WistTime", "WistTime\WistTime.csproj", "{6A455892-4B4F-4225-82B2-0437E8DD38B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WistList", "WistList\WistList.csproj", "{AAAC3705-FF23-46B4-AD1F-016EA4EF6AC9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,5 +62,9 @@ Global
 		{6A455892-4B4F-4225-82B2-0437E8DD38B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A455892-4B4F-4225-82B2-0437E8DD38B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A455892-4B4F-4225-82B2-0437E8DD38B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAAC3705-FF23-46B4-AD1F-016EA4EF6AC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAAC3705-FF23-46B4-AD1F-016EA4EF6AC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAAC3705-FF23-46B4-AD1F-016EA4EF6AC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAAC3705-FF23-46B4-AD1F-016EA4EF6AC9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

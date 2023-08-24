@@ -10,6 +10,7 @@ public sealed class WistImage
     private readonly List<WistInstruction> _instructions = new();
     public readonly List<string> Locals = new();
     public readonly HashSet<string> LocalsHashSet = new();
+    private WistFunction _function = null!;
     public IReadOnlyList<WistInstruction> Instructions => _instructions;
 
     public void PushConst(WistConst c) =>
@@ -95,7 +96,9 @@ public sealed class WistImage
 
     public void SetLocal(string locName)
     {
-        TryAddLoc(locName);
+        if (!_function.Parameters.Contains(locName))
+            TryAddLoc(locName);
+        
         _instructions.Add(new wInst(WistInstruction.WistOperation.SetLocal, new WistConst(locName)));
     }
 
@@ -175,6 +178,21 @@ public sealed class WistImage
                 WistInstruction.WistOperation.CallStructMethod,
                 new WistConst(mName),
                 WistConst.CreateInternalConst(argsLen)
+            )
+        );
+    }
+
+    public WistImage SetFunction(WistFunction function)
+    {
+        _function = function;
+        return this;
+    }
+
+    public void InstantiateList()
+    {
+        _instructions.Add(
+            new wInst(
+                WistInstruction.WistOperation.InstantiateList
             )
         );
     }

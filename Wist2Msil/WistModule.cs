@@ -16,6 +16,9 @@ public sealed class WistModule
 
     public void AddFunction(WistFunction wistFunction)
     {
+        if (_wistFunctions.Contains(wistFunction))
+            return;
+
         if (wistFunction is null)
             throw new InvalidOperationException();
 
@@ -24,6 +27,9 @@ public sealed class WistModule
 
     public void AddStruct(WistCompilationStruct wistStruct)
     {
+        if (_wistStructs.Contains(wistStruct))
+            return;
+        
         if (wistStruct is null)
             throw new InvalidOperationException();
 

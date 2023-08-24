@@ -1,6 +1,6 @@
 namespace WistConst;
 
-public enum WistType : byte
+public enum WistType : long
 {
     None,
     Null,

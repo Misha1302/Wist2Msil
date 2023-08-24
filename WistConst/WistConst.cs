@@ -164,6 +164,9 @@ public readonly struct WistConst : IEquatable<WistConst>
     public WistConst CopyStruct() => new(((WistStruct)((GCHandle)_handle!.Pointer).Target!).Copy());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public WistConst CopyList() => new(GetList().ToList());
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistCompilationStruct GetStructInternal() => (WistCompilationStruct)((GCHandle)_handle!.Pointer).Target!;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

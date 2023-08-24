@@ -41,6 +41,7 @@ expression
     | IDENTIFIER '(' (expression (',' expression)*)? ')'                                #funcCallExpression
     | expression '.' IDENTIFIER '(' (expression (',' expression)*)? ')'                 #structFuncCallExpression
     | expression '.' IDENTIFIER                                                         #structFieldExpression
+    | '[' (expression (',' expression)*)? ']'                                           #listExpression
     | expression REM_OP expression                                                      #remExpression
     | expression MUL_OP expression                                                      #mulExpression
     | expression ADD_OP expression                                                      #addExpression

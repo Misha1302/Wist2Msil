@@ -14,6 +14,13 @@ public static class WistBuildInFunctions
     }
 
     [WistFunction]
+    public static WistConst AddToList(WistConst list, WistConst elem)
+    {
+        list.GetList().Add(elem);
+        return default;
+    }
+
+    [WistFunction]
     public static WistConst ToStr(WistConst c) => new(c.ToString());
 
     [WistFunction]
