@@ -15,6 +15,8 @@ func Start() {
 
     lst.Remove(2)
     lst.RemoveAt(1) // first element. Like an element at zero index
+    
+    lst.PrintListExt()
 
     Print(lst.ToString())
 }
@@ -30,7 +32,6 @@ func ForLoop() {
 }
 
 
-
-//struct Extensions() ~ List {
-//    func Print(list): Print(ToStr(list._lst))
-//}
+func PrintListExt(lst) {
+    Print("Ext list printing: " + ToStr(lst._lst))
+}

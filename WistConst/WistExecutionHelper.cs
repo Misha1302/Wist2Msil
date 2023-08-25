@@ -1,10 +1,12 @@
 namespace WistConst;
 
+using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using WistTimer;
 
+[DebuggerDisplay("{DynamicMethod.Name}")]
 public sealed unsafe class WistExecutionHelper
 {
     public readonly DynamicMethod DynamicMethod;

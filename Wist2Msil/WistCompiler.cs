@@ -16,6 +16,7 @@ public sealed class WistCompiler
     private static readonly MethodInfo _copyListMethod;
     private readonly WistModule _module;
     private List<WistExecutionHelper> _executionHelpers = null!;
+    private WistFastSortedList<WistExecutionHelper> _sortedListOfHelpers = null!;
     private readonly List<WistStruct> _wistStructures = new();
 
     static WistCompiler()
@@ -48,6 +49,7 @@ public sealed class WistCompiler
     private void Compile()
     {
         _executionHelpers = new List<WistExecutionHelper>();
+        _sortedListOfHelpers = new WistFastSortedList<WistExecutionHelper>();
 
         foreach (var wistFunction in _module.Functions)
             DeclareFunction(wistFunction);
@@ -63,6 +65,10 @@ public sealed class WistCompiler
 
         foreach (var wistFunction in _module.Functions)
             CompileFunction(wistFunction);
+
+
+        foreach (var helper in _executionHelpers)
+            _sortedListOfHelpers.Add(_module.HashCode.GetHashCode(helper.DynamicMethod.Name), helper);
     }
 
     private void InitStruct(WistCompilationStruct wistStruct)
@@ -89,7 +95,7 @@ public sealed class WistCompiler
 
     private void DeclareStruct(WistCompilationStruct wistStruct)
     {
-        _wistStructures.Add(new WistStruct(wistStruct.Name, new List<WistStruct>()));
+        _wistStructures.Add(new WistStruct(wistStruct.Name, new List<WistStruct>(), _sortedListOfHelpers));
     }
 
     private void DeclareFunction(WistFunction wistFunc)
@@ -255,7 +261,7 @@ public sealed class WistCompiler
 
                     if (s is null)
                         throw new InvalidOperationException();
-                    
+
                     curExeHelper.Consts[i] = new WistConst(s);
 
                     il.Ldarg(exeHelperArgIndex);

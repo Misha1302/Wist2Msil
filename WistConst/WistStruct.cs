@@ -6,25 +6,29 @@ using System.Runtime.CompilerServices;
 public sealed class WistStruct
 {
     private readonly WistFastSortedList<WistConst> _sortedFields = new();
-    private readonly WistFastSortedList<WistMethod?> _sortedMethods = new();
+    private readonly WistFastSortedList<WistMethod> _sortedMethods = new();
+    private readonly WistFastSortedList<WistExecutionHelper> _executionHelpers;
     public readonly string Name;
     private readonly List<WistStruct> _inheritances;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistStruct(string name, List<WistStruct> inheritances)
+    public WistStruct(string name, List<WistStruct> inheritances,
+        WistFastSortedList<WistExecutionHelper> executionHelpers)
     {
         Name = name;
         _inheritances = inheritances;
+        _executionHelpers = executionHelpers;
     }
 
     private WistStruct(string name, WistFastSortedList<WistConst> sortedFields,
-        WistFastSortedList<WistMethod?> sortedMethods,
-        List<WistStruct> inheritances)
+        WistFastSortedList<WistMethod> sortedMethods,
+        IEnumerable<WistStruct> inheritances, WistFastSortedList<WistExecutionHelper> executionHelpers)
     {
         Name = name;
         _sortedFields = sortedFields.Copy();
         _sortedMethods = sortedMethods.Copy();
         _inheritances = inheritances.Select(x => x.Copy()).ToList();
+        _executionHelpers = executionHelpers;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -83,6 +87,7 @@ public sealed class WistStruct
     {
         var indexOfKey = _sortedMethods.IndexOfKey(key);
 
+        // call method in current class
         WistMethod? wistMethod = null;
         if (indexOfKey >= 0)
         {
@@ -90,6 +95,7 @@ public sealed class WistStruct
             goto end;
         }
 
+        // call method in parents
         for (var index = _inheritances.Count - 1; index >= 0; index--)
         {
             var inheritance = _inheritances[index];
@@ -100,16 +106,24 @@ public sealed class WistStruct
             goto end;
         }
 
+        // call extension method
+        indexOfKey = _executionHelpers.IndexOfKey(key);
+        if (indexOfKey >= 0)
+        {
+            var helper = _executionHelpers.GetByIndex(indexOfKey);
+            return (WistConst)helper.DynamicMethod.Invoke(null, args.Append(helper).ToArray())!;
+        }
+
         if (wistMethod is null)
             return default;
 
         end:
-        return (WistConst)wistMethod!.DynamicMethod.Invoke(null, args.Append(wistMethod.ExecutionHelper).ToArray())!;
+        return (WistConst)wistMethod.DynamicMethod.Invoke(null, args.Append(wistMethod.ExecutionHelper).ToArray())!;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AddMethod(int key, DynamicMethod m, WistExecutionHelper executionHelper) =>
         _sortedMethods.Add(key, new WistMethod(m, executionHelper));
 
-    public WistStruct Copy() => new(Name, _sortedFields, _sortedMethods, _inheritances);
+    public WistStruct Copy() => new(Name, _sortedFields, _sortedMethods, _inheritances, _executionHelpers);
 }
