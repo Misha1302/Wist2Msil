@@ -2,23 +2,29 @@
 include "List.wist"
 
 func Start() {
-    lst = new List([1, 2])
-    
-    // this works too but it's not concise
-    // lst = new List().Constructor([1, 2])
-    
-    lst.Add(5)
-    lst.Add(2)
-    lst.Add(1233)
-    
-    Print(lst.ToString())
+    times = new List()
 
-    lst.Remove(2)
-    lst.RemoveAt(1) // first element. Like an element at zero index
+    for i = 0; i < 30; i = i + 1 {
+        t = GetTimeInMs()
+        
     
-    lst.PrintListExt()
-
-    Print(lst.ToString())
+        lst = new List([1, 2, 3, 4, 5, 6, 7, 8, 9])
+        
+        for j = 0; j < 500_000; j = j + 1 {
+            lst.Add(5)
+            lst.Add(5)
+            lst.Add(5)
+            lst.RemoveAt(3)
+            lst.RemoveAt(2)
+            lst.RemoveAt(1)
+        }
+        
+        
+        times.Add(GetTimeInMs() - t)
+    }
+    
+    Print(times.ToString())
+    Print(times.Average())
 }
 
 func ForLoop() {

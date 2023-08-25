@@ -306,8 +306,10 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
         _curFunc.Image.Dup();
 
+        _saveResultLevel++;
         for (var index = 0; index < context.expression().Length; index++)
             Visit(context.expression(index));
+        _saveResultLevel--;
 
         _curFunc.Image.Call(fullName, argsCount - 1);
 
@@ -338,8 +340,10 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         _curFunc.Image.Dup();
         _saveResultLevel--;
 
+        _saveResultLevel++;
         for (var index = 1; index < context.expression().Length; index++)
             Visit(context.expression(index));
+        _saveResultLevel--;
 
         var argsCount = context.expression().Length;
         var fullName = WistFuncName.CreateFullName(context.IDENTIFIER().GetText(), argsCount, null);

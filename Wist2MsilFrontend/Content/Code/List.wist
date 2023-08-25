@@ -7,6 +7,10 @@ struct List(_lst) {
         ret self
     }
     
+    func Constructor(self) {
+        ret self.Constructor([])
+    }
+    
     func Add(self, elem) {
         ListAdd(self._lst, elem)
     }
@@ -25,5 +29,27 @@ struct List(_lst) {
     
     func ToString(self) {
         ret ToStr(self._lst)
+    }
+    
+    func GetElem(self, ind) {
+        ret GetElemFromList(self._lst, ind - 1)
+    }
+    
+    func GetElem(self, value, ind) {
+        ret SetElemInList(self._lst, value, ind)
+    }
+    
+    func GetLen(self) {
+        ret GetListLen(self._lst)
+    }
+    
+    func Average(self) {
+        sum = 0
+        len = GetListLen(self._lst)
+        
+        for i = 0; i < len; i = i + 1:
+            sum = sum + self.GetElem(i)
+
+        ret sum / len
     }
 }
