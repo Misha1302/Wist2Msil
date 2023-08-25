@@ -53,7 +53,7 @@ expression
     
     
      
-newStruct: 'new' IDENTIFIER '(' ')';
+newStruct: 'new' IDENTIFIER '(' (expression (',' expression)*)? ')';
 
 constant: NUMBER | STRING | BOOL | NULL;
 

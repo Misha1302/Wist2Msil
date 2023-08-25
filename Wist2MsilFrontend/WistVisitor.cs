@@ -37,7 +37,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         _wistFunctions = wistFunctions;
         _wistStructs = wistStructs;
         _wistLibraryManager = wistLibraryManager;
-        
+
         _initialized = true;
     }
 
@@ -160,7 +160,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
         var wistFunction =
             _wistFunctions.Find(x => x.Name.FullName == WistFuncName.CreateFullName(name, argsCount, _curStructName))!;
-        
+
         _curFunc = wistFunction;
 
         Visit(context.block());
@@ -286,8 +286,34 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         if (wistStruct is null)
             throw new InvalidOperationException();
 
-        if (_saveResultLevel != 0)
-            _curFunc.Image.Instantiate(wistStruct);
+        var argsCount = context.expression().Length + 1;
+
+        var fullName = WistFuncName.CreateFullName("Constructor", argsCount, null);
+        var ctorFound = wistStruct.Methods.Any(x => x.NameWithoutOwner == fullName);
+
+        if (!ctorFound && _saveResultLevel == 0)
+            return null;
+        
+        _curFunc.Image.Instantiate(wistStruct);
+
+        if (!ctorFound)
+        {
+            if (argsCount == 1)
+                return null;
+
+            throw new InvalidOperationException();
+        }
+
+        _curFunc.Image.Dup();
+
+        for (var index = 0; index < context.expression().Length; index++)
+            Visit(context.expression(index));
+
+        _curFunc.Image.Call(fullName, argsCount - 1);
+
+        if (_saveResultLevel == 0)
+            _curFunc.Image.Drop();
+
 
         return null;
     }
