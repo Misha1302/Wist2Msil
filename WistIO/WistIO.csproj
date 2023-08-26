@@ -6,20 +6,21 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath>bin\</OutputPath>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <OutputPath>bin</OutputPath>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
       <OutputPath>bin\</OutputPath>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Wist2MsilFrontend\Wist2MsilFrontend.csproj" />
+      <ProjectReference Include="..\WistConst\WistConst.csproj" />
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="move &quot;bin\net7.0\WistList.dll&quot; &quot;..\Wist2MsilFrontend\Content\Code\Libraries&quot;" />
+      <Exec Command="move &quot;bin\net7.0\WistIO.dll&quot; &quot;..\Wist2MsilFrontend\Content\Code\Libraries&quot;" />
     </Target>
 
 </Project>

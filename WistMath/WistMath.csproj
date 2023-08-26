@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="move &quot;bin\net7.0\WistMath.dll&quot; &quot;..\Wist2MsilFrontend\Content\Code&quot;" />
+      <Exec Command="move &quot;bin\net7.0\WistMath.dll&quot; &quot;..\Wist2MsilFrontend\Content\Code\Libraries&quot;" />
     </Target>
 
 </Project>

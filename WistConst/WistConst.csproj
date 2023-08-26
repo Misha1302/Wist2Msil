@@ -8,9 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\WistError\WistError.csproj"/>
-        <ProjectReference Include="..\WistFuncName\WistFuncName.csproj"/>
-        <ProjectReference Include="..\WistTimer\WistTimer.csproj"/>
+        <ProjectReference Include="..\WistError\WistError.csproj" />
+        <ProjectReference Include="..\WistFuncName\WistFuncName.csproj" />
+        <ProjectReference Include="..\WistTimer\WistTimer.csproj" />
     </ItemGroup>
 
 </Project>

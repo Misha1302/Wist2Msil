@@ -5,12 +5,7 @@ using System.Reflection;
 public sealed class WistLibraryManager
 {
     private readonly List<MethodInfo> _methods = new();
-    private readonly string[] _paths = { @"", @"Content\Code", @"Content", @"Content\Libraries", @"Libraries" };
-
-    public WistLibraryManager()
-    {
-        AddBuildInFunctions();
-    }
+    private readonly string[] _paths = { @"", @"Content\Code", @"Content\Code\Libraries", @"Content", @"Content\Libraries", @"Libraries" };
 
     public MethodInfo? GetMethod(string name)
     {
@@ -40,16 +35,6 @@ public sealed class WistLibraryManager
                 .Where(y => y.GetCustomAttributesData()
                     .Any(z => z.AttributeType == typeof(WistFunctionAttribute))
                 )
-            );
-
-        _methods.AddRange(methodInfos);
-    }
-
-    public void AddBuildInFunctions()
-    {
-        var methodInfos = typeof(WistBuildInFunctions).GetMethods()
-            .Where(y => y.GetCustomAttributesData()
-                .Any(z => z.AttributeType == typeof(WistFunctionAttribute))
             );
 
         _methods.AddRange(methodInfos);

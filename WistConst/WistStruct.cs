@@ -81,9 +81,8 @@ public sealed class WistStruct
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AddField(int key, WistConst value) => _sortedFields.Add(key, value);
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistConst CallMethod(int key, params object[] args)
+    public WistConst CallMethod(int key, params object?[] args)
     {
         var indexOfKey = _sortedMethods.IndexOfKey(key);
 
@@ -111,14 +110,16 @@ public sealed class WistStruct
         if (indexOfKey >= 0)
         {
             var helper = _executionHelpers.GetByIndex(indexOfKey);
-            return (WistConst)helper.DynamicMethod.Invoke(null, args.Append(helper).ToArray())!;
+            args[^1] = helper;
+            return (WistConst)helper.DynamicMethod.Invoke(null, args)!;
         }
 
         if (wistMethod is null)
             return default;
 
         end:
-        return (WistConst)wistMethod.DynamicMethod.Invoke(null, args.Append(wistMethod.ExecutionHelper).ToArray())!;
+        args[^1] = wistMethod.ExecutionHelper;
+        return (WistConst)wistMethod.DynamicMethod.Invoke(null, args)!;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

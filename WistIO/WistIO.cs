@@ -1,22 +1,16 @@
-﻿namespace Wist2MsilFrontend;
+﻿namespace WistIO;
 
 using Wist2Msil;
+using Wist2MsilFrontend;
 using WistConst;
 
 [WistLibrary]
-public static class WistBuildInFunctions
+public static class WistIO
 {
     [WistFunction]
     public static WistConst Print(WistConst c)
     {
         Console.WriteLine(c.ToString());
-        return default;
-    }
-
-    [WistFunction]
-    public static WistConst AddToList(WistConst list, WistConst elem)
-    {
-        list.GetList().Add(elem);
         return default;
     }
 

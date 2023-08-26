@@ -124,7 +124,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         {
             _curFunc.Image.Dup();
             Visit(expression);
-            _curFunc.Image.Call(typeof(WistBuildInFunctions).GetMethod(nameof(WistBuildInFunctions.AddToList)));
+            _curFunc.Image.Call(typeof(WistVisitorHelper).GetMethod(nameof(WistVisitorHelper.AddToList)));
             _curFunc.Image.Drop();
         }
 
