@@ -4,11 +4,11 @@ using System.Runtime.CompilerServices;
 
 public sealed class WistFastSortedList<TValue>
 {
-    private readonly List<KeyValuePair<int, TValue>> _list = new();
+    private KeyValuePair<int, TValue>[] _arr = Array.Empty<KeyValuePair<int, TValue>>();
 
-    private WistFastSortedList(IEnumerable<KeyValuePair<int, TValue>> list)
+    private WistFastSortedList(IEnumerable<KeyValuePair<int, TValue>> collection)
     {
-        _list = list.ToList();
+        _arr = collection.ToArray();
     }
 
     public WistFastSortedList()
@@ -22,7 +22,13 @@ public sealed class WistFastSortedList<TValue>
         if (binarySearch >= 0)
             ThrowEntryExists(key);
 
-        _list.Insert(~binarySearch, new KeyValuePair<int, TValue>(key, value));
+        var ind = ~binarySearch;
+
+        Array.Resize(ref _arr, _arr.Length + 1); // increase array length by 1
+        Array.Copy(_arr, ind, _arr, ind + 1, _arr.Length - ind - 1); // shift elements right from the index
+        _arr[ind] = new KeyValuePair<int, TValue>(key, value); // insert element at the index
+
+        // _arr.Insert(~binarySearch, new KeyValuePair<int, TValue>(key, value));
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -35,11 +41,11 @@ public sealed class WistFastSortedList<TValue>
     public int IndexOfKey(int key) => BinarySearch(key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public TValue GetByIndex(int index) => _list[index].Value;
+    public TValue GetByIndex(int index) => _arr[index].Value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetByIndex(int index, TValue value) =>
-        _list[index] = new KeyValuePair<int, TValue>(_list[index].Key, value);
+        _arr[index] = new KeyValuePair<int, TValue>(_arr[index].Key, value);
 
 
     /*[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -57,11 +63,11 @@ public sealed class WistFastSortedList<TValue>
     private int BinarySearch(long key)
     {
         var lo = 0;
-        var hi = _list.Count - 1;
+        var hi = _arr.Length - 1;
         while (lo <= hi)
         {
             var i = GetMedian(lo, hi);
-            switch (Compare(_list[i].Key, key))
+            switch (Compare(_arr[i].Key, key))
             {
                 case < 0:
                     lo = i + 1;
@@ -84,5 +90,5 @@ public sealed class WistFastSortedList<TValue>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static int GetMedian(int lo, int hi) => lo + (hi - lo) / 2;
 
-    public WistFastSortedList<TValue> Copy() => new(_list);
+    public WistFastSortedList<TValue> Copy() => new(_arr);
 }
