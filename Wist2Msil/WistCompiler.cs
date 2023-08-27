@@ -66,9 +66,11 @@ public sealed class WistCompiler
         foreach (var wistFunction in _module.Functions)
             CompileFunction(wistFunction);
 
-
         foreach (var helper in _executionHelpers)
             _sortedListOfHelpers.Add(_module.HashCode.GetHashCode(helper.DynamicMethod.Name), helper);
+
+        foreach (var s in _module.Structs) 
+            _wistStructures.Find(x => x.Name == s.Name)!.Init();
     }
 
     private void InitStruct(WistCompilationStruct wistStruct)

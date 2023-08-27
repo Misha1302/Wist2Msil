@@ -15,6 +15,12 @@ public sealed class WistFastSortedList<TValue>
     {
     }
 
+    public void ForEach(Action<TValue> act)
+    {
+        foreach (var el in _arr) 
+            act(el.Value);
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(int key, TValue value)
     {
@@ -27,8 +33,6 @@ public sealed class WistFastSortedList<TValue>
         Array.Resize(ref _arr, _arr.Length + 1); // increase array length by 1
         Array.Copy(_arr, ind, _arr, ind + 1, _arr.Length - ind - 1); // shift elements right from the index
         _arr[ind] = new KeyValuePair<int, TValue>(key, value); // insert element at the index
-
-        // _arr.Insert(~binarySearch, new KeyValuePair<int, TValue>(key, value));
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]

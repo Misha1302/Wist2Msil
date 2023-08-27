@@ -21,6 +21,14 @@ public sealed unsafe class WistExecutionHelper
         ExecutionHelpers = wistExecutionHelpers;
     }
 
+    public nint MethodPtr
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private set;
+    }
+
     public WistConst Run(out long executionTime)
     {
         var fp = GetMethodRuntimeHandle(DynamicMethod).GetFunctionPointer();
@@ -34,7 +42,7 @@ public sealed unsafe class WistExecutionHelper
     {
         var getMethodDescriptorInfo = typeof(DynamicMethod).GetMethod("GetMethodDescriptor",
             BindingFlags.NonPublic | BindingFlags.Instance);
-        var handle = (RuntimeMethodHandle)getMethodDescriptorInfo!.Invoke(method, null)!;
+        var handle = (RuntimeMethodHandle)getMethodDescriptorInfo!.Invoke(method, Array.Empty<object?>())!;
 
         return handle;
     }
@@ -99,34 +107,34 @@ public sealed unsafe class WistExecutionHelper
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod0(WistConst wistStruct, int key) =>
-        wistStruct.GetStruct().CallMethod(key, new object?[] { null });
+        wistStruct.GetStruct().CallMethod(key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod1(WistConst wistStruct, WistConst a, int key) =>
-        wistStruct.GetStruct().CallMethod(key, a, null);
+        wistStruct.GetStruct().CallMethod(key, a);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod2(WistConst wistStruct, WistConst a, WistConst b, int key) =>
-        wistStruct.GetStruct().CallMethod(key, a, b, null);
+        wistStruct.GetStruct().CallMethod(key, a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod3(WistConst wistStruct, WistConst a, WistConst b, WistConst c, int key) =>
-        wistStruct.GetStruct().CallMethod(key, a, b, c, null);
+        wistStruct.GetStruct().CallMethod(key, a, b, c);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod4(WistConst wistStruct, WistConst a, WistConst b, WistConst c,
         WistConst d, int key) =>
-        wistStruct.GetStruct().CallMethod(key, a, b, c, d, null);
+        wistStruct.GetStruct().CallMethod(key, a, b, c, d);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod5(WistConst wistStruct, WistConst a, WistConst b, WistConst c,
         WistConst d, WistConst e, int key) =>
-        wistStruct.GetStruct().CallMethod(key, a, b, c, d, e, null);
+        wistStruct.GetStruct().CallMethod(key, a, b, c, d, e);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod6(WistConst wistStruct, WistConst a, WistConst b, WistConst c,
         WistConst d, WistConst e, WistConst f, int key) =>
-        wistStruct.GetStruct().CallMethod(key, a, b, c, d, e, f, null);
+        wistStruct.GetStruct().CallMethod(key, a, b, c, d, e, f);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CSharpCall0(WistConst ptr)
@@ -178,5 +186,10 @@ public sealed unsafe class WistExecutionHelper
             (delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistConst>)
             ptr.GetPointer();
         return pointer(a, b, c, d, e, f);
+    }
+
+    public void Init()
+    {
+        MethodPtr = GetMethodRuntimeHandle(DynamicMethod).GetFunctionPointer();
     }
 }

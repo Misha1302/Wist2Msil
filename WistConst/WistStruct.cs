@@ -82,7 +82,7 @@ public sealed class WistStruct
     public void AddField(int key, WistConst value) => _sortedFields.Add(key, value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistConst CallMethod(int key, params object?[] args)
+    public WistConst CallMethod(int key, params WistConst[] args)
     {
         var indexOfKey = _sortedMethods.IndexOfKey(key);
 
@@ -110,21 +110,51 @@ public sealed class WistStruct
         if (indexOfKey >= 0)
         {
             var helper = _executionHelpers.GetByIndex(indexOfKey);
-            args[^1] = helper;
-            return (WistConst)helper.DynamicMethod.Invoke(null, args)!;
+            return SwitchCall(args, helper.MethodPtr, helper);
         }
 
         if (wistMethod is null)
             return default;
 
         end:
-        args[^1] = wistMethod.ExecutionHelper;
-        return (WistConst)wistMethod.DynamicMethod.Invoke(null, args)!;
+        return SwitchCall(args, wistMethod.MethodPtr, wistMethod.ExecutionHelper);
+    }
+
+    private static unsafe WistConst SwitchCall(WistConst[] args, nint methodPtr,
+        WistExecutionHelper wistMethodExecutionHelper)
+    {
+        return args.Length switch
+        {
+            0 => ((delegate*<WistExecutionHelper, WistConst>)methodPtr)
+                (wistMethodExecutionHelper),
+            1 => ((delegate*<WistConst, WistExecutionHelper, WistConst>)methodPtr)
+                (args[0], wistMethodExecutionHelper),
+            2 => ((delegate*<WistConst, WistConst, WistExecutionHelper, WistConst>)methodPtr)
+                (args[0], args[1], wistMethodExecutionHelper),
+            3 => ((delegate*<WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)methodPtr)
+                (args[0], args[1], args[2], wistMethodExecutionHelper),
+            4 => ((delegate*<WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)methodPtr)
+                (args[0], args[1], args[2], args[3], wistMethodExecutionHelper),
+            5 => ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)
+                    methodPtr)
+                (args[0], args[1], args[2], args[3], args[4], wistMethodExecutionHelper),
+            6 => ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper,
+                    WistConst>)methodPtr)
+                (args[0], args[1], args[2], args[3], args[4], args[5], wistMethodExecutionHelper),
+            _ => default
+        };
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AddMethod(int key, DynamicMethod m, WistExecutionHelper executionHelper) =>
         _sortedMethods.Add(key, new WistMethod(m, executionHelper));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Init()
+    {
+        _sortedMethods.ForEach(x => x.Init());
+        _executionHelpers.ForEach(x => x.Init());
+    }
 
     public WistStruct Copy() => new(Name, _sortedFields, _sortedMethods, _inheritances, _executionHelpers);
 }
