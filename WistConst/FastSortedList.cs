@@ -6,9 +6,10 @@ public sealed class WistFastSortedList<TValue>
 {
     private KeyValuePair<int, TValue>[] _arr = Array.Empty<KeyValuePair<int, TValue>>();
 
-    private WistFastSortedList(IEnumerable<KeyValuePair<int, TValue>> collection)
+    private WistFastSortedList(KeyValuePair<int, TValue>[] arr)
     {
-        _arr = collection.ToArray();
+        _arr = new KeyValuePair<int, TValue>[arr.Length];
+        Array.Copy(arr, _arr, arr.Length);
     }
 
     public WistFastSortedList()
@@ -17,7 +18,7 @@ public sealed class WistFastSortedList<TValue>
 
     public void ForEach(Action<TValue> act)
     {
-        foreach (var el in _arr) 
+        foreach (var el in _arr)
             act(el.Value);
     }
 
@@ -42,7 +43,7 @@ public sealed class WistFastSortedList<TValue>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int IndexOfKey(int key) => BinarySearch(key);
+    public int IndexOfKey(int key) => LinerSearch(key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TValue GetByIndex(int index) => _arr[index].Value;
@@ -51,6 +52,17 @@ public sealed class WistFastSortedList<TValue>
     public void SetByIndex(int index, TValue value) =>
         _arr[index] = new KeyValuePair<int, TValue>(_arr[index].Key, value);
 
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private int LinerSearch(long key)
+    {
+        for (var i = 0; i < _arr.Length; i++)
+            if (_arr[i].Key == key)
+                return i;
+
+        return -1;
+    }
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private int BinarySearch(long key)
     {

@@ -43,7 +43,7 @@ public sealed class WistImage
         _instructions.Add(
             new wInst(
                 WistInstruction.WistOperation.CSharpCall,
-                WistConst.CreateInternalConst(m.MethodHandle.GetFunctionPointer()),
+                new WistConst(m),
                 WistConst.CreateInternalConst(m.GetParameters().Length)
             )
         );

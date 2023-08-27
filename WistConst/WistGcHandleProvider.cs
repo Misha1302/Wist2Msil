@@ -3,7 +3,7 @@ namespace WistConst;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-public sealed class WistGcHandleProvider : IDisposable
+public sealed class WistGcHandleProvider
 {
     private GCHandle _handle;
 
@@ -14,14 +14,6 @@ public sealed class WistGcHandleProvider : IDisposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Dispose()
-    {
-        ReleaseUnmanagedResources();
-        GC.SuppressFinalize(this);
-    }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if RELEASE
     public unsafe T Get<T>() => Unsafe.As<nint, T>(ref *(nint*)((nint)_handle & ~(nint)1));
 #else
@@ -29,15 +21,8 @@ public sealed class WistGcHandleProvider : IDisposable
 #endif
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void ReleaseUnmanagedResources()
-    {
-        if (_handle.IsAllocated)
-            _handle.Free();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     ~WistGcHandleProvider()
     {
-        ReleaseUnmanagedResources();
+        _handle.Free();
     }
 }

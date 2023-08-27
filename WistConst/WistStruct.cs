@@ -20,15 +20,20 @@ public sealed class WistStruct
         _executionHelpers = executionHelpers;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private WistStruct(string name, WistFastSortedList<WistConst> sortedFields,
         WistFastSortedList<WistMethod> sortedMethods,
-        IEnumerable<WistStruct> inheritances, WistFastSortedList<WistExecutionHelper> executionHelpers)
+        List<WistStruct> inheritances, WistFastSortedList<WistExecutionHelper> executionHelpers)
     {
         Name = name;
         _sortedFields = sortedFields.Copy();
-        _sortedMethods = sortedMethods.Copy();
-        _inheritances = inheritances.Select(x => x.Copy()).ToList();
+        _sortedMethods = sortedMethods;
         _executionHelpers = executionHelpers;
+
+        var count = inheritances.Count;
+        _inheritances = new List<WistStruct>(count);
+        for (var index = count - 1; index >= 0; index--) 
+            _inheritances.Add(inheritances[index].Copy());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -120,6 +125,7 @@ public sealed class WistStruct
         return SwitchCall(args, wistMethod.MethodPtr, wistMethod.ExecutionHelper);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static unsafe WistConst SwitchCall(WistConst[] args, nint methodPtr,
         WistExecutionHelper wistMethodExecutionHelper)
     {
@@ -155,6 +161,7 @@ public sealed class WistStruct
         _sortedMethods.ForEach(x => x.Init());
         _executionHelpers.ForEach(x => x.Init());
     }
-
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistStruct Copy() => new(Name, _sortedFields, _sortedMethods, _inheritances, _executionHelpers);
 }

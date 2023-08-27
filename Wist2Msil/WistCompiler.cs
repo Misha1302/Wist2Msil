@@ -181,11 +181,7 @@ public sealed class WistCompiler
                     il.Call(_methods["GreaterThanOrEquals"]);
                     break;
                 case WistInstruction.WistOperation.CSharpCall:
-                    il.Ldarg(exeHelperArgIndex);
-                    il.Ldfld(_constsField);
-                    il.Ldc_I4(i);
-                    il.Ldelem(typeof(WistConst));
-                    il.Call(_methods[$"CSharpCall{consts2[i].GetInternalInteger()}"]);
+                    il.Call(consts1[i].Get<MethodInfo>());
                     break;
                 case WistInstruction.WistOperation.Call:
                     var ind = _executionHelpers.FindIndex(
@@ -286,7 +282,7 @@ public sealed class WistCompiler
                     il.Call(_methods[$"CallStructMethod{consts2[i].GetInternalInteger() + 1}"]);
                     break;
                 case WistInstruction.WistOperation.InstantiateList:
-                    curExeHelper.Consts[i] = new WistConst(new List<WistConst>());
+                    curExeHelper.Consts[i] = new WistConst(new List<WistConst>(10));
 
                     il.Ldarg(exeHelperArgIndex);
                     il.Ldfld(_constsField);

@@ -1,5 +1,6 @@
 namespace WistConst;
 
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -15,6 +16,8 @@ public readonly struct WistConst : IEquatable<WistConst>
     [FieldOffset(8)] public readonly WistType Type;
 
     [FieldOffset(16)] private readonly WistGcHandleProvider _handle;
+    
+    private static readonly WistConst _null = new(WistType.Null);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(string v)
@@ -39,6 +42,8 @@ public readonly struct WistConst : IEquatable<WistConst>
         _valueR = v;
         Type = WistType.Number;
     }
+
+    public T Get<T>() => _handle.Get<T>();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CreateInternalConst(int i) => new(i);
@@ -122,6 +127,17 @@ public readonly struct WistConst : IEquatable<WistConst>
         Type = type;
     }
 
+    public WistConst(MethodInfo mCompilationStruct)
+    {
+        Unsafe.SkipInit(out _valueN);
+        Unsafe.SkipInit(out _valueL);
+        Unsafe.SkipInit(out _valueI);
+        Unsafe.SkipInit(out _valueB);
+        Unsafe.SkipInit(out _valueR);
+        _handle = new WistGcHandleProvider(mCompilationStruct);
+        Type = WistType.MInfo;
+    }
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double GetNumber() => _valueR;
@@ -177,5 +193,5 @@ public readonly struct WistConst : IEquatable<WistConst>
     public WistCompilationStruct GetStructInternal() => _handle.Get<WistCompilationStruct>();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CreateNull() => new(WistType.Null);
+    public static WistConst CreateNull() => _null;
 }

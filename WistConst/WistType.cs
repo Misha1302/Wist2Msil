@@ -11,5 +11,6 @@ public enum WistType : long
     InternalInteger,
     Pointer,
     Struct,
-    StructInternal
+    StructInternal,
+    MInfo
 }
