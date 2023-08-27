@@ -33,7 +33,7 @@ public sealed class WistLibraryManager
             )
             .SelectMany(x => x.GetMethods()
                 .Where(y => y.GetCustomAttributesData()
-                    .Any(z => z.AttributeType == typeof(WistFunctionAttribute))
+                    .Any(z => z.AttributeType == typeof(WistLibraryFunctionAttribute))
                 )
             );
 

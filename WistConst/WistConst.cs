@@ -43,6 +43,7 @@ public readonly struct WistConst : IEquatable<WistConst>
         Type = WistType.Number;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Get<T>() => _handle.Get<T>();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -1,6 +1,6 @@
 ﻿namespace Wist2MsilFrontend;
 
 [AttributeUsage(AttributeTargets.Method)]
-public sealed class WistFunctionAttribute : Attribute
+public sealed class WistLibraryFunctionAttribute : Attribute
 {
 }

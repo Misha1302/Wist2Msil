@@ -32,7 +32,7 @@ public sealed class WistStruct
 
         var count = inheritances.Count;
         _inheritances = new List<WistStruct>(count);
-        for (var index = count - 1; index >= 0; index--) 
+        for (var index = count - 1; index >= 0; index--)
             _inheritances.Add(inheritances[index].Copy());
     }
 
@@ -87,16 +87,135 @@ public sealed class WistStruct
     public void AddField(int key, WistConst value) => _sortedFields.Add(key, value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistConst CallMethod(int key, params WistConst[] args)
+    public unsafe WistConst CallMethod(int key)
+    {
+        CallMethodInternal(key, out var wistMethod, out var helper);
+
+        if (wistMethod != null)
+            return ((delegate*<WistExecutionHelper, WistConst>)wistMethod.MethodPtr)
+                (wistMethod.ExecutionHelper);
+
+        if (helper != null)
+            return ((delegate*<WistExecutionHelper, WistConst>)helper.MethodPtr)
+                (helper);
+
+        return default;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public unsafe WistConst CallMethod(int key, WistConst a)
+    {
+        CallMethodInternal(key, out var wistMethod, out var helper);
+
+        if (wistMethod != null)
+            return ((delegate*<WistConst, WistExecutionHelper, WistConst>)wistMethod.MethodPtr)
+                (a, wistMethod.ExecutionHelper);
+
+        if (helper != null)
+            return ((delegate*<WistConst, WistExecutionHelper, WistConst>)helper.MethodPtr)
+                (a, helper);
+
+        return default;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public unsafe WistConst CallMethod(int key, WistConst a, WistConst b)
+    {
+        CallMethodInternal(key, out var wistMethod, out var helper);
+
+        if (wistMethod != null)
+            return ((delegate*<WistConst, WistConst, WistExecutionHelper, WistConst>)wistMethod.MethodPtr)
+                (a, b, wistMethod.ExecutionHelper);
+
+        if (helper != null)
+            return ((delegate*<WistConst, WistConst, WistExecutionHelper, WistConst>)helper.MethodPtr)
+                (a, b, helper);
+
+        return default;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public unsafe WistConst CallMethod(int key, WistConst a, WistConst b, WistConst c)
+    {
+        CallMethodInternal(key, out var wistMethod, out var helper);
+
+        if (wistMethod != null)
+            return ((delegate*<WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)wistMethod.MethodPtr)
+                (a, b, c, wistMethod.ExecutionHelper);
+
+        if (helper != null)
+            return ((delegate*<WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)helper.MethodPtr)
+                (a, b, c, helper);
+
+        return default;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public unsafe WistConst CallMethod(int key, WistConst a, WistConst b, WistConst c, WistConst d)
+    {
+        CallMethodInternal(key, out var wistMethod, out var helper);
+
+        if (wistMethod != null)
+            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)wistMethod
+                    .MethodPtr)
+                (a, b, c, d, wistMethod.ExecutionHelper);
+
+        if (helper != null)
+            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)helper.MethodPtr)
+                (a, b, c, d, helper);
+
+        return default;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public unsafe WistConst CallMethod(int key, WistConst a, WistConst b, WistConst c, WistConst d, WistConst f)
+    {
+        CallMethodInternal(key, out var wistMethod, out var helper);
+
+        if (wistMethod != null)
+            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)
+                    wistMethod.MethodPtr)
+                (a, b, c, d, f, wistMethod.ExecutionHelper);
+
+        if (helper != null)
+            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)helper
+                    .MethodPtr)
+                (a, b, c, d, f, helper);
+
+        return default;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public unsafe WistConst CallMethod(int key, WistConst a, WistConst b, WistConst c, WistConst d, WistConst f, WistConst g)
+    {
+        CallMethodInternal(key, out var wistMethod, out var helper);
+
+        if (wistMethod != null)
+            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)
+                    wistMethod.MethodPtr)
+                (a, b, c, d, f, g, wistMethod.ExecutionHelper);
+
+        if (helper != null)
+            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)helper
+                    .MethodPtr)
+                (a, b, c, d, f, g, helper);
+
+        return default;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void CallMethodInternal(int key, out WistMethod? wistMethod, out WistExecutionHelper? helper)
     {
         var indexOfKey = _sortedMethods.IndexOfKey(key);
 
+        wistMethod = null;
+        helper = null;
+
         // call method in current class
-        WistMethod? wistMethod = null;
         if (indexOfKey >= 0)
         {
             wistMethod = _sortedMethods.GetByIndex(indexOfKey);
-            goto end;
+            return;
         }
 
         // call method in parents
@@ -107,48 +226,13 @@ public sealed class WistStruct
             if (indexOfKey < 0) continue;
 
             wistMethod = inheritance._sortedMethods.GetByIndex(indexOfKey);
-            goto end;
+            return;
         }
 
         // call extension method
         indexOfKey = _executionHelpers.IndexOfKey(key);
         if (indexOfKey >= 0)
-        {
-            var helper = _executionHelpers.GetByIndex(indexOfKey);
-            return SwitchCall(args, helper.MethodPtr, helper);
-        }
-
-        if (wistMethod is null)
-            return default;
-
-        end:
-        return SwitchCall(args, wistMethod.MethodPtr, wistMethod.ExecutionHelper);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static unsafe WistConst SwitchCall(WistConst[] args, nint methodPtr,
-        WistExecutionHelper wistMethodExecutionHelper)
-    {
-        return args.Length switch
-        {
-            0 => ((delegate*<WistExecutionHelper, WistConst>)methodPtr)
-                (wistMethodExecutionHelper),
-            1 => ((delegate*<WistConst, WistExecutionHelper, WistConst>)methodPtr)
-                (args[0], wistMethodExecutionHelper),
-            2 => ((delegate*<WistConst, WistConst, WistExecutionHelper, WistConst>)methodPtr)
-                (args[0], args[1], wistMethodExecutionHelper),
-            3 => ((delegate*<WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)methodPtr)
-                (args[0], args[1], args[2], wistMethodExecutionHelper),
-            4 => ((delegate*<WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)methodPtr)
-                (args[0], args[1], args[2], args[3], wistMethodExecutionHelper),
-            5 => ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)
-                    methodPtr)
-                (args[0], args[1], args[2], args[3], args[4], wistMethodExecutionHelper),
-            6 => ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper,
-                    WistConst>)methodPtr)
-                (args[0], args[1], args[2], args[3], args[4], args[5], wistMethodExecutionHelper),
-            _ => default
-        };
+            helper = _executionHelpers.GetByIndex(indexOfKey);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -161,7 +245,7 @@ public sealed class WistStruct
         _sortedMethods.ForEach(x => x.Init());
         _executionHelpers.ForEach(x => x.Init());
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistStruct Copy() => new(Name, _sortedFields, _sortedMethods, _inheritances, _executionHelpers);
 }

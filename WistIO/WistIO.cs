@@ -8,22 +8,22 @@ using WistConst;
 // ReSharper disable once InconsistentNaming
 public static class WistIO
 {
-    [WistFunction]
+    [WistLibraryFunction]
     public static WistConst Print(WistConst c)
     {
         Console.WriteLine(c.ToString());
         return WistConst.CreateNull();
     }
 
-    [WistFunction]
+    [WistLibraryFunction]
     public static WistConst ToStr(WistConst c) => new(c.ToString());
 
-    [WistFunction]
+    [WistLibraryFunction]
     public static WistConst InputString() => new(Console.ReadLine() ?? "\n");
 
-    [WistFunction]
+    [WistLibraryFunction]
     public static WistConst InputNumber() => new((Console.ReadLine() ?? string.Empty).ToDouble());
 
-    [WistFunction]
+    [WistLibraryFunction]
     public static WistConst InputBool() => new((Console.ReadLine() ?? string.Empty).ToBool());
 }

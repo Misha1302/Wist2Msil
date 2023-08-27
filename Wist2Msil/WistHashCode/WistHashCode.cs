@@ -17,6 +17,7 @@ public sealed class WistHashCode
     {
         var sum = BitConverter.ToInt32(MD5.HashData(Encoding.UTF8.GetBytes(s)));
         _hashes.TryAdd(s, sum);
+        
         return sum;
     }
 
