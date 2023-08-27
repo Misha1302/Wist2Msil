@@ -6,7 +6,7 @@ public static class WistVisitorHelper
 {
     public static WistConst AddToList(WistConst list, WistConst elem)
     {
-        list.GetList().Add(elem);
+        list.Get<List<WistConst>>().Add(elem);
         return WistConst.CreateNull();
     }
 }

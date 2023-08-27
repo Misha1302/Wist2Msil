@@ -16,7 +16,7 @@ public readonly struct WistConst : IEquatable<WistConst>
     [FieldOffset(8)] public readonly WistType Type;
 
     [FieldOffset(16)] private readonly WistGcHandleProvider _handle;
-    
+
     private static readonly WistConst _null = new(WistType.Null);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -149,9 +149,6 @@ public readonly struct WistConst : IEquatable<WistConst>
     public bool GetBool() => _valueB;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string GetString() => _handle.Get<string>();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(WistConst obj) => EqualsConsts(obj);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -161,9 +158,23 @@ public readonly struct WistConst : IEquatable<WistConst>
     public override int GetHashCode() => HashCode.Combine(_valueL, (int)Type, _handle);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool EqualsConsts(in WistConst obj) => obj.Type != WistType.String
-        ? (obj._valueL ^ (byte)obj.Type) == (_valueL ^ (byte)Type)
-        : obj.GetString() == GetString();
+    private bool EqualsConsts(in WistConst obj)
+    {
+        if (((int)obj.Type & (int)WistType.ValueType) != 0)
+        {
+            if (obj.Type == WistType.Number)
+                return Math.Abs(obj._valueR - _valueR) < 0.001;
+
+            return (obj._valueL ^ (byte)obj.Type) == (_valueL ^ (byte)Type);
+        }
+
+        return obj.Type switch
+        {
+            WistType.String => obj.Get<string>() == Get<string>(),
+            WistType.List => obj.Get<List<WistConst>>().SequenceEqual(Get<List<WistConst>>()),
+            _ => false
+        };
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(in WistConst left, in WistConst right) => left.EqualsConsts(right);
@@ -178,19 +189,10 @@ public readonly struct WistConst : IEquatable<WistConst>
     public override string ToString() => WistConstOperations.ToStr(this);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public List<WistConst> GetList() => _handle.Get<List<WistConst>>();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistStruct GetStruct() => _handle.Get<WistStruct>();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst CopyStruct() => new(_handle.Get<WistStruct>().Copy());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistConst CopyList() => new(GetList().ToList());
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistCompilationStruct GetStructInternal() => _handle.Get<WistCompilationStruct>();
+    public WistConst CopyList() => new(Get<List<WistConst>>().ToList());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CreateNull() => _null;

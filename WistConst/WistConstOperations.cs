@@ -18,32 +18,6 @@ public static class WistConstOperations
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst GreaterThanOrEquals(in WistConst a, in WistConst b) => new(a.GetNumber() >= b.GetNumber());
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Equals(in WistConst a, in WistConst b)
-    {
-        return a.Type switch
-        {
-            WistType.Number => new WistConst(Math.Abs(a.GetNumber() - b.GetNumber()) < 0.001),
-            WistType.String => new WistConst(a.GetString() == b.GetString()),
-            WistType.Bool => new WistConst(a.GetBool() == b.GetBool()),
-            WistType.List => new WistConst(a.GetList().SequenceEqual(b.GetList())),
-            _ => Throw($"Cannot compare types: {a.Type} and {b.Type}")
-        };
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst NotEquals(in WistConst a, in WistConst b)
-    {
-        return a.Type switch
-        {
-            WistType.Number => new WistConst(Math.Abs(a.GetNumber() - b.GetNumber()) >= 0.001),
-            WistType.String => new WistConst(a.GetString() != b.GetString()),
-            WistType.Bool => new WistConst(a.GetBool() != b.GetBool()),
-            WistType.List => new WistConst(!a.GetList().SequenceEqual(b.GetList())),
-            _ => Throw($"Cannot compare types: {a.Type} and {b.Type}")
-        };
-    }
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst Rem(in WistConst a, in WistConst b) => new(a.GetNumber() % b.GetNumber());
@@ -52,13 +26,13 @@ public static class WistConstOperations
     public static WistConst Add(in WistConst a, in WistConst b) =>
         a.Type == WistType.Number
             ? new WistConst(a.GetNumber() + b.GetNumber())
-            : new WistConst(a.GetString() + b.GetString());
+            : new WistConst(a.Get<string>() + b.Get<string>());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst Sub(in WistConst a, in WistConst b) =>
         a.Type == WistType.Number
             ? new WistConst(a.GetNumber() - b.GetNumber())
-            : new WistConst(Replace(a.GetString(), b.GetString(), string.Empty));
+            : new WistConst(Replace(a.Get<string>(), b.Get<string>(), string.Empty));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst Mul(in WistConst a, in WistConst b) => new(a.GetNumber() * b.GetNumber());
@@ -79,8 +53,8 @@ public static class WistConstOperations
         {
             WistType.Bool => c.GetBool().ToString(),
             WistType.Number => NumberToString(c.GetNumber()),
-            WistType.String => c.GetString(),
-            WistType.List => string.Join(", ", c.GetList()),
+            WistType.String => c.Get<string>(),
+            WistType.List => string.Join(", ", c.Get<List<WistConst>>()),
             WistType.None => "<<None>>",
             WistType.InternalInteger => $"i32_{c.GetInternalInteger()}",
             WistType.Pointer => $"ptr_{c.GetPointer()}",

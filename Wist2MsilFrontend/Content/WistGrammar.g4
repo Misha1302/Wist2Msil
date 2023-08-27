@@ -42,6 +42,7 @@ expression
     | expression '.' IDENTIFIER '(' (expression (',' expression)*)? ')'                 #structFuncCallExpression
     | expression '.' IDENTIFIER                                                         #structFieldExpression
     | '[' (expression (',' expression)*)? ']'                                           #listExpression
+    | expression POW_OP expression                                                      #powExpression
     | expression REM_OP expression                                                      #remExpression
     | expression MUL_OP expression                                                      #mulExpression
     | expression ADD_OP expression                                                      #addExpression
@@ -66,6 +67,7 @@ BOOL: 'true' | 'false' | 'yes' | 'no';
 NULL: 'null' | 'none';
 
 BOOL_OP: 'and' | 'or' | 'xor';
+POW_OP: '^';
 MUL_OP: '*' | '/';
 ADD_OP: '+' | '-';
 REM_OP: '%';

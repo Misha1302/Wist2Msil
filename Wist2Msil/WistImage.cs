@@ -1,7 +1,6 @@
 namespace Wist2Msil;
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using WistConst;
 using wInst = WistInstruction;
 
@@ -9,7 +8,7 @@ public sealed class WistImage
 {
     private readonly List<WistInstruction> _instructions = new();
     public readonly List<string> Locals = new();
-    public readonly HashSet<string> LocalsHashSet = new();
+    private readonly HashSet<string> _localsHashSet = new();
     private WistFunction _function = null!;
     public IReadOnlyList<WistInstruction> Instructions => _instructions;
 
@@ -22,9 +21,7 @@ public sealed class WistImage
     public void Div() => _instructions.Add(new wInst(WistInstruction.WistOperation.Div));
     public void Rem() => _instructions.Add(new wInst(WistInstruction.WistOperation.Rem));
     public void Pow() => _instructions.Add(new wInst(WistInstruction.WistOperation.Pow));
-
-    public void IsEquals() => _instructions.Add(new wInst(WistInstruction.WistOperation.IsEquals));
-    public void IsNotEquals() => _instructions.Add(new wInst(WistInstruction.WistOperation.IsNotEquals));
+    
     public void GreaterThan() => _instructions.Add(new wInst(WistInstruction.WistOperation.GreaterThan));
 
     public void GreaterThanOrEquals() =>
@@ -39,12 +36,10 @@ public sealed class WistImage
         if (m is null)
             throw new InvalidOperationException();
 
-        RuntimeHelpers.PrepareMethod(m.MethodHandle);
         _instructions.Add(
             new wInst(
                 WistInstruction.WistOperation.CSharpCall,
-                new WistConst(m),
-                WistConst.CreateInternalConst(m.GetParameters().Length)
+                new WistConst(m)
             )
         );
     }
@@ -62,11 +57,6 @@ public sealed class WistImage
     public void Drop()
     {
         _instructions.Add(new wInst(WistInstruction.WistOperation.Drop));
-    }
-
-    public void Unite(WistImage anotherImage)
-    {
-        _instructions.AddRange(anotherImage._instructions);
     }
 
     public void Dup()
@@ -89,11 +79,6 @@ public sealed class WistImage
         _instructions.Add(new wInst(WistInstruction.WistOperation.GotoIfFalse, new WistConst(labelName)));
     }
 
-    public void GotoIfTrue(string labelName)
-    {
-        _instructions.Add(new wInst(WistInstruction.WistOperation.GotoIfTrue, new WistConst(labelName)));
-    }
-
     public void SetLocal(string locName)
     {
         if (!_function.Parameters.Contains(locName))
@@ -104,9 +89,9 @@ public sealed class WistImage
 
     private void TryAddLoc(string locName)
     {
-        if (LocalsHashSet.Contains(locName)) return;
+        if (_localsHashSet.Contains(locName)) return;
 
-        LocalsHashSet.Add(locName);
+        _localsHashSet.Add(locName);
         Locals.Add(locName);
     }
 

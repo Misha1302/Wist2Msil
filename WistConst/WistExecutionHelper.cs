@@ -83,12 +83,6 @@ public sealed unsafe class WistExecutionHelper
         WistConstOperations.GreaterThanOrEquals(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst IsEquals(WistConst a, WistConst b) => WistConstOperations.Equals(a, b);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst IsNotEquals(WistConst a, WistConst b) => WistConstOperations.NotEquals(a, b);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst Cmp(WistConst a, WistConst b) => new(a == b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -99,94 +93,42 @@ public sealed unsafe class WistExecutionHelper
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void SetField(WistConst wistStruct, WistConst constValue, int key) =>
-        wistStruct.GetStruct().SetField(key, constValue);
+        wistStruct.Get<WistStruct>().SetField(key, constValue);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst GetField(WistConst wistStruct, int key) =>
-        wistStruct.GetStruct().GetField(key);
+        wistStruct.Get<WistStruct>().GetField(key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod0(WistConst wistStruct, int key) =>
-        wistStruct.GetStruct().CallMethod(key);
+        wistStruct.Get<WistStruct>().CallMethod(key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod1(WistConst wistStruct, WistConst a, int key) =>
-        wistStruct.GetStruct().CallMethod(key, a);
+        wistStruct.Get<WistStruct>().CallMethod(key, a);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod2(WistConst wistStruct, WistConst a, WistConst b, int key) =>
-        wistStruct.GetStruct().CallMethod(key, a, b);
+        wistStruct.Get<WistStruct>().CallMethod(key, a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod3(WistConst wistStruct, WistConst a, WistConst b, WistConst c, int key) =>
-        wistStruct.GetStruct().CallMethod(key, a, b, c);
+        wistStruct.Get<WistStruct>().CallMethod(key, a, b, c);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod4(WistConst wistStruct, WistConst a, WistConst b, WistConst c,
         WistConst d, int key) =>
-        wistStruct.GetStruct().CallMethod(key, a, b, c, d);
+        wistStruct.Get<WistStruct>().CallMethod(key, a, b, c, d);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod5(WistConst wistStruct, WistConst a, WistConst b, WistConst c,
         WistConst d, WistConst e, int key) =>
-        wistStruct.GetStruct().CallMethod(key, a, b, c, d, e);
+        wistStruct.Get<WistStruct>().CallMethod(key, a, b, c, d, e);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod6(WistConst wistStruct, WistConst a, WistConst b, WistConst c,
         WistConst d, WistConst e, WistConst f, int key) =>
-        wistStruct.GetStruct().CallMethod(key, a, b, c, d, e, f);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CSharpCall0(WistConst ptr)
-    {
-        var pointer = (delegate*<WistConst>)ptr.GetPointer();
-        return pointer();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CSharpCall1(WistConst a, WistConst ptr)
-    {
-        var pointer = (delegate*<WistConst, WistConst>)ptr.GetPointer();
-        return pointer(a);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CSharpCall2(WistConst a, WistConst b, WistConst ptr)
-    {
-        var pointer = (delegate*<WistConst, WistConst, WistConst>)ptr.GetPointer();
-        return pointer(a, b);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CSharpCall3(WistConst a, WistConst b, WistConst c, WistConst ptr)
-    {
-        var pointer = (delegate*<WistConst, WistConst, WistConst, WistConst>)ptr.GetPointer();
-        return pointer(a, b, c);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CSharpCall4(WistConst a, WistConst b, WistConst c, WistConst d, WistConst ptr)
-    {
-        var pointer = (delegate*<WistConst, WistConst, WistConst, WistConst, WistConst>)ptr.GetPointer();
-        return pointer(a, b, c, d);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CSharpCall5(WistConst a, WistConst b, WistConst c, WistConst d, WistConst e, WistConst ptr)
-    {
-        var pointer = (delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst>)ptr.GetPointer();
-        return pointer(a, b, c, d, e);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CSharpCall6(WistConst a, WistConst b, WistConst c, WistConst d, WistConst e, WistConst f,
-        WistConst ptr)
-    {
-        var pointer =
-            (delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistConst>)
-            ptr.GetPointer();
-        return pointer(a, b, c, d, e, f);
-    }
+        wistStruct.Get<WistStruct>().CallMethod(key, a, b, c, d, e, f);
 
     public void Init()
     {

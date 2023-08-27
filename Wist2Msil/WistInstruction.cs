@@ -27,8 +27,6 @@ public struct WistInstruction
         Mul,
         Div,
         Rem,
-        IsEquals,
-        IsNotEquals,
         LessThan,
         GreaterThan,
         LessThanOrEquals,

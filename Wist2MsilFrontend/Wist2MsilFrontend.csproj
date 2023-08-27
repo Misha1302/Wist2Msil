@@ -43,4 +43,8 @@
         <ProjectReference Include="..\WistFuncName\WistFuncName.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="Content\WistGrammar.g4" />
+    </ItemGroup>
+
 </Project>

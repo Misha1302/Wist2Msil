@@ -3,6 +3,7 @@ include "WistIO.dll"
 include "List.wist"
 
 func Start() {
+    Print(2^10)
     times = new List()
 
     for i = 0; i < 7; i = i + 1 {

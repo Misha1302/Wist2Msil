@@ -480,3 +480,7 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 # End of https://www.toptal.com/developers/gitignore/api/rider,csharp
+Wist2MsilFrontend/Content/Code/Libraries/WistTime.dll
+Wist2MsilFrontend/Content/Code/Libraries/WistList.dll
+Wist2MsilFrontend/Content/Code/Libraries/WistMath.dll
+Wist2MsilFrontend/Content/Code/Libraries/WistIO.dll

@@ -220,6 +220,18 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         return null;
     }
 
+    public override object? VisitPowExpression(WistGrammarParser.PowExpressionContext context)
+    {
+        _saveResultLevel++;
+        foreach (var expressionContext in context.expression())
+            Visit(expressionContext);
+        _saveResultLevel--;
+
+        _curFunc.Image.Pow();
+
+        return null;
+    }
+    
     public override object? VisitCmpExpression(WistGrammarParser.CmpExpressionContext context)
     {
         _saveResultLevel++;
