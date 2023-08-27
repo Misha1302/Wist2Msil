@@ -300,7 +300,7 @@ public sealed class WistCompiler
             }
         }
 
-        il.Call(_methods["PushDefaultConst"]);
+        il.Call(_methods["PushNullConst"]);
         il.Ret();
 
 

@@ -5,13 +5,14 @@ using Wist2MsilFrontend;
 using WistConst;
 
 [WistLibrary]
+// ReSharper disable once InconsistentNaming
 public static class WistIO
 {
     [WistFunction]
     public static WistConst Print(WistConst c)
     {
         Console.WriteLine(c.ToString());
-        return default;
+        return WistConst.CreateNull();
     }
 
     [WistFunction]

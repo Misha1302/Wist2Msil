@@ -95,7 +95,7 @@ public sealed unsafe class WistExecutionHelper
     public static WistConst NegCmp(WistConst a, WistConst b) => new(a != b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst PushDefaultConst() => default;
+    public static WistConst PushNullConst() => WistConst.CreateNull();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void SetField(WistConst wistStruct, WistConst constValue, int key) =>

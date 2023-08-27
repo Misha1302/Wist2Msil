@@ -84,7 +84,8 @@ public static class WistConstOperations
             WistType.None => "<<None>>",
             WistType.InternalInteger => $"i32_{c.GetInternalInteger()}",
             WistType.Pointer => $"ptr_{c.GetPointer()}",
-            WistType.Struct => $"<<Struct>>",
+            WistType.Struct => "<<Struct>>",
+            WistType.Null => "<<Null>>",
             _ => Throw($"Unknown type to convert to string - {c.Type}").ToString()
         };
     }
