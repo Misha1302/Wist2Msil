@@ -21,7 +21,7 @@ public sealed class WistImage
     public void Div() => _instructions.Add(new wInst(WistInstruction.WistOperation.Div));
     public void Rem() => _instructions.Add(new wInst(WistInstruction.WistOperation.Rem));
     public void Pow() => _instructions.Add(new wInst(WistInstruction.WistOperation.Pow));
-    
+
     public void GreaterThan() => _instructions.Add(new wInst(WistInstruction.WistOperation.GreaterThan));
 
     public void GreaterThanOrEquals() =>
@@ -83,7 +83,7 @@ public sealed class WistImage
     {
         if (!_function.Parameters.Contains(locName))
             TryAddLoc(locName);
-        
+
         _instructions.Add(new wInst(WistInstruction.WistOperation.SetLocal, new WistConst(locName)));
     }
 

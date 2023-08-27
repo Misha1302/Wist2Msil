@@ -29,7 +29,7 @@ public sealed class WistModule
     {
         if (_wistStructs.Contains(wistStruct))
             return;
-        
+
         if (wistStruct is null)
             throw new InvalidOperationException();
 

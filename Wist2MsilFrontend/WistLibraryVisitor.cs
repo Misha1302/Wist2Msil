@@ -15,7 +15,8 @@ public sealed class WistLibraryVisitor : WistGrammarBaseVisitor<object?>
     private readonly List<WistCompilationStruct> _wistStructs;
     private readonly WistLibraryManager _wistLibraryManager;
 
-    public WistLibraryVisitor(string path, List<WistFunction> wistFunctions, List<WistCompilationStruct> wistStructs, WistLibraryManager wistLibraryManager)
+    public WistLibraryVisitor(string path, List<WistFunction> wistFunctions, List<WistCompilationStruct> wistStructs,
+        WistLibraryManager wistLibraryManager)
     {
         _path = path;
         _wistFunctions = wistFunctions;

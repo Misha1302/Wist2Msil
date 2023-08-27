@@ -231,7 +231,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
         return null;
     }
-    
+
     public override object? VisitCmpExpression(WistGrammarParser.CmpExpressionContext context)
     {
         _saveResultLevel++;
@@ -305,7 +305,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
         if (!ctorFound && _saveResultLevel == 0)
             return null;
-        
+
         _curFunc.Image.Instantiate(wistStruct);
 
         if (!ctorFound)

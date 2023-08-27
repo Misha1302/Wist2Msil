@@ -69,7 +69,7 @@ public sealed class WistCompiler
         foreach (var helper in _executionHelpers)
             _sortedListOfHelpers.Add(_module.HashCode.GetHashCode(helper.DynamicMethod.Name), helper);
 
-        foreach (var s in _module.Structs) 
+        foreach (var s in _module.Structs)
             _wistStructures.Find(x => x.Name == s.Name)!.Init();
     }
 

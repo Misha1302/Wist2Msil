@@ -5,7 +5,9 @@ using System.Reflection;
 public sealed class WistLibraryManager
 {
     private readonly List<MethodInfo> _methods = new();
-    private readonly string[] _paths = { @"", @"Content\Code", @"Content\Code\Libraries", @"Content", @"Content\Libraries", @"Libraries" };
+
+    private readonly string[] _paths =
+        { @"", @"Content\Code", @"Content\Code\Libraries", @"Content", @"Content\Libraries", @"Libraries" };
 
     public MethodInfo? GetMethod(string name)
     {

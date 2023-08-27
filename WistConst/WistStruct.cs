@@ -161,7 +161,8 @@ public sealed class WistStruct
                 (a, b, c, d, wistMethod.ExecutionHelper);
 
         if (helper != null)
-            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)helper.MethodPtr)
+            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)helper
+                    .MethodPtr)
                 (a, b, c, d, helper);
 
         return default;
@@ -178,25 +179,29 @@ public sealed class WistStruct
                 (a, b, c, d, f, wistMethod.ExecutionHelper);
 
         if (helper != null)
-            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)helper
-                    .MethodPtr)
+            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)
+                    helper
+                        .MethodPtr)
                 (a, b, c, d, f, helper);
 
         return default;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public unsafe WistConst CallMethod(int key, WistConst a, WistConst b, WistConst c, WistConst d, WistConst f, WistConst g)
+    public unsafe WistConst CallMethod(int key, WistConst a, WistConst b, WistConst c, WistConst d, WistConst f,
+        WistConst g)
     {
         CallMethodInternal(key, out var wistMethod, out var helper);
 
         if (wistMethod != null)
-            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)
+            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper,
+                        WistConst>)
                     wistMethod.MethodPtr)
                 (a, b, c, d, f, g, wistMethod.ExecutionHelper);
 
         if (helper != null)
-            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)helper
+            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper,
+                    WistConst>)helper
                     .MethodPtr)
                 (a, b, c, d, f, g, helper);
 
