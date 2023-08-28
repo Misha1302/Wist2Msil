@@ -90,138 +90,98 @@ public sealed class WistStruct
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public unsafe WistConst CallMethod(int key)
     {
-        CallMethodInternal(key, out var wistMethod, out var helper);
+        var (ptr, helper) = CallMethodInternal(key);
 
-        if (wistMethod != null)
-            return ((delegate*<WistExecutionHelper, WistConst>)wistMethod.MethodPtr)
-                (wistMethod.ExecutionHelper);
-
-        if (helper != null)
-            return ((delegate*<WistExecutionHelper, WistConst>)helper.MethodPtr)
-                (helper);
-
-        return default;
+        if (ptr == default)
+            return default;
+        return ((delegate*<WistExecutionHelper, WistConst>)ptr)
+            (helper);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public unsafe WistConst CallMethod(int key, WistConst a)
     {
-        CallMethodInternal(key, out var wistMethod, out var helper);
+        var (ptr, helper) = CallMethodInternal(key);
 
-        if (wistMethod != null)
-            return ((delegate*<WistConst, WistExecutionHelper, WistConst>)wistMethod.MethodPtr)
-                (a, wistMethod.ExecutionHelper);
 
-        if (helper != null)
-            return ((delegate*<WistConst, WistExecutionHelper, WistConst>)helper.MethodPtr)
-                (a, helper);
-
-        return default;
+        if (ptr == default)
+            return default;
+        return ((delegate*<WistConst, WistExecutionHelper, WistConst>)ptr)
+            (a, helper);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public unsafe WistConst CallMethod(int key, WistConst a, WistConst b)
     {
-        CallMethodInternal(key, out var wistMethod, out var helper);
+        var (ptr, helper) = CallMethodInternal(key);
 
-        if (wistMethod != null)
-            return ((delegate*<WistConst, WistConst, WistExecutionHelper, WistConst>)wistMethod.MethodPtr)
-                (a, b, wistMethod.ExecutionHelper);
 
-        if (helper != null)
-            return ((delegate*<WistConst, WistConst, WistExecutionHelper, WistConst>)helper.MethodPtr)
-                (a, b, helper);
-
-        return default;
+        if (ptr == default)
+            return default;
+        return ((delegate*<WistConst, WistConst, WistExecutionHelper, WistConst>)ptr)
+            (a, b, helper);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public unsafe WistConst CallMethod(int key, WistConst a, WistConst b, WistConst c)
     {
-        CallMethodInternal(key, out var wistMethod, out var helper);
+        var (ptr, helper) = CallMethodInternal(key);
 
-        if (wistMethod != null)
-            return ((delegate*<WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)wistMethod.MethodPtr)
-                (a, b, c, wistMethod.ExecutionHelper);
 
-        if (helper != null)
-            return ((delegate*<WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)helper.MethodPtr)
-                (a, b, c, helper);
-
-        return default;
+        if (ptr == default)
+            return default;
+        return ((delegate*<WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)ptr)
+            (a, b, c, helper);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public unsafe WistConst CallMethod(int key, WistConst a, WistConst b, WistConst c, WistConst d)
     {
-        CallMethodInternal(key, out var wistMethod, out var helper);
+        var (ptr, helper) = CallMethodInternal(key);
 
-        if (wistMethod != null)
-            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)wistMethod
-                    .MethodPtr)
-                (a, b, c, d, wistMethod.ExecutionHelper);
 
-        if (helper != null)
-            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)helper
-                    .MethodPtr)
-                (a, b, c, d, helper);
-
-        return default;
+        if (ptr == default)
+            return default;
+        return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)ptr)
+            (a, b, c, d, helper);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public unsafe WistConst CallMethod(int key, WistConst a, WistConst b, WistConst c, WistConst d, WistConst f)
     {
-        CallMethodInternal(key, out var wistMethod, out var helper);
+        var (ptr, helper) = CallMethodInternal(key);
 
-        if (wistMethod != null)
-            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)
-                    wistMethod.MethodPtr)
-                (a, b, c, d, f, wistMethod.ExecutionHelper);
 
-        if (helper != null)
-            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)
-                    helper
-                        .MethodPtr)
-                (a, b, c, d, f, helper);
-
-        return default;
+        if (ptr == default)
+            return default;
+        return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper, WistConst>)
+                ptr)
+            (a, b, c, d, f, helper);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public unsafe WistConst CallMethod(int key, WistConst a, WistConst b, WistConst c, WistConst d, WistConst f,
         WistConst g)
     {
-        CallMethodInternal(key, out var wistMethod, out var helper);
+        var (ptr, helper) = CallMethodInternal(key);
 
-        if (wistMethod != null)
-            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper,
-                        WistConst>)
-                    wistMethod.MethodPtr)
-                (a, b, c, d, f, g, wistMethod.ExecutionHelper);
-
-        if (helper != null)
-            return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper,
-                    WistConst>)helper
-                    .MethodPtr)
-                (a, b, c, d, f, g, helper);
-
-        return default;
+        if (ptr == default)
+            return default;
+        return ((delegate*<WistConst, WistConst, WistConst, WistConst, WistConst, WistConst, WistExecutionHelper,
+                WistConst>)ptr)
+            (a, b, c, d, f, g, helper);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void CallMethodInternal(int key, out WistMethod? wistMethod, out WistExecutionHelper? helper)
+    private (nint methodPtr, WistExecutionHelper exeHelper) CallMethodInternal(int key)
     {
         var indexOfKey = _sortedMethods.IndexOfKey(key);
-
-        wistMethod = null;
-        helper = null;
 
         // call method in current class
         if (indexOfKey >= 0)
         {
-            wistMethod = _sortedMethods.GetByIndex(indexOfKey);
-            return;
+            var wistMethod = _sortedMethods.GetByIndex(indexOfKey);
+            return (wistMethod.MethodPtr, wistMethod.ExecutionHelper);
         }
 
         // call method in parents
@@ -231,14 +191,19 @@ public sealed class WistStruct
             indexOfKey = inheritance._sortedMethods.IndexOfKey(key);
             if (indexOfKey < 0) continue;
 
-            wistMethod = inheritance._sortedMethods.GetByIndex(indexOfKey);
-            return;
+            var wistMethod = inheritance._sortedMethods.GetByIndex(indexOfKey);
+            return (wistMethod.MethodPtr, wistMethod.ExecutionHelper);
         }
 
         // call extension method
         indexOfKey = _executionHelpers.IndexOfKey(key);
         if (indexOfKey >= 0)
-            helper = _executionHelpers.GetByIndex(indexOfKey);
+        {
+            var helper = _executionHelpers.GetByIndex(indexOfKey);
+            return (helper.MethodPtr, helper);
+        }
+
+        return default;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -11,14 +11,14 @@ public sealed class WistFastList<T> : IEnumerable<T>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistFastList(int capacity = 16)
     {
-        _arr = new T[_capacity = Math.Max(capacity, 1)];
+        _arr = new T[_capacity = capacity];
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistFastList(T[] arr, int capacity)
     {
         _arr = arr;
-        _capacity = Math.Max(capacity, 1);
+        _capacity = capacity;
     }
 
     public int Count
@@ -29,7 +29,7 @@ public sealed class WistFastList<T> : IEnumerable<T>
         private set;
     }
 
-    
+
     public T this[int index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -85,7 +85,7 @@ public sealed class WistFastList<T> : IEnumerable<T>
     private void TryGrow()
     {
         if (Count + 1 >= _capacity)
-            Array.Resize(ref _arr, _capacity *= 2);
+            Array.Resize(ref _arr, _capacity = _capacity * 2 + 1);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -103,7 +103,16 @@ public sealed class WistFastList<T> : IEnumerable<T>
     public void AddRange(IEnumerable<T> collection) => AddRange(collection.ToArray());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistFastList<T> Copy() => new(_arr.ToArray(), _arr.Length);
+    public WistFastList<T> Copy() => new(CopyArray(_arr), _capacity);
+
+    private static T[] CopyArray(T[] arr)
+    {
+        var newArr = new T[arr.Length];
+        for (var index = 0; index < arr.Length; index++) 
+            newArr[index] = arr[index];
+
+        return newArr;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Insert(int ind, T elem)
