@@ -3,15 +3,16 @@
 using Antlr4.Runtime.Tree;
 using Wist2Msil;
 using Wist2MsilFrontend.Content;
+using WistFastList;
 using WistFuncName;
 
 public sealed class WistFunctionsVisitor : WistGrammarBaseVisitor<object?>
 {
-    private readonly List<WistFunction> _list = new();
+    private readonly WistFastList<WistFunction> _list = new();
     private string? _curStructName;
 
-    public List<WistFunction> GetAllFunctions(IParseTree parseTree) =>
-        (List<WistFunction>)Visit(parseTree);
+    public WistFastList<WistFunction> GetAllFunctions(IParseTree parseTree) =>
+        (WistFastList<WistFunction>)Visit(parseTree);
 
     public override object? VisitStructDecl(WistGrammarParser.StructDeclContext context)
     {

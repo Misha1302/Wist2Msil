@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using GrEmit;
 using Wist2Msil.WistHashCode;
 using WistConst;
+using WistFastList;
 using WistTimer;
 
 public sealed class WistCompiler
@@ -15,9 +16,9 @@ public sealed class WistCompiler
     private static readonly MethodInfo _copyWistStructMethod;
     private static readonly MethodInfo _copyListMethod;
     private readonly WistModule _module;
-    private List<WistExecutionHelper> _executionHelpers = null!;
+    private WistFastList<WistExecutionHelper> _executionHelpers = null!;
     private WistFastSortedList<WistExecutionHelper> _sortedListOfHelpers = null!;
-    private readonly List<WistStruct> _wistStructures = new();
+    private readonly WistFastList<WistStruct> _wistStructures = new();
 
     static WistCompiler()
     {
@@ -48,7 +49,7 @@ public sealed class WistCompiler
 
     private void Compile()
     {
-        _executionHelpers = new List<WistExecutionHelper>();
+        _executionHelpers = new WistFastList<WistExecutionHelper>();
         _sortedListOfHelpers = new WistFastSortedList<WistExecutionHelper>();
 
         foreach (var wistFunction in _module.Functions)
@@ -70,20 +71,20 @@ public sealed class WistCompiler
             _sortedListOfHelpers.Add(_module.HashCode.GetHashCode(helper.DynamicMethod.Name), helper);
 
         foreach (var s in _module.Structs)
-            _wistStructures.Find(x => x.Name == s.Name)!.Init();
+            _wistStructures.FirstOrDefault(x => x.Name == s.Name)!.Init();
     }
 
     private void InitStruct(WistCompilationStruct wistStruct)
     {
         var src = wistStruct;
-        var s = _wistStructures.Find(x => x.Name == src.Name)!;
+        var s = _wistStructures.FirstOrDefault(x => x.Name == src.Name)!;
 
         foreach (var field in src.Fields)
             s.AddField(_module.HashCode.GetHashCode(field), default);
 
         foreach (var method in src.Methods)
         {
-            var wistExecutionHelper = _executionHelpers.Find(x => x.DynamicMethod.Name == method.FullName);
+            var wistExecutionHelper = _executionHelpers.FirstOrDefault(x => x.DynamicMethod.Name == method.FullName);
             s.AddMethod(
                 _module.HashCode.GetHashCode(method.NameWithoutOwner),
                 wistExecutionHelper!.DynamicMethod,
@@ -92,12 +93,12 @@ public sealed class WistCompiler
         }
 
         foreach (var inheritance in src.Inheritances)
-            s.AddInheritance(_wistStructures.Find(x => x.Name == inheritance)!);
+            s.AddInheritance(_wistStructures.FirstOrDefault(x => x.Name == inheritance)!);
     }
 
     private void DeclareStruct(WistCompilationStruct wistStruct)
     {
-        _wistStructures.Add(new WistStruct(wistStruct.Name, new List<WistStruct>(), _sortedListOfHelpers));
+        _wistStructures.Add(new WistStruct(wistStruct.Name, new WistFastList<WistStruct>(), _sortedListOfHelpers));
     }
 
     private void DeclareFunction(WistFunction wistFunc)
@@ -127,7 +128,7 @@ public sealed class WistCompiler
         var consts1 = wistFunc.Image.Instructions.Select(x => x.Constant).ToArray();
         var consts2 = wistFunc.Image.Instructions.Select(x => x.Constant2).ToArray();
 
-        var curExeHelper = _executionHelpers.Find(x => x.DynamicMethod.Name == wistFunc.Name.FullName)!;
+        var curExeHelper = _executionHelpers.FirstOrDefault(x => x.DynamicMethod.Name == wistFunc.Name.FullName)!;
         using var il = new GroboIL(curExeHelper.DynamicMethod);
 
         var locals = wistFunc.Image.Locals
@@ -178,7 +179,7 @@ public sealed class WistCompiler
                     il.Call(consts1[i].Get<MethodInfo>());
                     break;
                 case WistInstruction.WistOperation.Call:
-                    var ind = _executionHelpers.FindIndex(
+                    var ind = _executionHelpers.ToList().FindIndex(
                         x => x.DynamicMethod.Name == consts2[i].Get<string>()
                     );
 
@@ -249,7 +250,7 @@ public sealed class WistCompiler
                     break;
                 case WistInstruction.WistOperation.Instantiate:
                     var src = consts1[i].Get<WistCompilationStruct>();
-                    var s = _wistStructures.Find(x => x.Name == src.Name)!;
+                    var s = _wistStructures.FirstOrDefault(x => x.Name == src.Name)!;
 
                     if (s is null)
                         throw new InvalidOperationException();
@@ -276,7 +277,7 @@ public sealed class WistCompiler
                     il.Call(_methods[$"CallStructMethod{consts2[i].GetInternalInteger() + 1}"]);
                     break;
                 case WistInstruction.WistOperation.InstantiateList:
-                    curExeHelper.Consts[i] = new WistConst(new List<WistConst>(10));
+                    curExeHelper.Consts[i] = new WistConst(new WistFastList<WistConst>(10));
 
                     il.Ldarg(exeHelperArgIndex);
                     il.Ldfld(_constsField);

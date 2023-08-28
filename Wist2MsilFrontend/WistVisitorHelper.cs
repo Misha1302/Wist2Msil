@@ -8,7 +8,7 @@ public static class WistVisitorHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst AddToList(WistConst list, WistConst elem)
     {
-        list.Get<List<WistConst>>().Add(elem);
+        list.Get<WistFastList.WistFastList<WistConst>>().Add(elem);
         return WistConst.CreateNull();
     }
 }

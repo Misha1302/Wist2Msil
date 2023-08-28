@@ -1,17 +1,18 @@
 ﻿namespace Wist2MsilFrontend;
 
 using System.Reflection;
+using WistFastList;
 
 public sealed class WistLibraryManager
 {
-    private readonly List<MethodInfo> _methods = new();
+    private readonly WistFastList<MethodInfo> _methods = new();
 
     private readonly string[] _paths =
         { @"", @"Content\Code", @"Content\Code\Libraries", @"Content", @"Content\Libraries", @"Libraries" };
 
     public MethodInfo? GetMethod(string name)
     {
-        return _methods.Find(x => CreateName(x) == name);
+        return _methods.FirstOrDefault(x => CreateName(x) == name);
     }
 
     private static string CreateName(MethodBase methodInfo) => methodInfo.Name + methodInfo.GetParameters().Length;
@@ -37,7 +38,7 @@ public sealed class WistLibraryManager
                 .Where(y => y.GetCustomAttributesData()
                     .Any(z => z.AttributeType == typeof(WistLibraryFunctionAttribute))
                 )
-            );
+            ).ToArray();
 
         _methods.AddRange(methodInfos);
     }

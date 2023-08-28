@@ -11,11 +11,11 @@ public sealed class WistLibraryVisitor : WistGrammarBaseVisitor<object?>
     private static readonly HashSet<string> _visitedPaths = new();
     private WistLibraryManager? _libManager;
     private readonly string _path;
-    private readonly List<WistFunction> _wistFunctions;
-    private readonly List<WistCompilationStruct> _wistStructs;
+    private readonly WistFastList.WistFastList<WistFunction> _wistFunctions;
+    private readonly WistFastList.WistFastList<WistCompilationStruct> _wistStructs;
     private readonly WistLibraryManager _wistLibraryManager;
 
-    public WistLibraryVisitor(string path, List<WistFunction> wistFunctions, List<WistCompilationStruct> wistStructs,
+    public WistLibraryVisitor(string path, WistFastList.WistFastList<WistFunction> wistFunctions, WistFastList.WistFastList<WistCompilationStruct> wistStructs,
         WistLibraryManager wistLibraryManager)
     {
         _path = path;

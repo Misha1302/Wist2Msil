@@ -54,7 +54,7 @@ public static class WistConstOperations
             WistType.Bool => c.GetBool().ToString(),
             WistType.Number => NumberToString(c.GetNumber()),
             WistType.String => c.Get<string>(),
-            WistType.List => string.Join(", ", c.Get<List<WistConst>>()),
+            WistType.List => string.Join(", ", c.Get<WistFastList.WistFastList<WistConst>>()),
             WistType.None => "<<None>>",
             WistType.InternalInteger => $"i32_{c.GetInternalInteger()}",
             WistType.Pointer => $"ptr_{c.GetPointer()}",

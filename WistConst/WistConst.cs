@@ -3,6 +3,7 @@ namespace WistConst;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using WistFastList;
 
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct WistConst : IEquatable<WistConst>
@@ -81,7 +82,7 @@ public readonly struct WistConst : IEquatable<WistConst>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistConst(List<WistConst> wistConsts)
+    public WistConst(WistFastList<WistConst> wistConsts)
     {
         Unsafe.SkipInit(out _valueN);
         Unsafe.SkipInit(out _valueL);
@@ -172,7 +173,7 @@ public readonly struct WistConst : IEquatable<WistConst>
         return obj.Type switch
         {
             WistType.String => obj.Get<string>() == Get<string>(),
-            WistType.List => obj.Get<List<WistConst>>().SequenceEqual(Get<List<WistConst>>()),
+            WistType.List => obj.Get<WistFastList<WistConst>>().SequenceEqual(Get<WistFastList<WistConst>>()),
             _ => false
         };
     }
@@ -193,7 +194,7 @@ public readonly struct WistConst : IEquatable<WistConst>
     public WistConst CopyStruct() => new(_handle.Get<WistStruct>().Copy());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistConst CopyList() => new(Get<List<WistConst>>().ToList());
+    public WistConst CopyList() => new(Get<WistFastList<WistConst>>().Copy());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CreateNull() => _null;

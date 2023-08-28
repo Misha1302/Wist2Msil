@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WistList", "WistList\WistLi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WistIO", "WistIO\WistIO.csproj", "{425BB28C-292F-4164-91C7-F4FCBBACC86C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WistFastList", "WistFastList\WistFastList.csproj", "{F79EE4F1-D89B-4006-AD14-FFA2B39086A4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,5 +68,9 @@ Global
 		{425BB28C-292F-4164-91C7-F4FCBBACC86C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{425BB28C-292F-4164-91C7-F4FCBBACC86C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{425BB28C-292F-4164-91C7-F4FCBBACC86C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F79EE4F1-D89B-4006-AD14-FFA2B39086A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F79EE4F1-D89B-4006-AD14-FFA2B39086A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F79EE4F1-D89B-4006-AD14-FFA2B39086A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F79EE4F1-D89B-4006-AD14-FFA2B39086A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

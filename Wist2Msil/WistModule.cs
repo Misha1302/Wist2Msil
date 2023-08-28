@@ -4,35 +4,32 @@ using WistConst;
 
 public sealed class WistModule
 {
-    private readonly List<WistFunction> _wistFunctions = new();
-    private readonly List<WistCompilationStruct> _wistStructs = new();
-
     public readonly WistHashCode.WistHashCode HashCode = new();
 
     // ReSharper disable once ReturnTypeCanBeEnumerable.Global
-    public IReadOnlyList<WistFunction> Functions => _wistFunctions;
+    public WistFastList.WistFastList<WistFunction> Functions { get; } = new();
 
-    public IReadOnlyList<WistCompilationStruct> Structs => _wistStructs;
+    public WistFastList.WistFastList<WistCompilationStruct> Structs { get; } = new();
 
     public void AddFunction(WistFunction wistFunction)
     {
-        if (_wistFunctions.Contains(wistFunction))
+        if (Functions.Contains(wistFunction))
             return;
 
         if (wistFunction is null)
             throw new InvalidOperationException();
 
-        _wistFunctions.Add(wistFunction);
+        Functions.Add(wistFunction);
     }
 
     public void AddStruct(WistCompilationStruct wistStruct)
     {
-        if (_wistStructs.Contains(wistStruct))
+        if (Structs.Contains(wistStruct))
             return;
 
         if (wistStruct is null)
             throw new InvalidOperationException();
 
-        _wistStructs.Add(wistStruct);
+        Structs.Add(wistStruct);
     }
 }

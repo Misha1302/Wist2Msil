@@ -10,8 +10,8 @@ using WistFuncName;
 public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 {
     private readonly WistModule _wistModule = new();
-    private List<WistCompilationStruct> _wistStructs = null!;
-    private List<WistFunction> _wistFunctions = null!;
+    private WistFastList.WistFastList<WistCompilationStruct> _wistStructs = null!;
+    private WistFastList.WistFastList<WistFunction> _wistFunctions = null!;
     private WistFunction _curFunc = null!;
     private int _saveResultLevel;
     private bool _initialized;
@@ -25,7 +25,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         _path = path;
     }
 
-    public WistVisitor(string path, List<WistFunction> wistFunctions, List<WistCompilationStruct> wistStructs,
+    public WistVisitor(string path, WistFastList.WistFastList<WistFunction> wistFunctions, WistFastList.WistFastList<WistCompilationStruct> wistStructs,
         WistLibraryManager wistLibraryManager, IParseTree tree)
     {
         _path = path;
@@ -140,7 +140,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
         var text = context.IDENTIFIER().GetText();
         var fullName = WistFuncName.CreateFullName(text, context.expression().Length, null);
-        var wistFunction = _wistFunctions.Find(x => x.Name.FullName == fullName);
+        var wistFunction = _wistFunctions.FirstOrDefault(x => x.Name.FullName == fullName);
 
         if (wistFunction != null)
             _curFunc.Image.Call(wistFunction);
@@ -159,7 +159,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         var argsCount = context.IDENTIFIER().Length - 1;
 
         var wistFunction =
-            _wistFunctions.Find(x => x.Name.FullName == WistFuncName.CreateFullName(name, argsCount, _curStructName))!;
+            _wistFunctions.FirstOrDefault(x => x.Name.FullName == WistFuncName.CreateFullName(name, argsCount, _curStructName))!;
 
         _curFunc = wistFunction;
 
@@ -294,7 +294,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitNewStruct(WistGrammarParser.NewStructContext context)
     {
-        var wistStruct = _wistStructs.Find(x => x.Name == context.IDENTIFIER().GetText());
+        var wistStruct = _wistStructs.FirstOrDefault(x => x.Name == context.IDENTIFIER().GetText());
         if (wistStruct is null)
             throw new InvalidOperationException();
 
@@ -334,7 +334,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitStructDecl(WistGrammarParser.StructDeclContext context)
     {
-        var wistStruct = _wistStructs.Find(x => x.Name == context.IDENTIFIER(0).GetText());
+        var wistStruct = _wistStructs.FirstOrDefault(x => x.Name == context.IDENTIFIER(0).GetText());
         if (wistStruct is null)
             throw new InvalidOperationException();
 

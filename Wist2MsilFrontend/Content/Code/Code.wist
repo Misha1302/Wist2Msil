@@ -14,6 +14,7 @@ func Start() {
         
         
         times.Add(GetTimeInMs() - t)
+        Print(times.GetElem(times.GetLen()))
     }
     
     Print(times.ToString())

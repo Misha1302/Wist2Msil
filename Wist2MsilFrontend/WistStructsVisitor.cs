@@ -3,27 +3,28 @@
 using Antlr4.Runtime.Tree;
 using Wist2MsilFrontend.Content;
 using WistConst;
+using WistFastList;
 using WistFuncName;
 
 public sealed class WistStructsVisitor : WistGrammarBaseVisitor<object?>
 {
-    private readonly List<WistCompilationStruct> _list = new();
-    private List<WistFuncName>? _methods;
+    private readonly WistFastList<WistCompilationStruct> _list = new();
+    private WistFastList<WistFuncName>? _methods;
     private string? _curStructName;
 
-    public List<WistCompilationStruct> GetAllStructs(IParseTree parseTree) =>
-        (List<WistCompilationStruct>)Visit(parseTree);
+    public WistFastList<WistCompilationStruct> GetAllStructs(IParseTree parseTree) =>
+        (WistFastList<WistCompilationStruct>)Visit(parseTree);
 
     public override object? VisitStructDecl(WistGrammarParser.StructDeclContext context)
     {
         var name = context.IDENTIFIER(0).GetText();
         var fields = context.IDENTIFIER().Skip(1).Select(x => x.GetText()).ToArray();
 
-        List<string> inheritances = new();
+        WistFastList<string> inheritances = new();
         if (context.inheritance() != null)
-            inheritances = (List<string>)VisitInheritance(context.inheritance());
+            inheritances = (WistFastList<string>)VisitInheritance(context.inheritance());
 
-        _methods = new List<WistFuncName>();
+        _methods = new WistFastList<WistFuncName>();
         _curStructName = name;
         Visit(context.block());
         _curStructName = null;
@@ -34,7 +35,8 @@ public sealed class WistStructsVisitor : WistGrammarBaseVisitor<object?>
 
     public override object VisitInheritance(WistGrammarParser.InheritanceContext context)
     {
-        return new List<string>(context.IDENTIFIER().Select(x => x.GetText()));
+        var arr = context.IDENTIFIER().Select(x => x.GetText()).ToArray();
+        return new WistFastList<string>(arr, arr.Length);
     }
 
     public override object? VisitFuncDecl(WistGrammarParser.FuncDeclContext context)

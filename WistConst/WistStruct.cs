@@ -2,6 +2,7 @@
 
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+using WistFastList;
 
 public sealed class WistStruct
 {
@@ -9,10 +10,10 @@ public sealed class WistStruct
     private readonly WistFastSortedList<WistMethod> _sortedMethods = new();
     private readonly WistFastSortedList<WistExecutionHelper> _executionHelpers;
     public readonly string Name;
-    private readonly List<WistStruct> _inheritances;
+    private readonly WistFastList<WistStruct> _inheritances;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistStruct(string name, List<WistStruct> inheritances,
+    public WistStruct(string name, WistFastList<WistStruct> inheritances,
         WistFastSortedList<WistExecutionHelper> executionHelpers)
     {
         Name = name;
@@ -23,7 +24,7 @@ public sealed class WistStruct
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private WistStruct(string name, WistFastSortedList<WistConst> sortedFields,
         WistFastSortedList<WistMethod> sortedMethods,
-        List<WistStruct> inheritances, WistFastSortedList<WistExecutionHelper> executionHelpers)
+        WistFastList<WistStruct> inheritances, WistFastSortedList<WistExecutionHelper> executionHelpers)
     {
         Name = name;
         _sortedFields = sortedFields.Copy();
@@ -31,7 +32,7 @@ public sealed class WistStruct
         _executionHelpers = executionHelpers;
 
         var count = inheritances.Count;
-        _inheritances = new List<WistStruct>(count);
+        _inheritances = new WistFastList<WistStruct>(count);
         for (var index = count - 1; index >= 0; index--)
             _inheritances.Add(inheritances[index].Copy());
     }
