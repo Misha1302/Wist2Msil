@@ -9,6 +9,7 @@ func Start() {
         t = GetTimeInMs()
         
         for j = 0; j < 500_000; j = j + 1 {
+            // it's very slow...
             lst = new List([])
         }
         
@@ -19,19 +20,4 @@ func Start() {
     
     Print(times.ToString())
     Print(times.Average())
-}
-
-func ForLoop() {
-    // it's so slow...
-    // maybe i can change i type to int for the best speed?
-    for i = 0; i < 100; i = i + 1 {
-        t = GetTimeInMs()
-        for c = 0; c < 100_000_000; c = c + 1 { }
-        Print(GetTimeInMs() - t)
-    }
-}
-
-
-func PrintListExt(lst) {
-    Print("Ext list printing: " + ToStr(lst._lst))
 }
