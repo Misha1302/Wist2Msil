@@ -3,20 +3,28 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using WistError;
+using WistFastList;
 
 public static class WistConstOperations
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst LessThan(in WistConst a, in WistConst b) => new(a.GetNumber() < b.GetNumber());
+    private static readonly WistConst _true = new(true);
+    private static readonly WistConst _false = new(false);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst GreaterThan(in WistConst a, in WistConst b) => new(a.GetNumber() > b.GetNumber());
+    public static WistConst LessThan(in WistConst a, in WistConst b) =>
+        a.GetNumber() < b.GetNumber() ? _true : _false;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst LessThanOrEquals(in WistConst a, in WistConst b) => new(a.GetNumber() <= b.GetNumber());
+    public static WistConst GreaterThan(in WistConst a, in WistConst b) =>
+        a.GetNumber() > b.GetNumber() ? _true : _false;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst GreaterThanOrEquals(in WistConst a, in WistConst b) => new(a.GetNumber() >= b.GetNumber());
+    public static WistConst LessThanOrEquals(in WistConst a, in WistConst b) =>
+        a.GetNumber() <= b.GetNumber() ? _true : _false;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst GreaterThanOrEquals(in WistConst a, in WistConst b) =>
+        a.GetNumber() >= b.GetNumber() ? _true : _false;
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -54,7 +62,7 @@ public static class WistConstOperations
             WistType.Bool => c.GetBool().ToString(),
             WistType.Number => NumberToString(c.GetNumber()),
             WistType.String => c.Get<string>(),
-            WistType.List => string.Join(", ", c.Get<WistFastList.WistFastList<WistConst>>()),
+            WistType.List => string.Join(", ", c.Get<WistFastList<WistConst>>()),
             WistType.None => "<<None>>",
             WistType.InternalInteger => $"i32_{c.GetInternalInteger()}",
             WistType.Pointer => $"ptr_{c.GetPointer()}",
@@ -64,9 +72,11 @@ public static class WistConstOperations
         };
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static string NumberToString(double number) =>
         number.ToString(Math.Abs(number) < 1e10 ? "0.########" : "e", CultureInfo.InvariantCulture);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static string Replace(string src, string tar, string value)
     {
         var srcInternal = src;
@@ -77,4 +87,10 @@ public static class WistConstOperations
 
         return srcInternal;
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst Cmp(WistConst c, WistConst c1) => c == c1 ? _true : _false;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst NotCmp(WistConst c, WistConst c1) => c != c1 ? _true : _false;
 }

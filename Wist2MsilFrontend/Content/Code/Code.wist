@@ -9,8 +9,7 @@ func Start() {
         t = GetTimeInMs()
         
         for j = 0; j < 500_000; j = j + 1 {
-            // it's very slow...
-            lst = new List([])
+            l = new List([1,2,3,j])
         }
         
         
@@ -20,4 +19,5 @@ func Start() {
     
     Print(times.ToString())
     Print(times.Average())
+	InputString()
 }

@@ -103,16 +103,7 @@ public sealed class WistFastList<T> : IEnumerable<T>
     public void AddRange(IEnumerable<T> collection) => AddRange(collection.ToArray());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistFastList<T> Copy() => new(CopyArray(_arr), _capacity);
-
-    private static T[] CopyArray(T[] arr)
-    {
-        var newArr = new T[arr.Length];
-        for (var index = 0; index < arr.Length; index++) 
-            newArr[index] = arr[index];
-
-        return newArr;
-    }
+    public WistFastList<T> Copy() => (WistFastList<T>)MemberwiseClone();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Insert(int ind, T elem)

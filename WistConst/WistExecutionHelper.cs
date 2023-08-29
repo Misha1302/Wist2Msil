@@ -83,10 +83,10 @@ public sealed unsafe class WistExecutionHelper
         WistConstOperations.GreaterThanOrEquals(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Cmp(WistConst a, WistConst b) => new(a == b);
+    public static WistConst Cmp(WistConst a, WistConst b) => WistConstOperations.Cmp(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst NegCmp(WistConst a, WistConst b) => new(a != b);
+    public static WistConst NegCmp(WistConst a, WistConst b) => WistConstOperations.NotCmp(a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst PushNullConst() => WistConst.CreateNull();

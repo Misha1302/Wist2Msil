@@ -7,13 +7,6 @@ public sealed class WistFastSortedList<TValue>
     private KeyValuePair<int, TValue>[] _arr = Array.Empty<KeyValuePair<int, TValue>>();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private WistFastSortedList(KeyValuePair<int, TValue>[] arr)
-    {
-        _arr = new KeyValuePair<int, TValue>[arr.Length];
-        Array.Copy(arr, _arr, arr.Length);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistFastSortedList()
     {
     }
@@ -97,5 +90,5 @@ public sealed class WistFastSortedList<TValue>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static int GetMedian(int lo, int hi) => lo + (hi - lo) / 2;
 
-    public WistFastSortedList<TValue> Copy() => new(_arr);
+    public WistFastSortedList<TValue> Copy() => (WistFastSortedList<TValue>)MemberwiseClone();
 }

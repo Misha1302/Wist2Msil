@@ -7,41 +7,32 @@ struct List(_lst) {
         ret self
     }
     
-    func Constructor(self) {
+    func Constructor(self):
         ret self.Constructor([])
-    }
     
-    func Add(self, elem) {
+    func Add(self, elem):
         ListAdd(self._lst, elem)
-    }
     
-    func Remove(self, elem) {
+    func Remove(self, elem):
         ListRemove(self._lst, elem)
-    }
     
-    func RemoveAt(self, ind) { // we count from 1!
+    func RemoveAt(self, ind):
         ListRemoveAt(self._lst, ind - 1) 
-    }
     
-    func Insert(self, ind, elem) { // we count from 1!
+    func Insert(self, ind, elem):
         ListInsert(self._lst, ind - 1, elem)
-    }
     
-    func ToString(self) {
+    func ToString(self):
         ret ToStr(self._lst)
-    }
     
-    func GetElem(self, ind) {
+    func GetElem(self, ind):
         ret GetElemFromList(self._lst, ind - 1)
-    }
     
-    func GetElem(self, value, ind) {
+    func GetElem(self, value, ind):
         ret SetElemInList(self._lst, value, ind)
-    }
     
-    func GetLen(self) {
+    func GetLen(self):
         ret GetListLen(self._lst)
-    }
     
     func Average(self) {
         sum = 0

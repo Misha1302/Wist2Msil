@@ -172,7 +172,7 @@ public sealed class WistStruct
             (a, b, c, d, f, g, helper);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private (nint methodPtr, WistExecutionHelper exeHelper) CallMethodInternal(int key)
     {
         var indexOfKey = _sortedMethods.IndexOfKey(key);
@@ -218,5 +218,5 @@ public sealed class WistStruct
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistStruct Copy() => new(Name, _sortedFields, _sortedMethods, _inheritances, _executionHelpers);
+    public WistStruct Copy() => (WistStruct)MemberwiseClone();
 }
