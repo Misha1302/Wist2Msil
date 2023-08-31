@@ -20,25 +20,32 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
     private WistLibraryManager _wistLibraryManager = null!;
     private (string startLoopLabel, string endLoopLabel, string lastAssigmentLabel) _loopLabels;
     private readonly string _path;
+    private readonly List<WistError> _lexerErrors;
+    private readonly List<WistError> _parserErrors;
 
-    public WistVisitor(string path)
+    public WistVisitor(string path, List<WistError> lexerErrors,
+        List<WistError> parserErrors)
     {
         _path = path;
+        _lexerErrors = lexerErrors;
+        _parserErrors = parserErrors;
     }
 
     public WistVisitor(string path, WistFastList<WistFunction> wistFunctions,
         WistFastList<WistCompilationStruct> wistStructs,
-        WistLibraryManager wistLibraryManager, IParseTree tree)
+        WistLibraryManager wistLibraryManager, IParseTree tree, List<WistError> lexerErrors, List<WistError> parserErrors)
     {
         _path = path;
         wistFunctions.AddRange(new WistFunctionsVisitor().GetAllFunctions(tree));
         wistStructs.AddRange(new WistStructsVisitor().GetAllStructs(tree));
-        new WistLibraryVisitor(path, wistFunctions, wistStructs, wistLibraryManager).SetLibManager(wistLibraryManager)
+        new WistLibraryVisitor(path, wistFunctions, wistStructs, wistLibraryManager, lexerErrors, parserErrors).SetLibManager(wistLibraryManager)
             .Visit(tree);
 
         _wistFunctions = wistFunctions;
         _wistStructs = wistStructs;
         _wistLibraryManager = wistLibraryManager;
+        _lexerErrors = lexerErrors;
+        _parserErrors = parserErrors;
 
         _initialized = true;
     }
@@ -51,7 +58,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
             _wistFunctions = new WistFunctionsVisitor().GetAllFunctions(tree);
             _wistStructs = new WistStructsVisitor().GetAllStructs(tree);
             _wistLibraryManager = new WistLibraryManager();
-            new WistLibraryVisitor(_path, _wistFunctions, _wistStructs, _wistLibraryManager)
+            new WistLibraryVisitor(_path, _wistFunctions, _wistStructs, _wistLibraryManager, _lexerErrors, _parserErrors)
                 .SetLibManager(_wistLibraryManager).Visit(tree);
         }
 

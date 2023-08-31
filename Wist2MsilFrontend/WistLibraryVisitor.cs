@@ -5,6 +5,7 @@ using Antlr4.Runtime.Tree;
 using Wist2Msil;
 using Wist2MsilFrontend.Content;
 using WistConst;
+using WistError;
 using WistFastList;
 
 public sealed class WistLibraryVisitor : WistGrammarBaseVisitor<object?>
@@ -15,15 +16,20 @@ public sealed class WistLibraryVisitor : WistGrammarBaseVisitor<object?>
     private readonly WistFastList<WistFunction> _wistFunctions;
     private readonly WistFastList<WistCompilationStruct> _wistStructs;
     private readonly WistLibraryManager _wistLibraryManager;
+    private readonly List<WistError> _lexerErrors;
+    private readonly List<WistError> _parserErrors;
 
     public WistLibraryVisitor(string path, WistFastList<WistFunction> wistFunctions,
         WistFastList<WistCompilationStruct> wistStructs,
-        WistLibraryManager wistLibraryManager)
+        WistLibraryManager wistLibraryManager, List<WistError> lexerErrors, List<WistError> parserErrors)
     {
         _path = path;
         _wistFunctions = wistFunctions;
         _wistStructs = wistStructs;
         _wistLibraryManager = wistLibraryManager;
+
+        _lexerErrors = lexerErrors;
+        _parserErrors = parserErrors;
     }
 
     public WistLibraryVisitor SetLibManager(WistLibraryManager? libraryManager)
@@ -57,17 +63,27 @@ public sealed class WistLibraryVisitor : WistGrammarBaseVisitor<object?>
 
             _visitedPaths.Add(fullPath);
 
-            var tree = new WistGrammarParser(
-                new CommonTokenStream(
-                    new WistGrammarLexer(
-                        new AntlrInputStream(
-                            File.ReadAllText(fullPath)
-                        )
-                    )
+            var grammarLexer = new WistGrammarLexer(
+                new AntlrInputStream(
+                    File.ReadAllText(fullPath)
                 )
-            ).program();
+            );
+            var grammarParser = new WistGrammarParser(
+                new CommonTokenStream(
+                    grammarLexer
+                )
+            );
+            
+            var parserErrorListener = new WistErrorListener($"{fullPath}. Parser error. ", _parserErrors);
+            grammarParser.AddErrorListener(parserErrorListener);
+            
+            var lexerErrorListener = new WistErrorListener($"{fullPath}. Lexer error. ", _lexerErrors);
+            grammarLexer.AddErrorListener(lexerErrorListener);
+            
+            
+            var tree = grammarParser.program();
 
-            var visitor = new WistVisitor(_path, _wistFunctions, _wistStructs, _wistLibraryManager, tree);
+            var visitor = new WistVisitor(_path, _wistFunctions, _wistStructs, _wistLibraryManager, tree, _lexerErrors, _parserErrors);
             visitor.Visit(tree);
         }
 
