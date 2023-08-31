@@ -2,14 +2,15 @@ namespace Wist2Msil;
 
 using System.Reflection;
 using WistConst;
+using WistFastList;
 using wInst = WistInstruction;
 
 public sealed class WistImage
 {
-    public readonly WistFastList.WistFastList<string> Locals = new();
+    public readonly WistFastList<string> Locals = new();
     private readonly HashSet<string> _localsHashSet = new();
     private WistFunction _function = null!;
-    public WistFastList.WistFastList<WistInstruction> Instructions { get; } = new();
+    public WistFastList<WistInstruction> Instructions { get; } = new();
 
     public void PushConst(WistConst c) =>
         Instructions.Add(new wInst(WistInstruction.WistOperation.PushConst, c));

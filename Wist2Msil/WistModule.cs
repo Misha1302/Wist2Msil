@@ -1,15 +1,16 @@
 ﻿namespace Wist2Msil;
 
 using WistConst;
+using WistFastList;
 
 public sealed class WistModule
 {
     public readonly WistHashCode.WistHashCode HashCode = new();
 
     // ReSharper disable once ReturnTypeCanBeEnumerable.Global
-    public WistFastList.WistFastList<WistFunction> Functions { get; } = new();
+    public WistFastList<WistFunction> Functions { get; } = new();
 
-    public WistFastList.WistFastList<WistCompilationStruct> Structs { get; } = new();
+    public WistFastList<WistCompilationStruct> Structs { get; } = new();
 
     public void AddFunction(WistFunction wistFunction)
     {

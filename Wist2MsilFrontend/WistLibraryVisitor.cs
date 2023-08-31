@@ -5,17 +5,19 @@ using Antlr4.Runtime.Tree;
 using Wist2Msil;
 using Wist2MsilFrontend.Content;
 using WistConst;
+using WistFastList;
 
 public sealed class WistLibraryVisitor : WistGrammarBaseVisitor<object?>
 {
     private static readonly HashSet<string> _visitedPaths = new();
     private WistLibraryManager? _libManager;
     private readonly string _path;
-    private readonly WistFastList.WistFastList<WistFunction> _wistFunctions;
-    private readonly WistFastList.WistFastList<WistCompilationStruct> _wistStructs;
+    private readonly WistFastList<WistFunction> _wistFunctions;
+    private readonly WistFastList<WistCompilationStruct> _wistStructs;
     private readonly WistLibraryManager _wistLibraryManager;
 
-    public WistLibraryVisitor(string path, WistFastList.WistFastList<WistFunction> wistFunctions, WistFastList.WistFastList<WistCompilationStruct> wistStructs,
+    public WistLibraryVisitor(string path, WistFastList<WistFunction> wistFunctions,
+        WistFastList<WistCompilationStruct> wistStructs,
         WistLibraryManager wistLibraryManager)
     {
         _path = path;

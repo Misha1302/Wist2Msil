@@ -5,13 +5,14 @@ using Wist2Msil;
 using Wist2MsilFrontend.Content;
 using WistConst;
 using WistError;
+using WistFastList;
 using WistFuncName;
 
 public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 {
     private readonly WistModule _wistModule = new();
-    private WistFastList.WistFastList<WistCompilationStruct> _wistStructs = null!;
-    private WistFastList.WistFastList<WistFunction> _wistFunctions = null!;
+    private WistFastList<WistCompilationStruct> _wistStructs = null!;
+    private WistFastList<WistFunction> _wistFunctions = null!;
     private WistFunction _curFunc = null!;
     private int _saveResultLevel;
     private bool _initialized;
@@ -25,7 +26,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         _path = path;
     }
 
-    public WistVisitor(string path, WistFastList.WistFastList<WistFunction> wistFunctions, WistFastList.WistFastList<WistCompilationStruct> wistStructs,
+    public WistVisitor(string path, WistFastList<WistFunction> wistFunctions,
+        WistFastList<WistCompilationStruct> wistStructs,
         WistLibraryManager wistLibraryManager, IParseTree tree)
     {
         _path = path;
@@ -159,7 +161,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         var argsCount = context.IDENTIFIER().Length - 1;
 
         var wistFunction =
-            _wistFunctions.FirstOrDefault(x => x.Name.FullName == WistFuncName.CreateFullName(name, argsCount, _curStructName))!;
+            _wistFunctions.FirstOrDefault(x =>
+                x.Name.FullName == WistFuncName.CreateFullName(name, argsCount, _curStructName))!;
 
         _curFunc = wistFunction;
 

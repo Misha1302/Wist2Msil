@@ -25,8 +25,8 @@ public readonly struct WistConst
     private static readonly WistConst _null = new(WistType.Null);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void SkipInitAll(out nint valueN, out double valueR, out long valueL, out int valueI,
-        out bool valueB,
+    private static void SkipInitAll(
+        out nint valueN, out double valueR, out long valueL, out int valueI, out bool valueB,
         out WistType type, out WistFastList<WistConst> list, out string str, out WistStruct @struct,
         out WistCompilationStruct cStruct, out MethodInfo mInfo)
     {

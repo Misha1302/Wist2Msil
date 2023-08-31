@@ -3,7 +3,6 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using WistError;
-using WistFastList;
 
 public static class WistConstOperations
 {
