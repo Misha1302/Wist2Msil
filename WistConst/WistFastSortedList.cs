@@ -46,7 +46,7 @@ public sealed class WistFastSortedList<TValue>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int IndexOfKey(int key) => LinerSearch(key);
+    public int IndexOfKey(int key) => BinarySearch(key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TValue GetByIndex(int index) => _arr[index].Value;
@@ -54,17 +54,6 @@ public sealed class WistFastSortedList<TValue>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetByIndex(int index, TValue value) =>
         _arr[index] = new KeyValuePair<int, TValue>(_arr[index].Key, value);
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private int LinerSearch(long key)
-    {
-        for (var i = 0; i < _arr.Length; i++)
-            if (_arr[i].Key == key)
-                return i;
-
-        return -1;
-    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private int BinarySearch(long key)

@@ -93,42 +93,42 @@ public sealed unsafe class WistExecutionHelper
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void SetField(WistConst wistStruct, WistConst constValue, int key) =>
-        wistStruct.Get<WistStruct>().SetField(key, constValue);
+        wistStruct.GetWistStruct().SetField(key, constValue);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst GetField(WistConst wistStruct, int key) =>
-        wistStruct.Get<WistStruct>().GetField(key);
+        wistStruct.GetWistStruct().GetField(key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod0(WistConst wistStruct, int key) =>
-        wistStruct.Get<WistStruct>().CallMethod(key);
+        wistStruct.GetWistStruct().CallMethod(key);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod1(WistConst wistStruct, WistConst a, int key) =>
-        wistStruct.Get<WistStruct>().CallMethod(key, a);
+        wistStruct.GetWistStruct().CallMethod(key, a);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod2(WistConst wistStruct, WistConst a, WistConst b, int key) =>
-        wistStruct.Get<WistStruct>().CallMethod(key, a, b);
+        wistStruct.GetWistStruct().CallMethod(key, a, b);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod3(WistConst wistStruct, WistConst a, WistConst b, WistConst c, int key) =>
-        wistStruct.Get<WistStruct>().CallMethod(key, a, b, c);
+        wistStruct.GetWistStruct().CallMethod(key, a, b, c);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod4(WistConst wistStruct, WistConst a, WistConst b, WistConst c,
         WistConst d, int key) =>
-        wistStruct.Get<WistStruct>().CallMethod(key, a, b, c, d);
+        wistStruct.GetWistStruct().CallMethod(key, a, b, c, d);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod5(WistConst wistStruct, WistConst a, WistConst b, WistConst c,
         WistConst d, WistConst e, int key) =>
-        wistStruct.Get<WistStruct>().CallMethod(key, a, b, c, d, e);
+        wistStruct.GetWistStruct().CallMethod(key, a, b, c, d, e);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CallStructMethod6(WistConst wistStruct, WistConst a, WistConst b, WistConst c,
         WistConst d, WistConst e, WistConst f, int key) =>
-        wistStruct.Get<WistStruct>().CallMethod(key, a, b, c, d, e, f);
+        wistStruct.GetWistStruct().CallMethod(key, a, b, c, d, e, f);
 
     public void Init()
     {

@@ -176,11 +176,11 @@ public sealed class WistCompiler
                     il.Call(_methods["GreaterThanOrEquals"]);
                     break;
                 case WistInstruction.WistOperation.CSharpCall:
-                    il.Call(consts1[i].Get<MethodInfo>());
+                    il.Call(consts1[i].GetMethodInfo());
                     break;
                 case WistInstruction.WistOperation.Call:
                     var ind = _executionHelpers.ToList().FindIndex(
-                        x => x.DynamicMethod.Name == consts2[i].Get<string>()
+                        x => x.DynamicMethod.Name == consts2[i].GetString()
                     );
 
                     il.Ldarg(exeHelperArgIndex);
@@ -190,7 +190,7 @@ public sealed class WistCompiler
                     il.Call(_executionHelpers[ind].DynamicMethod);
                     break;
                 case WistInstruction.WistOperation.SetLabel:
-                    name = consts1[i].Get<string>();
+                    name = consts1[i].GetString();
                     if (!labels.TryGetValue(name, out label))
                         labels.Add(name, label = il.DefineLabel(name));
 
@@ -226,22 +226,22 @@ public sealed class WistCompiler
                     il.Call(_methods["NegCmp"]);
                     break;
                 case WistInstruction.WistOperation.LoadLocal:
-                    var argLocalName = consts1[i].Get<string>();
+                    var argLocalName = consts1[i].GetString();
 
                     if (locals.Any(x => x.Key == argLocalName))
                         il.Ldloc(locals[argLocalName]);
                     else if (wistFunc.Parameters.Any(x => x == argLocalName))
-                        il.Ldarg(Array.IndexOf(wistFunc.Parameters, consts1[i].Get<string>()));
+                        il.Ldarg(Array.IndexOf(wistFunc.Parameters, consts1[i].GetString()));
                     else throw new InvalidOperationException();
 
                     break;
                 case WistInstruction.WistOperation.SetLocal:
-                    name = consts1[i].Get<string>();
+                    name = consts1[i].GetString();
 
                     if (locals.Any(x => x.Key == name))
                         il.Stloc(locals[name]);
                     else if (wistFunc.Parameters.Any(x => x == name))
-                        il.Starg(Array.IndexOf(wistFunc.Parameters, consts1[i].Get<string>()));
+                        il.Starg(Array.IndexOf(wistFunc.Parameters, consts1[i].GetString()));
                     else throw new InvalidOperationException();
 
                     break;
@@ -249,7 +249,7 @@ public sealed class WistCompiler
                     il.Ret();
                     break;
                 case WistInstruction.WistOperation.Instantiate:
-                    var src = consts1[i].Get<WistCompilationStruct>();
+                    var src = consts1[i].GetWistCompStruct();
                     var s = _wistStructures.FirstOrDefault(x => x.Name == src.Name)!;
 
                     if (s is null)
@@ -265,15 +265,15 @@ public sealed class WistCompiler
                     il.Call(_copyWistStructMethod);
                     break;
                 case WistInstruction.WistOperation.SetField:
-                    il.Ldc_I4(consts1[i].Get<string>().GetWistHashCode(_module));
+                    il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
                     il.Call(_methods["SetField"]);
                     break;
                 case WistInstruction.WistOperation.PushField:
-                    il.Ldc_I4(consts1[i].Get<string>().GetWistHashCode(_module));
+                    il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
                     il.Call(_methods["GetField"]);
                     break;
                 case WistInstruction.WistOperation.CallStructMethod:
-                    il.Ldc_I4(consts1[i].Get<string>().GetWistHashCode(_module));
+                    il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
                     il.Call(_methods[$"CallStructMethod{consts2[i].GetInternalInteger() + 1}"]);
                     break;
                 case WistInstruction.WistOperation.InstantiateList:
@@ -297,7 +297,7 @@ public sealed class WistCompiler
 
         GroboIL.Label AddOrGetLabel(int i)
         {
-            var name = consts1[i].Get<string>();
+            var name = consts1[i].GetString();
             if (!labels.TryGetValue(name, out var label))
                 labels.Add(name, label = il.DefineLabel(name));
             return label;

@@ -12,12 +12,13 @@ func Start() {
         // the loop is quite fast, but ...
         for j = 0; j < 500_000; j = j + 1 {
             // creating new list and WistFastList are very slow
-            l = new List([1,2,3,j])
+            l = [1,2,3,j]
         }
         
         
         times.Add(GetTimeInMs() - t)
-        Print(times.GetElem(times.GetLen()))
+        Print(l)
+        Print(times.ToString())
     }
     
     Print(times.ToString())

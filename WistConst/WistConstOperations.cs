@@ -34,13 +34,13 @@ public static class WistConstOperations
     public static WistConst Add(in WistConst a, in WistConst b) =>
         a.Type == WistType.Number
             ? new WistConst(a.GetNumber() + b.GetNumber())
-            : new WistConst(a.Get<string>() + b.Get<string>());
+            : new WistConst(a.GetString() + b.GetString());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst Sub(in WistConst a, in WistConst b) =>
         a.Type == WistType.Number
             ? new WistConst(a.GetNumber() - b.GetNumber())
-            : new WistConst(Replace(a.Get<string>(), b.Get<string>(), string.Empty));
+            : new WistConst(Replace(a.GetString(), b.GetString(), string.Empty));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst Mul(in WistConst a, in WistConst b) => new(a.GetNumber() * b.GetNumber());
@@ -61,8 +61,8 @@ public static class WistConstOperations
         {
             WistType.Bool => c.GetBool().ToString(),
             WistType.Number => NumberToString(c.GetNumber()),
-            WistType.String => c.Get<string>(),
-            WistType.List => string.Join(", ", c.Get<WistFastList<WistConst>>()),
+            WistType.String => c.GetString(),
+            WistType.List => string.Join(", ", c.GetWistFastList()),
             WistType.None => "<<None>>",
             WistType.InternalInteger => $"i32_{c.GetInternalInteger()}",
             WistType.Pointer => $"ptr_{c.GetPointer()}",
@@ -89,8 +89,8 @@ public static class WistConstOperations
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Cmp(WistConst c, WistConst c1) => c == c1 ? _true : _false;
+    public static WistConst Cmp(WistConst c, WistConst c1) => c.EqualsConsts(c1) ? _true : _false;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst NotCmp(WistConst c, WistConst c1) => c != c1 ? _true : _false;
+    public static WistConst NotCmp(WistConst c, WistConst c1) => c.EqualsConsts(c1) ? _false : _true;
 }

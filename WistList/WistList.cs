@@ -9,43 +9,43 @@ public static class WistList
     [WistLibraryFunction]
     public static WistConst ListAdd(WistConst list, WistConst elem)
     {
-        list.Get<WistFastList.WistFastList<WistConst>>().Add(elem);
+        list.GetWistFastList().Add(elem);
         return WistConst.CreateNull();
     }
 
     [WistLibraryFunction]
     public static WistConst ListRemove(WistConst list, WistConst elem)
     {
-        list.Get<WistFastList.WistFastList<WistConst>>().Remove(elem);
+        list.GetWistFastList().Remove(elem);
         return WistConst.CreateNull();
     }
 
     [WistLibraryFunction]
     public static WistConst ListRemoveAt(WistConst list, WistConst ind)
     {
-        list.Get<WistFastList.WistFastList<WistConst>>().RemoveAt((int)(ind.GetNumber() + 0.1));
+        list.GetWistFastList().RemoveAt((int)(ind.GetNumber() + 0.1));
         return WistConst.CreateNull();
     }
 
     [WistLibraryFunction]
     public static WistConst GetElemFromList(WistConst list, WistConst ind) =>
-        list.Get<WistFastList.WistFastList<WistConst>>()[(int)(ind.GetNumber() + 0.1)];
+        list.GetWistFastList()[(int)(ind.GetNumber() + 0.1)];
 
     [WistLibraryFunction]
     public static WistConst GetListLen(WistConst list) =>
-        new(list.Get<WistFastList.WistFastList<WistConst>>().Count);
+        new(list.GetWistFastList().Count);
 
     [WistLibraryFunction]
     public static WistConst SetElemInList(WistConst list, WistConst elem, WistConst ind)
     {
-        list.Get<WistFastList.WistFastList<WistConst>>()[(int)(ind.GetNumber() + 0.1)] = elem;
+        list.GetWistFastList()[(int)(ind.GetNumber() + 0.1)] = elem;
         return WistConst.CreateNull();
     }
 
     [WistLibraryFunction]
     public static WistConst ListInsert(WistConst list, WistConst ind, WistConst elem)
     {
-        list.Get<WistFastList.WistFastList<WistConst>>().Insert((int)(ind.GetNumber() + 0.1), elem);
+        list.GetWistFastList().Insert((int)(ind.GetNumber() + 0.1), elem);
         return WistConst.CreateNull();
     }
 }

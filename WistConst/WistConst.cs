@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using WistFastList;
 
 [StructLayout(LayoutKind.Explicit)]
-public readonly struct WistConst : IEquatable<WistConst>
+public readonly struct WistConst
 {
     [FieldOffset(0)] private readonly nint _valueN;
     [FieldOffset(0)] private readonly double _valueR;
@@ -16,36 +16,50 @@ public readonly struct WistConst : IEquatable<WistConst>
 
     [FieldOffset(8)] public readonly WistType Type;
 
-    [FieldOffset(16)] private readonly WistGcHandleProvider _handle;
+    [FieldOffset(16)] private readonly WistFastList<WistConst> _list = null!;
+    [FieldOffset(16)] private readonly string _str = null!;
+    [FieldOffset(16)] private readonly WistStruct _struct = null!;
+    [FieldOffset(16)] private readonly WistCompilationStruct _wistCompilationStruct = null!;
+    [FieldOffset(16)] private readonly MethodInfo _methodInfo = null!;
 
     private static readonly WistConst _null = new(WistType.Null);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void SkipInitAll(out nint valueN, out double valueR, out long valueL, out int valueI,
+        out bool valueB,
+        out WistType type, out WistFastList<WistConst> list, out string str, out WistStruct @struct,
+        out WistCompilationStruct cStruct, out MethodInfo mInfo)
+    {
+        Unsafe.SkipInit(out valueN);
+        Unsafe.SkipInit(out valueR);
+        Unsafe.SkipInit(out valueL);
+        Unsafe.SkipInit(out valueI);
+        Unsafe.SkipInit(out valueB);
+        Unsafe.SkipInit(out type);
+        Unsafe.SkipInit(out list);
+        Unsafe.SkipInit(out str);
+        Unsafe.SkipInit(out @struct);
+        Unsafe.SkipInit(out cStruct);
+        Unsafe.SkipInit(out mInfo);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(string v)
     {
-        Unsafe.SkipInit(out _valueN);
-        Unsafe.SkipInit(out _valueL);
-        Unsafe.SkipInit(out _valueI);
-        Unsafe.SkipInit(out _valueB);
-        Unsafe.SkipInit(out _valueR);
-        _handle = new WistGcHandleProvider(v);
+        SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
+            out _struct, out _wistCompilationStruct, out _methodInfo);
+        _str = v;
         Type = WistType.String;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(double v)
     {
-        Unsafe.SkipInit(out _valueN);
-        Unsafe.SkipInit(out _valueL);
-        Unsafe.SkipInit(out _valueI);
-        Unsafe.SkipInit(out _valueB);
-        Unsafe.SkipInit(out _handle);
+        SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
+            out _struct, out _wistCompilationStruct, out _methodInfo);
         _valueR = v;
         Type = WistType.Number;
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T Get<T>() => _handle.Get<T>();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CreateInternalConst(int i) => new(i);
@@ -53,7 +67,8 @@ public readonly struct WistConst : IEquatable<WistConst>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private WistConst(int i)
     {
-        _handle = null!;
+        SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
+            out _struct, out _wistCompilationStruct, out _methodInfo);
         _valueI = i;
         Type = WistType.InternalInteger;
     }
@@ -64,7 +79,8 @@ public readonly struct WistConst : IEquatable<WistConst>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private WistConst(nint ptr)
     {
-        _handle = null!;
+        SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
+            out _struct, out _wistCompilationStruct, out _methodInfo);
         _valueN = ptr;
         Type = WistType.Pointer;
     }
@@ -72,11 +88,8 @@ public readonly struct WistConst : IEquatable<WistConst>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(bool b)
     {
-        Unsafe.SkipInit(out _valueN);
-        Unsafe.SkipInit(out _valueL);
-        Unsafe.SkipInit(out _valueI);
-        Unsafe.SkipInit(out _valueR);
-        Unsafe.SkipInit(out _handle);
+        SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
+            out _struct, out _wistCompilationStruct, out _methodInfo);
         _valueB = b;
         Type = WistType.Bool;
     }
@@ -84,59 +97,43 @@ public readonly struct WistConst : IEquatable<WistConst>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(WistFastList<WistConst> wistConsts)
     {
-        Unsafe.SkipInit(out _valueN);
-        Unsafe.SkipInit(out _valueL);
-        Unsafe.SkipInit(out _valueI);
-        Unsafe.SkipInit(out _valueB);
-        Unsafe.SkipInit(out _valueR);
-        _handle = new WistGcHandleProvider(wistConsts);
+        SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
+            out _struct, out _wistCompilationStruct, out _methodInfo);
+        _list = wistConsts;
         Type = WistType.List;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(WistStruct s)
     {
-        Unsafe.SkipInit(out _valueN);
-        Unsafe.SkipInit(out _valueL);
-        Unsafe.SkipInit(out _valueI);
-        Unsafe.SkipInit(out _valueB);
-        Unsafe.SkipInit(out _valueR);
-        _handle = new WistGcHandleProvider(s);
+        SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
+            out _struct, out _wistCompilationStruct, out _methodInfo);
+        _struct = s;
         Type = WistType.Struct;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(WistCompilationStruct mCompilationStruct)
     {
-        Unsafe.SkipInit(out _valueN);
-        Unsafe.SkipInit(out _valueL);
-        Unsafe.SkipInit(out _valueI);
-        Unsafe.SkipInit(out _valueB);
-        Unsafe.SkipInit(out _valueR);
-        _handle = new WistGcHandleProvider(mCompilationStruct);
+        SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
+            out _struct, out _wistCompilationStruct, out _methodInfo);
+        _wistCompilationStruct = mCompilationStruct;
         Type = WistType.StructInternal;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private WistConst(WistType type)
     {
-        Unsafe.SkipInit(out _valueN);
-        Unsafe.SkipInit(out _valueL);
-        Unsafe.SkipInit(out _valueI);
-        Unsafe.SkipInit(out _valueB);
-        Unsafe.SkipInit(out _valueR);
-        Unsafe.SkipInit(out _handle);
+        SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
+            out _struct, out _wistCompilationStruct, out _methodInfo);
         Type = type;
     }
 
-    public WistConst(MethodInfo mCompilationStruct)
+    public WistConst(MethodInfo mInfo)
     {
-        Unsafe.SkipInit(out _valueN);
-        Unsafe.SkipInit(out _valueL);
-        Unsafe.SkipInit(out _valueI);
-        Unsafe.SkipInit(out _valueB);
-        Unsafe.SkipInit(out _valueR);
-        _handle = new WistGcHandleProvider(mCompilationStruct);
+        SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
+            out _struct, out _wistCompilationStruct, out _methodInfo);
+        _methodInfo = mInfo;
         Type = WistType.MInfo;
     }
 
@@ -151,16 +148,7 @@ public readonly struct WistConst : IEquatable<WistConst>
     public bool GetBool() => _valueB;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(WistConst obj) => EqualsConsts(obj);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object? obj) => obj is WistConst other && EqualsConsts(other);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode() => HashCode.Combine(_valueL, (int)Type, _handle);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool EqualsConsts(in WistConst obj)
+    public bool EqualsConsts(in WistConst obj)
     {
         if (((int)obj.Type & (int)WistType.ValueType) != 0)
         {
@@ -172,17 +160,11 @@ public readonly struct WistConst : IEquatable<WistConst>
 
         return obj.Type switch
         {
-            WistType.String => obj.Get<string>() == Get<string>(),
-            WistType.List => obj.Get<WistFastList<WistConst>>().SequenceEqual(Get<WistFastList<WistConst>>()),
+            WistType.String => obj.GetString() == GetString(),
+            WistType.List => obj.GetWistFastList().SequenceEqual(GetWistFastList()),
             _ => false
         };
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(in WistConst left, in WistConst right) => left.EqualsConsts(right);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(in WistConst left, in WistConst right) => !left.EqualsConsts(right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public nint GetPointer() => _valueN;
@@ -191,11 +173,27 @@ public readonly struct WistConst : IEquatable<WistConst>
     public override string ToString() => WistConstOperations.ToStr(this);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistConst CopyStruct() => new(_handle.Get<WistStruct>().Copy());
+    public WistConst CopyStruct() => new(GetWistStruct().Copy());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistConst CopyList() => new(Get<WistFastList<WistConst>>().Copy());
+    public WistConst CopyList() => new(GetWistFastList().Copy());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CreateNull() => _null;
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public WistStruct GetWistStruct() => _struct;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public WistFastList<WistConst> GetWistFastList() => _list;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public string GetString() => _str;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public WistCompilationStruct GetWistCompStruct() => _wistCompilationStruct;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public MethodInfo GetMethodInfo() => _methodInfo;
 }
