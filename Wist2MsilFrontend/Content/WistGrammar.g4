@@ -18,13 +18,14 @@ assigment: varAssigment | structFieldAssigment;
 varAssigment: IDENTIFIER '=' expression;
 structFieldAssigment: expression '.' IDENTIFIER '=' expression;
 
-loops: whileLoop | forLoop;
+loops: whileLoop | forLoop | repeatLoop;
 
 break: 'break' endOfLine;
 continue: 'continue' endOfLine;
 
 whileLoop: 'while' expression block;
 forLoop: 'for' assigment? endOfLine expression? endOfLine assigment? block;
+repeatLoop: 'repeat' '('? expression? ',' expression ',' expression? ')'? 'with' IDENTIFIER block;
 
 structDecl: 'struct' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' inheritance? block;
 inheritance: (':' IDENTIFIER (IDENTIFIER (',' IDENTIFIER)*)?);
@@ -32,7 +33,7 @@ inheritance: (':' IDENTIFIER (IDENTIFIER (',' IDENTIFIER)*)?);
 funcDecl: 'func' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
 labelDecl: IDENTIFIER ':';
 
-block: endOfLine* (('{' line* '}') | (':') line) endOfLine*;
+block: endOfLine* (('{' endOfLine* line* '}') | (':') line) endOfLine*;
 
 expression
     : constant                                                                          #constantExpression
@@ -74,5 +75,5 @@ REM_OP: '%';
 CMP_OP: '==' | '!=' | '>' | '<' | '<=' | '>=';
 
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
-WHITE_SPACE: [ \t] -> skip;
+WHITE_SPACE: [ \t\r\n] -> skip;
 SINGLE_LINE_COMMENT: '//' ~[\r\n]* -> skip;

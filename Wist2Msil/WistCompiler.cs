@@ -1,5 +1,6 @@
 namespace Wist2Msil;
 
+using System.Data;
 using System.Reflection;
 using System.Reflection.Emit;
 using GrEmit;
@@ -14,7 +15,10 @@ public sealed class WistCompiler
     private static readonly FieldInfo _constsField;
     private static readonly FieldInfo _executionHelpersField;
     private static readonly MethodInfo _copyWistStructMethod;
-    private static readonly MethodInfo _copyListMethod;
+    private static readonly MethodInfo _createListMethod;
+    private static readonly MethodInfo _getRepeatEnumerator;
+    private static readonly MethodInfo _repeatEnumeratorNext;
+    private static readonly MethodInfo _repeatEnumeratorCurrent;
     private readonly WistModule _module;
     private WistFastList<WistExecutionHelper> _executionHelpers = null!;
     private WistFastSortedList<WistExecutionHelper> _sortedListOfHelpers = null!;
@@ -37,8 +41,23 @@ public sealed class WistCompiler
             typeof(WistConst).GetMethod(nameof(WistConst.CopyStruct), BindingFlags.Instance | BindingFlags.Public) ??
             throw new NullReferenceException();
 
-        _copyListMethod =
-            typeof(WistConst).GetMethod(nameof(WistConst.CopyList), BindingFlags.Instance | BindingFlags.Public) ??
+        _getRepeatEnumerator =
+            typeof(WistConst).GetMethod(nameof(WistConst.GetRepeatEnumerator),
+                BindingFlags.Instance | BindingFlags.Public) ??
+            throw new NullReferenceException();
+
+        _repeatEnumeratorNext =
+            typeof(WistRepeatEnumerator).GetMethod(nameof(WistRepeatEnumerator.Next),
+                BindingFlags.Instance | BindingFlags.Public) ??
+            throw new NullReferenceException();
+
+        _repeatEnumeratorCurrent =
+            typeof(WistRepeatEnumerator).GetMethod(nameof(WistRepeatEnumerator.Current),
+                BindingFlags.Instance | BindingFlags.Public) ??
+            throw new NullReferenceException();
+        
+        _createListMethod =
+            typeof(WistConst).GetMethod(nameof(WistConst.CreateList), BindingFlags.Static | BindingFlags.Public) ??
             throw new NullReferenceException();
     }
 
@@ -277,14 +296,18 @@ public sealed class WistCompiler
                     il.Call(_methods[$"CallStructMethod{consts2[i].GetInternalInteger() + 1}"]);
                     break;
                 case WistInstruction.WistOperation.InstantiateList:
-                    curExeHelper.Consts[i] = new WistConst(new WistFastList<WistConst>(10));
-
-                    il.Ldarg(exeHelperArgIndex);
-                    il.Ldfld(_constsField);
-                    il.Ldc_I4(i);
-                    il.Ldelema(typeof(WistConst));
-
-                    il.Call(_copyListMethod);
+                    il.Call(_createListMethod);
+                    break;
+                case WistInstruction.WistOperation.GotoIfNext:
+                    Ldref(il);
+                    il.Call(_getRepeatEnumerator);
+                    il.Call(_repeatEnumeratorNext);
+                    il.Brfalse(AddOrGetLabel(i));
+                    break;
+                case WistInstruction.WistOperation.Current:
+                    Ldref(il);
+                    il.Call(_getRepeatEnumerator);
+                    il.Call(_repeatEnumeratorCurrent);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(inst.Op.ToString());
@@ -302,6 +325,13 @@ public sealed class WistCompiler
                 labels.Add(name, label = il.DefineLabel(name));
             return label;
         }
+    }
+
+    private static void Ldref(GroboIL il)
+    {
+        var loc = il.DeclareLocal(typeof(WistConst));
+        il.Stloc(loc);
+        il.Ldloca(loc);
     }
 
     private static void Push(GroboIL il, int i, int exeHelperArgIndex)

@@ -5,17 +5,14 @@ include "List.wist"
 func Start() {
     times = new List()
 
-    for i = 0; i < 7; i = i + 1 {
+    for i = 0; i < 5; i = i + 1 {
         t = GetTimeInMs()
         
-        // it's block works quite fast now!
-        for j = 0; j < 500_000; j = j + 1 {
+        repeat 0, 10_000_000, 1 with j {
             l = [1,2,3,j]
         }
         
-        
         times.Add(GetTimeInMs() - t)
-        Print(l)
         Print(times.ToString())
     }
     
@@ -23,4 +20,3 @@ func Start() {
     Print(times.Average())
 	InputString()
 }
-

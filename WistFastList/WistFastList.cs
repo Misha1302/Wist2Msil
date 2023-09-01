@@ -104,6 +104,7 @@ public sealed class WistFastList<T> : IEnumerable<T>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistFastList<T> Copy() => new(CopyArray(_arr), _capacity);
+    public WistFastList<T> Create() => new(new T[_arr.Length], _capacity);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static T[] CopyArray(T[] arr)

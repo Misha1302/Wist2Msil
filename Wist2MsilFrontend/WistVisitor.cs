@@ -77,6 +77,38 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public WistModule GetModule() => _wistModule;
 
+    public override object? VisitRepeatLoop(WistGrammarParser.RepeatLoopContext context)
+    {
+        var methodInfo = typeof(WistVisitorHelper).GetMethod(nameof(WistVisitorHelper.InstantiateRepeatEnumerator));
+
+        _saveResultLevel++;
+        foreach (var expressionContext in context.expression())
+            Visit(expressionContext);
+        _curFunc.Image.Call(methodInfo);
+        _saveResultLevel--;
+
+        var startLabelName = WistLabelsManager.RepeatStartLabelName();
+        var endLabelName = WistLabelsManager.RepeatEndLabelName();
+        _loopLabels = (startLabelName, endLabelName, string.Empty);
+
+        _curFunc.Image.SetLabel(startLabelName);
+        _curFunc.Image.Dup();
+        _curFunc.Image.GotoIfNext(endLabelName);
+
+        _curFunc.Image.Dup();
+        _curFunc.Image.Current();
+        _curFunc.Image.SetLocal(context.IDENTIFIER().GetText());
+
+        Visit(context.block());
+        _curFunc.Image.Goto(startLabelName);
+
+        _curFunc.Image.SetLabel(endLabelName);
+
+        _curFunc.Image.Drop();
+
+        return null;
+    }
+
     public override object? VisitVarAssigment(WistGrammarParser.VarAssigmentContext context)
     {
         var ident = context.IDENTIFIER().GetText();

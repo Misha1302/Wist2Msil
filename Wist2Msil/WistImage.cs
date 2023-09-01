@@ -31,7 +31,7 @@ public sealed class WistImage
     public void LessThanOrEquals() => Instructions.Add(new wInst(WistInstruction.WistOperation.LessThanOrEquals));
 
 
-    public void Call(MethodInfo? m)
+    public void Call(MethodInfo? m, WistConst secondParam = default)
     {
         if (m is null)
             throw new InvalidOperationException();
@@ -39,7 +39,8 @@ public sealed class WistImage
         Instructions.Add(
             new wInst(
                 WistInstruction.WistOperation.CSharpCall,
-                new WistConst(m)
+                new WistConst(m),
+                secondParam
             )
         );
     }
@@ -116,16 +117,6 @@ public sealed class WistImage
         Instructions.Add(new wInst(WistInstruction.WistOperation.Ret));
     }
 
-    public void LoadArg(string argName)
-    {
-        Instructions.Add(
-            new wInst(
-                WistInstruction.WistOperation.LoadArg,
-                new WistConst(argName)
-            )
-        );
-    }
-
     public void Instantiate(WistCompilationStruct mCompilationStruct)
     {
         Instructions.Add(
@@ -178,6 +169,25 @@ public sealed class WistImage
         Instructions.Add(
             new wInst(
                 WistInstruction.WistOperation.InstantiateList
+            )
+        );
+    }
+
+    public void Current()
+    {
+        Instructions.Add(
+            new wInst(
+                WistInstruction.WistOperation.Current
+            )
+        );
+    }
+
+    public void GotoIfNext(string labelName)
+    {
+        Instructions.Add(
+            new wInst(
+                WistInstruction.WistOperation.GotoIfNext,
+                new WistConst(labelName)
             )
         );
     }

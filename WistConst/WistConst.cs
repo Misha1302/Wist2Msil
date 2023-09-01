@@ -16,19 +16,20 @@ public readonly struct WistConst
 
     [FieldOffset(8)] public readonly WistType Type;
 
-    [FieldOffset(16)] private readonly WistFastList<WistConst> _list = null!;
-    [FieldOffset(16)] private readonly string _str = null!;
-    [FieldOffset(16)] private readonly WistStruct _struct = null!;
-    [FieldOffset(16)] private readonly WistCompilationStruct _wistCompilationStruct = null!;
-    [FieldOffset(16)] private readonly MethodInfo _methodInfo = null!;
+    [FieldOffset(16)] private readonly WistFastList<WistConst> _list;
+    [FieldOffset(16)] private readonly string _str;
+    [FieldOffset(16)] private readonly WistStruct _struct;
+    [FieldOffset(16)] private readonly WistCompilationStruct _wistCompilationStruct;
+    [FieldOffset(16)] private readonly MethodInfo _methodInfo;
+    [FieldOffset(16)] private readonly WistRepeatEnumerator _repeatEnumerator;
 
     private static readonly WistConst _null = new(WistType.Null);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void SkipInitAll(
-        out nint valueN, out double valueR, out long valueL, out int valueI, out bool valueB,
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    private static void SkipInitAll(out nint valueN, out double valueR, out long valueL, out int valueI,
+        out bool valueB,
         out WistType type, out WistFastList<WistConst> list, out string str, out WistStruct @struct,
-        out WistCompilationStruct cStruct, out MethodInfo mInfo)
+        out WistCompilationStruct cStruct, out MethodInfo mInfo, out WistRepeatEnumerator repeatEnumerator)
     {
         Unsafe.SkipInit(out valueN);
         Unsafe.SkipInit(out valueR);
@@ -41,13 +42,14 @@ public readonly struct WistConst
         Unsafe.SkipInit(out @struct);
         Unsafe.SkipInit(out cStruct);
         Unsafe.SkipInit(out mInfo);
+        Unsafe.SkipInit(out repeatEnumerator);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(string v)
     {
         SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
-            out _struct, out _wistCompilationStruct, out _methodInfo);
+            out _struct, out _wistCompilationStruct, out _methodInfo, out _repeatEnumerator);
         _str = v;
         Type = WistType.String;
     }
@@ -56,7 +58,7 @@ public readonly struct WistConst
     public WistConst(double v)
     {
         SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
-            out _struct, out _wistCompilationStruct, out _methodInfo);
+            out _struct, out _wistCompilationStruct, out _methodInfo, out _repeatEnumerator);
         _valueR = v;
         Type = WistType.Number;
     }
@@ -68,7 +70,7 @@ public readonly struct WistConst
     private WistConst(int i)
     {
         SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
-            out _struct, out _wistCompilationStruct, out _methodInfo);
+            out _struct, out _wistCompilationStruct, out _methodInfo, out _repeatEnumerator);
         _valueI = i;
         Type = WistType.InternalInteger;
     }
@@ -80,7 +82,7 @@ public readonly struct WistConst
     private WistConst(nint ptr)
     {
         SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
-            out _struct, out _wistCompilationStruct, out _methodInfo);
+            out _struct, out _wistCompilationStruct, out _methodInfo, out _repeatEnumerator);
         _valueN = ptr;
         Type = WistType.Pointer;
     }
@@ -89,7 +91,7 @@ public readonly struct WistConst
     public WistConst(bool b)
     {
         SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
-            out _struct, out _wistCompilationStruct, out _methodInfo);
+            out _struct, out _wistCompilationStruct, out _methodInfo, out _repeatEnumerator);
         _valueB = b;
         Type = WistType.Bool;
     }
@@ -98,7 +100,7 @@ public readonly struct WistConst
     public WistConst(WistFastList<WistConst> wistConsts)
     {
         SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
-            out _struct, out _wistCompilationStruct, out _methodInfo);
+            out _struct, out _wistCompilationStruct, out _methodInfo, out _repeatEnumerator);
         _list = wistConsts;
         Type = WistType.List;
     }
@@ -107,7 +109,7 @@ public readonly struct WistConst
     public WistConst(WistStruct s)
     {
         SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
-            out _struct, out _wistCompilationStruct, out _methodInfo);
+            out _struct, out _wistCompilationStruct, out _methodInfo, out _repeatEnumerator);
         _struct = s;
         Type = WistType.Struct;
     }
@@ -116,7 +118,7 @@ public readonly struct WistConst
     public WistConst(WistCompilationStruct mCompilationStruct)
     {
         SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
-            out _struct, out _wistCompilationStruct, out _methodInfo);
+            out _struct, out _wistCompilationStruct, out _methodInfo, out _repeatEnumerator);
         _wistCompilationStruct = mCompilationStruct;
         Type = WistType.StructInternal;
     }
@@ -125,16 +127,24 @@ public readonly struct WistConst
     private WistConst(WistType type)
     {
         SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
-            out _struct, out _wistCompilationStruct, out _methodInfo);
+            out _struct, out _wistCompilationStruct, out _methodInfo, out _repeatEnumerator);
         Type = type;
     }
 
     public WistConst(MethodInfo mInfo)
     {
         SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
-            out _struct, out _wistCompilationStruct, out _methodInfo);
+            out _struct, out _wistCompilationStruct, out _methodInfo, out _repeatEnumerator);
         _methodInfo = mInfo;
         Type = WistType.MInfo;
+    }
+
+    public WistConst(WistRepeatEnumerator repeatEnumerator)
+    {
+        SkipInitAll(out _valueN, out _valueR, out _valueL, out _valueI, out _valueB, out Type, out _list, out _str,
+            out _struct, out _wistCompilationStruct, out _methodInfo, out _repeatEnumerator);
+        _repeatEnumerator = repeatEnumerator;
+        Type = WistType.RepeatEnumerator;
     }
 
 
@@ -176,7 +186,7 @@ public readonly struct WistConst
     public WistConst CopyStruct() => new(GetWistStruct().Copy());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistConst CopyList() => new(GetWistFastList().Copy());
+    public static WistConst CreateList() => new(new WistFastList<WistConst>());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CreateNull() => _null;
@@ -196,4 +206,7 @@ public readonly struct WistConst
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public MethodInfo GetMethodInfo() => _methodInfo;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public WistRepeatEnumerator GetRepeatEnumerator() => _repeatEnumerator;
 }

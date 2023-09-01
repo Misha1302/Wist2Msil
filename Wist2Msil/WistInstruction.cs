@@ -43,12 +43,13 @@ public struct WistInstruction
         LoadLocal,
         SetLocal,
         Call,
-        LoadArg,
         Ret,
         Instantiate,
         SetField,
         PushField,
         CallStructMethod,
-        InstantiateList
+        InstantiateList,
+        Current,
+        GotoIfNext
     }
 }

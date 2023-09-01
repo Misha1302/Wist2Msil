@@ -13,4 +13,8 @@ public static class WistLabelsManager
     public static string ForLastAssigmentLabelName() => LabelName("for_last_assigment");
 
     public static string LabelName(string prefix) => $"{prefix}_{Guid.NewGuid()}";
+
+    public static string RepeatStartLabelName() => LabelName("repeat_start");
+
+    public static string RepeatEndLabelName() => LabelName("repeat_end");
 }
