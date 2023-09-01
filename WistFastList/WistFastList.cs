@@ -15,10 +15,10 @@ public sealed class WistFastList<T> : IEnumerable<T>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistFastList(T[] arr, int capacity)
+    public WistFastList(T[] arr)
     {
         _arr = arr;
-        _capacity = capacity;
+        _capacity = arr.Length;
     }
 
     public int Count

@@ -163,14 +163,11 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitListExpression(WistGrammarParser.ListExpressionContext context)
     {
-        _curFunc.Image.InstantiateList();
-        foreach (var expression in context.expression())
-        {
-            _curFunc.Image.Dup();
+        var expressionContexts = context.expression();
+        foreach (var expression in expressionContexts)
             Visit(expression);
-            _curFunc.Image.Call(typeof(WistVisitorHelper).GetMethod(nameof(WistVisitorHelper.AddToList)));
-            _curFunc.Image.Drop();
-        }
+
+        _curFunc.Image.InstantiateList(expressionContexts.Length);
 
         return null;
     }

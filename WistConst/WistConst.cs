@@ -186,7 +186,7 @@ public readonly struct WistConst
     public WistConst CopyStruct() => new(GetWistStruct().Copy());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CreateList() => new(new WistFastList<WistConst>());
+    public static WistConst CreateList(WistConst[] arr) => new(new WistFastList<WistConst>(arr));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CreateNull() => _null;

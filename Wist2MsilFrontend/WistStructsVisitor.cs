@@ -36,7 +36,7 @@ public sealed class WistStructsVisitor : WistGrammarBaseVisitor<object?>
     public override object VisitInheritance(WistGrammarParser.InheritanceContext context)
     {
         var arr = context.IDENTIFIER().Select(x => x.GetText()).ToArray();
-        return new WistFastList<string>(arr, arr.Length);
+        return new WistFastList<string>(arr);
     }
 
     public override object? VisitFuncDecl(WistGrammarParser.FuncDeclContext context)

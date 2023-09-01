@@ -164,11 +164,12 @@ public sealed class WistImage
         return this;
     }
 
-    public void InstantiateList()
+    public void InstantiateList(int length)
     {
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.InstantiateList
+                WistInstruction.WistOperation.InstantiateList,
+                new WistConst(length)
             )
         );
     }

@@ -295,7 +295,28 @@ public sealed class WistCompiler
                     il.Call(_methods[$"CallStructMethod{consts2[i].GetInternalInteger() + 1}"]);
                     break;
                 case WistInstruction.WistOperation.InstantiateList:
+                    var len = (int)(consts1[i].GetNumber() + 0.1);
+                    
+                    il.Ldc_I4(len);
+                    il.Newarr(typeof(WistConst));
+                    var arr = il.DeclareLocal(typeof(WistConst[]));
+                    il.Stloc(arr);
+
+                    var value = il.DeclareLocal(typeof(WistConst));
+                    for (var j = 0; j < len; j++)
+                    {
+                        il.Stloc(value);
+                        
+                        il.Ldloc(arr);
+                        il.Ldc_I4(j);
+                        il.Ldelema(typeof(WistConst));
+                        il.Ldloc(value);
+                        il.Stobj(typeof(WistConst));
+                    }
+                    
+                    il.Ldloc(arr);
                     il.Call(_createListMethod);
+
                     break;
                 case WistInstruction.WistOperation.GotoIfNext:
                     Ldref(il);
