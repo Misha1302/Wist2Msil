@@ -8,7 +8,7 @@ public sealed class WistRepeatEnumerator
 
     public WistRepeatEnumerator(int start, int max, int step)
     {
-        _cur = start;
+        _cur = start - step;
         _max = max;
         _step = step;
     }

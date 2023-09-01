@@ -25,7 +25,7 @@ continue: 'continue' endOfLine;
 
 whileLoop: 'while' expression block;
 forLoop: 'for' assigment? endOfLine expression? endOfLine assigment? block;
-repeatLoop: 'repeat' '('? expression? ',' expression ',' expression? ')'? 'with' IDENTIFIER block;
+repeatLoop: 'repeat' '('? (expression ',')? (expression ',')? expression ')'? 'with' IDENTIFIER block;
 
 structDecl: 'struct' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' inheritance? block;
 inheritance: (':' IDENTIFIER (IDENTIFIER (',' IDENTIFIER)*)?);

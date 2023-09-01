@@ -81,11 +81,21 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
     {
         var methodInfo = typeof(WistVisitorHelper).GetMethod(nameof(WistVisitorHelper.InstantiateRepeatEnumerator));
 
+        var expressionContexts = context.expression();
+        
+        
+        if(expressionContexts.Length == 1)
+            _curFunc.Image.PushConst(new WistConst(1));
+        
         _saveResultLevel++;
-        foreach (var expressionContext in context.expression())
+        foreach (var expressionContext in expressionContexts)
             Visit(expressionContext);
-        _curFunc.Image.Call(methodInfo);
         _saveResultLevel--;
+        
+        if(expressionContexts.Length <= 2)
+            _curFunc.Image.PushConst(new WistConst(1));
+        
+        _curFunc.Image.Call(methodInfo);
 
         var startLabelName = WistLabelsManager.RepeatStartLabelName();
         var endLabelName = WistLabelsManager.RepeatEndLabelName();

@@ -3,20 +3,9 @@ include "WistIO.dll"
 include "List.wist"
 
 func Start() {
-    times = new List()
-
-    for i = 0; i < 5; i = i + 1 {
-        t = GetTimeInMs()
-        
-        repeat 0, 10_000_000, 1 with j {
-            l = [1,2,3,j]
-        }
-        
-        times.Add(GetTimeInMs() - t)
-        Print(times.ToString())
+    repeat Ten() with a {
+        Print(a)
     }
-    
-    Print(times.ToString())
-    Print(times.Average())
-	InputString()
 }
+
+func Ten(): ret 10
