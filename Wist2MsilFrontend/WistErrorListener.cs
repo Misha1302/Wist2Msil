@@ -1,7 +1,6 @@
-﻿using Antlr4.Runtime;
+﻿namespace Wist2MsilFrontend;
 
-namespace Wist2MsilFrontend;
-
+using Antlr4.Runtime;
 using WistError;
 
 public sealed class WistErrorListener : IAntlrErrorListener<int>, IAntlrErrorListener<IToken>
@@ -27,7 +26,7 @@ public sealed class WistErrorListener : IAntlrErrorListener<int>, IAntlrErrorLis
     {
         _errors.Add(new WistError(_prefix + $"Error in line {line}. Msg: {FormatMsg(msg)}"));
     }
-    
+
 
     private static string FormatMsg(string msg) => msg.Replace("'\n'", "'\\n'").Replace("'\r'", "'\\r'");
 }

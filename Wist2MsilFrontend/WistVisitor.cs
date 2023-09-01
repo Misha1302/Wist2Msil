@@ -33,12 +33,14 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public WistVisitor(string path, WistFastList<WistFunction> wistFunctions,
         WistFastList<WistCompilationStruct> wistStructs,
-        WistLibraryManager wistLibraryManager, IParseTree tree, List<WistError> lexerErrors, List<WistError> parserErrors)
+        WistLibraryManager wistLibraryManager, IParseTree tree, List<WistError> lexerErrors,
+        List<WistError> parserErrors)
     {
         _path = path;
         wistFunctions.AddRange(new WistFunctionsVisitor().GetAllFunctions(tree));
         wistStructs.AddRange(new WistStructsVisitor().GetAllStructs(tree));
-        new WistLibraryVisitor(path, wistFunctions, wistStructs, wistLibraryManager, lexerErrors, parserErrors).SetLibManager(wistLibraryManager)
+        new WistLibraryVisitor(path, wistFunctions, wistStructs, wistLibraryManager, lexerErrors, parserErrors)
+            .SetLibManager(wistLibraryManager)
             .Visit(tree);
 
         _wistFunctions = wistFunctions;
@@ -58,7 +60,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
             _wistFunctions = new WistFunctionsVisitor().GetAllFunctions(tree);
             _wistStructs = new WistStructsVisitor().GetAllStructs(tree);
             _wistLibraryManager = new WistLibraryManager();
-            new WistLibraryVisitor(_path, _wistFunctions, _wistStructs, _wistLibraryManager, _lexerErrors, _parserErrors)
+            new WistLibraryVisitor(_path, _wistFunctions, _wistStructs, _wistLibraryManager, _lexerErrors,
+                    _parserErrors)
                 .SetLibManager(_wistLibraryManager).Visit(tree);
         }
 

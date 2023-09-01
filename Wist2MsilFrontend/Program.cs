@@ -26,8 +26,13 @@ visitor.Visit(program);
 var errors = lexerErrors.Concat(parserErrors).ToList();
 if (errors.Count != 0)
 {
+    var color = Console.ForegroundColor;
+    Console.ForegroundColor = ConsoleColor.Red;
+
     foreach (var error in errors)
         Console.WriteLine(error.Message);
+
+    Console.ForegroundColor = color;
 
     return;
 }

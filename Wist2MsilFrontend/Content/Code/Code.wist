@@ -8,10 +8,8 @@ func Start() {
     for i = 0; i < 7; i = i + 1 {
         t = GetTimeInMs()
         
-        // here is the slow part
-        // the loop is quite fast, but ...
+        // it's block works quite fast now!
         for j = 0; j < 500_000; j = j + 1 {
-            // creating new list and WistFastList are very slow
             l = [1,2,3,j]
         }
         

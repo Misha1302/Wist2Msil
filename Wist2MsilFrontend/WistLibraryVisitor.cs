@@ -73,17 +73,18 @@ public sealed class WistLibraryVisitor : WistGrammarBaseVisitor<object?>
                     grammarLexer
                 )
             );
-            
+
             var parserErrorListener = new WistErrorListener($"{fullPath}. Parser error. ", _parserErrors);
             grammarParser.AddErrorListener(parserErrorListener);
-            
+
             var lexerErrorListener = new WistErrorListener($"{fullPath}. Lexer error. ", _lexerErrors);
             grammarLexer.AddErrorListener(lexerErrorListener);
-            
-            
+
+
             var tree = grammarParser.program();
 
-            var visitor = new WistVisitor(_path, _wistFunctions, _wistStructs, _wistLibraryManager, tree, _lexerErrors, _parserErrors);
+            var visitor = new WistVisitor(_path, _wistFunctions, _wistStructs, _wistLibraryManager, tree, _lexerErrors,
+                _parserErrors);
             visitor.Visit(tree);
         }
 
