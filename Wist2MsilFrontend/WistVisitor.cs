@@ -10,7 +10,6 @@ using WistFuncName;
 
 public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 {
-    private readonly WistModule _wistModule = new();
     private WistFastList<WistCompilationStruct> _wistStructs = null!;
     private WistFastList<WistFunction> _wistFunctions = null!;
     private WistFunction _curFunc = null!;
@@ -52,6 +51,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         _initialized = true;
     }
 
+    public WistModule WistModule { get; } = new();
+
     public override object? Visit(IParseTree tree)
     {
         if (!_initialized)
@@ -68,33 +69,31 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         base.Visit(tree);
 
         foreach (var wistStruct in _wistStructs)
-            _wistModule.AddStruct(wistStruct);
+            WistModule.AddStruct(wistStruct);
         foreach (var wistFunction in _wistFunctions)
-            _wistModule.AddFunction(wistFunction);
+            WistModule.AddFunction(wistFunction);
 
         return null;
     }
-
-    public WistModule GetModule() => _wistModule;
 
     public override object? VisitRepeatLoop(WistGrammarParser.RepeatLoopContext context)
     {
         var methodInfo = typeof(WistVisitorHelper).GetMethod(nameof(WistVisitorHelper.InstantiateRepeatEnumerator));
 
         var expressionContexts = context.expression();
-        
-        
-        if(expressionContexts.Length == 1)
+
+
+        if (expressionContexts.Length == 1)
             _curFunc.Image.PushConst(new WistConst(1));
-        
+
         _saveResultLevel++;
         foreach (var expressionContext in expressionContexts)
             Visit(expressionContext);
         _saveResultLevel--;
-        
-        if(expressionContexts.Length <= 2)
+
+        if (expressionContexts.Length <= 2)
             _curFunc.Image.PushConst(new WistConst(1));
-        
+
         _curFunc.Image.Call(methodInfo);
 
         var startLabelName = WistLabelsManager.RepeatStartLabelName();
