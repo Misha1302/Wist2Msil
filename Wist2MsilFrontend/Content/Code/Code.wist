@@ -1,11 +1,8 @@
-﻿include "WistTime.dll"
-include "WistIO.dll"
-include "List.wist"
+﻿include "Includes.wist"
 
 func Start() {
-    repeat Ten() with a {
+    repeat Ten() with a:
         Print(a)
-    }
 }
 
 func Ten(): ret 10

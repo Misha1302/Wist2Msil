@@ -61,6 +61,12 @@ public sealed class WistLibraryVisitor : WistGrammarBaseVisitor<object?>
             if (_visitedPaths.Contains(fullPath))
                 return null;
 
+            if (!File.Exists(fullPath))
+            {
+                _parserErrors.Add(new WistError($"{fullPath} wasn't found"));
+                return null;
+            }
+
             _visitedPaths.Add(fullPath);
 
             var grammarLexer = new WistGrammarLexer(

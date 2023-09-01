@@ -33,7 +33,7 @@ inheritance: (':' IDENTIFIER (IDENTIFIER (',' IDENTIFIER)*)?);
 funcDecl: 'func' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
 labelDecl: IDENTIFIER ':';
 
-block: endOfLine* (('{' endOfLine* line* '}') | (':') line) endOfLine*;
+block: endOfLine* (('{' endOfLine* line* '}') | (':') (statement | expression)) endOfLine*;
 
 expression
     : constant                                                                          #constantExpression
@@ -75,5 +75,5 @@ REM_OP: '%';
 CMP_OP: '==' | '!=' | '>' | '<' | '<=' | '>=';
 
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
-WHITE_SPACE: [ \t\r\n] -> skip;
+WHITE_SPACE: [ \t\r\n]+ -> skip;
 SINGLE_LINE_COMMENT: '//' ~[\r\n]* -> skip;

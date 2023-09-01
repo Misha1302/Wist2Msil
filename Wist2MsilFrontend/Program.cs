@@ -38,7 +38,7 @@ if (errors.Count != 0)
 }
 
 
-var compiler = new WistCompiler(visitor.WistModule);
+var compiler = new WistCompiler(visitor.Module);
 var result = compiler.Run(out var compilationTime, out var executionTime);
 Console.WriteLine($"Start function returned {result}");
 Console.WriteLine($"Compilation took {compilationTime} ms");

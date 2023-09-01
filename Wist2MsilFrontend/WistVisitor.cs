@@ -51,27 +51,34 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         _initialized = true;
     }
 
-    public WistModule WistModule { get; } = new();
+    public WistModule Module { get; } = new();
 
     public override object? Visit(IParseTree tree)
     {
-        if (!_initialized)
+        try
         {
-            _initialized = true;
-            _wistFunctions = new WistFunctionsVisitor().GetAllFunctions(tree);
-            _wistStructs = new WistStructsVisitor().GetAllStructs(tree);
-            _wistLibraryManager = new WistLibraryManager();
-            new WistLibraryVisitor(_path, _wistFunctions, _wistStructs, _wistLibraryManager, _lexerErrors,
-                    _parserErrors)
-                .SetLibManager(_wistLibraryManager).Visit(tree);
+            if (!_initialized)
+            {
+                _initialized = true;
+                _wistFunctions = new WistFunctionsVisitor().GetAllFunctions(tree);
+                _wistStructs = new WistStructsVisitor().GetAllStructs(tree);
+                _wistLibraryManager = new WistLibraryManager();
+                new WistLibraryVisitor(_path, _wistFunctions, _wistStructs, _wistLibraryManager, _lexerErrors,
+                        _parserErrors)
+                    .SetLibManager(_wistLibraryManager).Visit(tree);
+            }
+
+            base.Visit(tree);
+
+            foreach (var wistStruct in _wistStructs)
+                Module.AddStruct(wistStruct);
+            foreach (var wistFunction in _wistFunctions)
+                Module.AddFunction(wistFunction);
         }
-
-        base.Visit(tree);
-
-        foreach (var wistStruct in _wistStructs)
-            WistModule.AddStruct(wistStruct);
-        foreach (var wistFunction in _wistFunctions)
-            WistModule.AddFunction(wistFunction);
+        catch
+        {
+            // ignored
+        }
 
         return null;
     }
@@ -195,7 +202,17 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         if (wistFunction != null)
             _curFunc.Image.Call(wistFunction);
         else
-            _curFunc.Image.Call(_wistLibraryManager.GetMethod(fullName));
+        {
+            var methodInfo = _wistLibraryManager.GetMethod(fullName);
+            if (methodInfo == null)
+            {
+                _parserErrors.Add(
+                    new WistError($"{fullName} wasn't found ({text}, {context.expression().Length} args)"));
+                return null;
+            }
+
+            _curFunc.Image.Call(methodInfo);
+        }
 
         if (_saveResultLevel == 0)
             _curFunc.Image.Drop();
