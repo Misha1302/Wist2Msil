@@ -1,6 +1,5 @@
 namespace Wist2Msil;
 
-using System.Data;
 using System.Reflection;
 using System.Reflection.Emit;
 using GrEmit;
@@ -55,7 +54,7 @@ public sealed class WistCompiler
             typeof(WistRepeatEnumerator).GetMethod(nameof(WistRepeatEnumerator.Current),
                 BindingFlags.Instance | BindingFlags.Public) ??
             throw new NullReferenceException();
-        
+
         _createListMethod =
             typeof(WistConst).GetMethod(nameof(WistConst.CreateList), BindingFlags.Static | BindingFlags.Public) ??
             throw new NullReferenceException();
