@@ -1,8 +1,13 @@
 ﻿include "Includes.wist"
 
 func Start() {
-    repeat Ten() with a:
-        Print(a)
+    repeat 1 with a {
+        l = new List()
+        
+        b0 = l.Add()
+        b1 = l.Add(5)
+        
+        Print(ToStr(b0) + " " + ToStr(b1))
+        Print(ToStr(b0 == none) + " " + ToStr(b1 == null))
+    }
 }
-
-func Ten(): ret 10

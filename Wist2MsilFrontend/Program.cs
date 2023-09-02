@@ -26,20 +26,48 @@ visitor.Visit(program);
 var errors = lexerErrors.Concat(parserErrors).ToList();
 if (errors.Count != 0)
 {
-    var color = Console.ForegroundColor;
-    Console.ForegroundColor = ConsoleColor.Red;
-
     foreach (var error in errors)
-        Console.WriteLine(error.Message);
-
-    Console.ForegroundColor = color;
+        PrintError(error.Message);
 
     return;
 }
 
 
 var compiler = new WistCompiler(visitor.Module);
-var result = compiler.Run(out var compilationTime, out var executionTime);
-Console.WriteLine($"Start function returned {result}");
-Console.WriteLine($"Compilation took {compilationTime} ms");
-Console.WriteLine($"Execution took {executionTime} ms");
+
+#if RELEASE
+try
+{
+#endif
+
+    var result = compiler.Run(out var compilationTime, out var executionTime);
+
+    Console.WriteLine($"Start function returned {result}");
+    Console.WriteLine($"Compilation took {compilationTime} ms");
+    Console.WriteLine($"Execution took {executionTime} ms");
+
+#if RELEASE
+}
+catch (WistCompilerError e)
+{
+    var funcPath = "";
+    if (e.FuncFullName.Owner != null)
+        funcPath += $"Owner: {e.FuncFullName.Owner}\n";
+
+    funcPath += $"Func name: {e.FuncFullName.Name}\n";
+    funcPath += $"Args count: {e.FuncFullName.ArgsCount}";
+
+    PrintError($"Compiler error in line: {e.Line}\n" + funcPath);
+}
+#endif
+
+
+void PrintError(string s)
+{
+    var color = Console.ForegroundColor;
+    Console.ForegroundColor = ConsoleColor.Red;
+
+    Console.WriteLine(s);
+
+    Console.ForegroundColor = color;
+}

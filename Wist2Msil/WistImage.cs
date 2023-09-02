@@ -10,25 +10,28 @@ public sealed class WistImage
     public readonly WistFastList<string> Locals = new();
     private readonly HashSet<string> _localsHashSet = new();
     private WistFunction _function = null!;
+    private Func<int> _getCurLine = null!;
     public WistFastList<WistInstruction> Instructions { get; } = new();
 
     public void PushConst(WistConst c) =>
-        Instructions.Add(new wInst(WistInstruction.WistOperation.PushConst, c));
+        Instructions.Add(new wInst(WistInstruction.WistOperation.PushConst, _getCurLine(), c));
 
-    public void Add() => Instructions.Add(new wInst(WistInstruction.WistOperation.Add));
-    public void Sub() => Instructions.Add(new wInst(WistInstruction.WistOperation.Sub));
-    public void Mul() => Instructions.Add(new wInst(WistInstruction.WistOperation.Mul));
-    public void Div() => Instructions.Add(new wInst(WistInstruction.WistOperation.Div));
-    public void Rem() => Instructions.Add(new wInst(WistInstruction.WistOperation.Rem));
-    public void Pow() => Instructions.Add(new wInst(WistInstruction.WistOperation.Pow));
+    public void Add() => Instructions.Add(new wInst(WistInstruction.WistOperation.Add, _getCurLine()));
+    public void Sub() => Instructions.Add(new wInst(WistInstruction.WistOperation.Sub, _getCurLine()));
+    public void Mul() => Instructions.Add(new wInst(WistInstruction.WistOperation.Mul, _getCurLine()));
+    public void Div() => Instructions.Add(new wInst(WistInstruction.WistOperation.Div, _getCurLine()));
+    public void Rem() => Instructions.Add(new wInst(WistInstruction.WistOperation.Rem, _getCurLine()));
+    public void Pow() => Instructions.Add(new wInst(WistInstruction.WistOperation.Pow, _getCurLine()));
 
-    public void GreaterThan() => Instructions.Add(new wInst(WistInstruction.WistOperation.GreaterThan));
+    public void GreaterThan() => Instructions.Add(new wInst(WistInstruction.WistOperation.GreaterThan, _getCurLine()));
 
     public void GreaterThanOrEquals() =>
-        Instructions.Add(new wInst(WistInstruction.WistOperation.GreaterThanOrEquals));
+        Instructions.Add(new wInst(WistInstruction.WistOperation.GreaterThanOrEquals, _getCurLine()));
 
-    public void LessThan() => Instructions.Add(new wInst(WistInstruction.WistOperation.LessThan));
-    public void LessThanOrEquals() => Instructions.Add(new wInst(WistInstruction.WistOperation.LessThanOrEquals));
+    public void LessThan() => Instructions.Add(new wInst(WistInstruction.WistOperation.LessThan, _getCurLine()));
+
+    public void LessThanOrEquals() =>
+        Instructions.Add(new wInst(WistInstruction.WistOperation.LessThanOrEquals, _getCurLine()));
 
 
     public void Call(MethodInfo? m, WistConst secondParam = default)
@@ -38,7 +41,8 @@ public sealed class WistImage
 
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.CSharpCall,
+                WistInstruction.WistOperation.CSharpCall, 
+                _getCurLine(),
                 new WistConst(m),
                 secondParam
             )
@@ -47,37 +51,37 @@ public sealed class WistImage
 
     public void SetLabel(string labelName)
     {
-        Instructions.Add(new wInst(WistInstruction.WistOperation.SetLabel, new WistConst(labelName)));
+        Instructions.Add(new wInst(WistInstruction.WistOperation.SetLabel, _getCurLine(), new WistConst(labelName)));
     }
 
     public void Goto(string labelName)
     {
-        Instructions.Add(new wInst(WistInstruction.WistOperation.Goto, new WistConst(labelName)));
+        Instructions.Add(new wInst(WistInstruction.WistOperation.Goto, _getCurLine(), new WistConst(labelName)));
     }
 
     public void Drop()
     {
-        Instructions.Add(new wInst(WistInstruction.WistOperation.Drop));
+        Instructions.Add(new wInst(WistInstruction.WistOperation.Drop, _getCurLine()));
     }
 
     public void Dup()
     {
-        Instructions.Add(new wInst(WistInstruction.WistOperation.Dup));
+        Instructions.Add(new wInst(WistInstruction.WistOperation.Dup, _getCurLine()));
     }
 
     public void Cmp()
     {
-        Instructions.Add(new wInst(WistInstruction.WistOperation.Cmp));
+        Instructions.Add(new wInst(WistInstruction.WistOperation.Cmp, _getCurLine()));
     }
 
     public void NegCmp()
     {
-        Instructions.Add(new wInst(WistInstruction.WistOperation.NegCmp));
+        Instructions.Add(new wInst(WistInstruction.WistOperation.NegCmp, _getCurLine()));
     }
 
     public void GotoIfFalse(string labelName)
     {
-        Instructions.Add(new wInst(WistInstruction.WistOperation.GotoIfFalse, new WistConst(labelName)));
+        Instructions.Add(new wInst(WistInstruction.WistOperation.GotoIfFalse, _getCurLine(), new WistConst(labelName)));
     }
 
     public void SetLocal(string locName)
@@ -85,7 +89,7 @@ public sealed class WistImage
         if (!_function.Parameters.Contains(locName))
             TryAddLoc(locName);
 
-        Instructions.Add(new wInst(WistInstruction.WistOperation.SetLocal, new WistConst(locName)));
+        Instructions.Add(new wInst(WistInstruction.WistOperation.SetLocal, _getCurLine(), new WistConst(locName)));
     }
 
     private void TryAddLoc(string locName)
@@ -98,7 +102,7 @@ public sealed class WistImage
 
     public void LoadLocal(string locName)
     {
-        Instructions.Add(new wInst(WistInstruction.WistOperation.LoadLocal, new WistConst(locName)));
+        Instructions.Add(new wInst(WistInstruction.WistOperation.LoadLocal, _getCurLine(), new WistConst(locName)));
     }
 
     public void Call(WistFunction square)
@@ -114,14 +118,15 @@ public sealed class WistImage
 
     public void Ret()
     {
-        Instructions.Add(new wInst(WistInstruction.WistOperation.Ret));
+        Instructions.Add(new wInst(WistInstruction.WistOperation.Ret, _getCurLine()));
     }
 
     public void Instantiate(WistCompilationStruct mCompilationStruct)
     {
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.Instantiate,
+                WistInstruction.WistOperation.Instantiate, 
+                _getCurLine(),
                 new WistConst(mCompilationStruct)
             )
         );
@@ -131,7 +136,8 @@ public sealed class WistImage
     {
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.SetField,
+                WistInstruction.WistOperation.SetField, 
+                _getCurLine(),
                 new WistConst(fieldName)
             )
         );
@@ -141,7 +147,8 @@ public sealed class WistImage
     {
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.PushField,
+                WistInstruction.WistOperation.PushField, 
+                _getCurLine(),
                 new WistConst(fieldName)
             )
         );
@@ -151,7 +158,8 @@ public sealed class WistImage
     {
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.CallStructMethod,
+                WistInstruction.WistOperation.CallStructMethod, 
+                _getCurLine(),
                 new WistConst(mName),
                 WistConst.CreateInternalConst(argsLen)
             )
@@ -168,7 +176,8 @@ public sealed class WistImage
     {
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.InstantiateList,
+                WistInstruction.WistOperation.InstantiateList, 
+                _getCurLine(),
                 new WistConst(length)
             )
         );
@@ -178,7 +187,8 @@ public sealed class WistImage
     {
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.Current
+                WistInstruction.WistOperation.Current,
+                _getCurLine()
             )
         );
     }
@@ -188,8 +198,11 @@ public sealed class WistImage
         Instructions.Add(
             new wInst(
                 WistInstruction.WistOperation.GotoIfNext,
+                _getCurLine(),
                 new WistConst(labelName)
             )
         );
     }
+
+    public void InitGetLineAction(Func<int> getCurLine) => _getCurLine = getCurLine;
 }

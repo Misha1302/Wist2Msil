@@ -21,6 +21,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
     private readonly string _path;
     private readonly List<WistError> _lexerErrors;
     private readonly List<WistError> _parserErrors;
+    private int _curLine = 1;
 
     public WistVisitor(string path, List<WistError> lexerErrors,
         List<WistError> parserErrors)
@@ -69,15 +70,17 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
             }
 
             base.Visit(tree);
-
-            foreach (var wistStruct in _wistStructs)
-                Module.AddStruct(wistStruct);
-            foreach (var wistFunction in _wistFunctions)
-                Module.AddFunction(wistFunction);
         }
         catch
         {
             // ignored
+        }
+        finally
+        {
+            foreach (var wistStruct in _wistStructs)
+                Module.AddStruct(wistStruct);
+            foreach (var wistFunction in _wistFunctions)
+                Module.AddFunction(wistFunction);
         }
 
         return null;
@@ -125,6 +128,12 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         return null;
     }
 
+    public override object? VisitEndOfLine(WistGrammarParser.EndOfLineContext context)
+    {
+        _curLine++;
+        return null;
+    }
+
     public override object? VisitVarAssigment(WistGrammarParser.VarAssigmentContext context)
     {
         var ident = context.IDENTIFIER().GetText();
@@ -163,7 +172,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
         if (context.NULL() != null)
         {
-            _curFunc.Image.PushConst(WistConst.CreateNull());
+            _curFunc.Image.PushConst(context.NULL().GetText() == "none" ? default : WistConst.CreateNull());
             return null;
         }
 
@@ -200,7 +209,9 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         var wistFunction = _wistFunctions.FirstOrDefault(x => x.Name.FullName == fullName);
 
         if (wistFunction != null)
+        {
             _curFunc.Image.Call(wistFunction);
+        }
         else
         {
             var methodInfo = _wistLibraryManager.GetMethod(fullName);
@@ -208,7 +219,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
             {
                 _parserErrors.Add(
                     new WistError($"{fullName} wasn't found ({text}, {context.expression().Length} args)"));
-                return null;
+                throw _parserErrors[^1];
             }
 
             _curFunc.Image.Call(methodInfo);
@@ -230,6 +241,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
                 x.Name.FullName == WistFuncName.CreateFullName(name, argsCount, _curStructName))!;
 
         _curFunc = wistFunction;
+        _curFunc.Image.InitGetLineAction(() => _curLine);
 
         Visit(context.block());
 
@@ -363,8 +375,13 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
     public override object? VisitNewStruct(WistGrammarParser.NewStructContext context)
     {
         var wistStruct = _wistStructs.FirstOrDefault(x => x.Name == context.IDENTIFIER().GetText());
+
         if (wistStruct is null)
-            throw new InvalidOperationException();
+        {
+            _parserErrors.Add(new WistError($"Line: {_curLine}. {context.IDENTIFIER().GetText()} struct wasn't found"));
+
+            throw _parserErrors[^1];
+        }
 
         var argsCount = context.expression().Length + 1;
 
@@ -381,7 +398,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
             if (argsCount == 1)
                 return null;
 
-            throw new InvalidOperationException();
+            _parserErrors.Add(new WistError($"Line: {_curLine}. Constructor with {argsCount} args wasn't found"));
+            throw _parserErrors[^1];
         }
 
         _curFunc.Image.Dup();
@@ -404,7 +422,12 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
     {
         var wistStruct = _wistStructs.FirstOrDefault(x => x.Name == context.IDENTIFIER(0).GetText());
         if (wistStruct is null)
-            throw new InvalidOperationException();
+        {
+            _parserErrors.Add(new WistError(
+                $"Line: {_curLine}. Struct with name {context.IDENTIFIER(0).GetText()} wasn't found"
+            ));
+            throw _parserErrors[^1];
+        }
 
         _curStructName = wistStruct.Name;
         Visit(context.block());

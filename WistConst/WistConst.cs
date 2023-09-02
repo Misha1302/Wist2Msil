@@ -172,7 +172,7 @@ public readonly struct WistConst
         {
             WistType.String => obj.GetString() == GetString(),
             WistType.List => obj.GetWistFastList().SequenceEqual(GetWistFastList()),
-            _ => false
+            _ => Type == obj.Type
         };
     }
 

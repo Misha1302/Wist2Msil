@@ -156,12 +156,45 @@ public sealed class WistCompiler
         for (var i = 0; i < wistFunc.Image.Instructions.Count; i++)
         {
             var inst = wistFunc.Image.Instructions[i];
+#if RELEASE
+            try
+            {
+                
+#endif
+                HandleOneOp(wistFunc, inst, il, i, exeHelperArgIndex, consts1, labels, locals, curExeHelper, consts2);
+#if RELEASE
+            }
+            catch 
+            {
+                throw new WistCompilerError(inst.Line, wistFunc.Name);
+            }
+            
+#endif
+        }
+
+        il.Call(_methods["PushNullConst"]);
+        il.Ret();
+    }
+
+    private void HandleOneOp(WistFunction wistFunc, WistInstruction inst, GroboIL il, int i1, int exeHelperArgIndex,
+        WistConst[] consts1, Dictionary<string, GroboIL.Label> labels, Dictionary<string, GroboIL.Local> locals,
+        WistExecutionHelper curExeHelper, WistConst[] consts2)
+    {
+        GroboIL.Label AddOrGetLabel(int i)
+        {
+            var name = consts1[i].GetString();
+            if (!labels.TryGetValue(name, out var label))
+                labels.Add(name, label = il.DefineLabel(name));
+            return label;
+        }
+
+        {
             GroboIL.Label? label;
             string? name;
             switch (inst.Op)
             {
                 case WistInstruction.WistOperation.PushConst:
-                    Push(il, i, exeHelperArgIndex);
+                    Push(il, i1, exeHelperArgIndex);
                     break;
                 case WistInstruction.WistOperation.Add:
                     il.Call(_methods["Add"]);
@@ -194,11 +227,11 @@ public sealed class WistCompiler
                     il.Call(_methods["GreaterThanOrEquals"]);
                     break;
                 case WistInstruction.WistOperation.CSharpCall:
-                    il.Call(consts1[i].GetMethodInfo());
+                    il.Call(consts1[i1].GetMethodInfo());
                     break;
                 case WistInstruction.WistOperation.Call:
                     var ind = _executionHelpers.ToList().FindIndex(
-                        x => x.DynamicMethod.Name == consts2[i].GetString()
+                        x => x.DynamicMethod.Name == consts1[i1].GetString()
                     );
 
                     il.Ldarg(exeHelperArgIndex);
@@ -208,25 +241,25 @@ public sealed class WistCompiler
                     il.Call(_executionHelpers[ind].DynamicMethod);
                     break;
                 case WistInstruction.WistOperation.SetLabel:
-                    name = consts1[i].GetString();
+                    name = consts1[i1].GetString();
                     if (!labels.TryGetValue(name, out label))
                         labels.Add(name, label = il.DefineLabel(name));
 
                     il.MarkLabel(label);
                     break;
                 case WistInstruction.WistOperation.Goto:
-                    label = AddOrGetLabel(i);
+                    label = AddOrGetLabel(i1);
 
                     il.Br(label);
                     break;
                 case WistInstruction.WistOperation.GotoIfFalse:
-                    label = AddOrGetLabel(i);
+                    label = AddOrGetLabel(i1);
 
                     il.Call(_methods["PopBool"]);
                     il.Brfalse(label);
                     break;
                 case WistInstruction.WistOperation.GotoIfTrue:
-                    label = AddOrGetLabel(i);
+                    label = AddOrGetLabel(i1);
 
                     il.Call(_methods["PopBool"]);
                     il.Brtrue(label);
@@ -244,58 +277,58 @@ public sealed class WistCompiler
                     il.Call(_methods["NegCmp"]);
                     break;
                 case WistInstruction.WistOperation.LoadLocal:
-                    var argLocalName = consts1[i].GetString();
+                    var argLocalName = consts1[i1].GetString();
 
                     if (locals.Any(x => x.Key == argLocalName))
                         il.Ldloc(locals[argLocalName]);
                     else if (wistFunc.Parameters.Any(x => x == argLocalName))
-                        il.Ldarg(Array.IndexOf(wistFunc.Parameters, consts1[i].GetString()));
-                    else throw new InvalidOperationException();
+                        il.Ldarg(Array.IndexOf(wistFunc.Parameters, consts1[i1].GetString()));
+                    else throw new WistCompilerError(inst.Line, wistFunc.Name);
 
                     break;
                 case WistInstruction.WistOperation.SetLocal:
-                    name = consts1[i].GetString();
+                    name = consts1[i1].GetString();
 
                     if (locals.Any(x => x.Key == name))
                         il.Stloc(locals[name]);
                     else if (wistFunc.Parameters.Any(x => x == name))
-                        il.Starg(Array.IndexOf(wistFunc.Parameters, consts1[i].GetString()));
-                    else throw new InvalidOperationException();
+                        il.Starg(Array.IndexOf(wistFunc.Parameters, consts1[i1].GetString()));
+                    else throw new WistCompilerError(inst.Line, wistFunc.Name);
 
                     break;
                 case WistInstruction.WistOperation.Ret:
                     il.Ret();
                     break;
                 case WistInstruction.WistOperation.Instantiate:
-                    var src = consts1[i].GetWistCompStruct();
+                    var src = consts1[i1].GetWistCompStruct();
                     var s = _wistStructures.FirstOrDefault(x => x.Name == src.Name)!;
 
                     if (s is null)
-                        throw new InvalidOperationException();
+                        throw new WistCompilerError(inst.Line, wistFunc.Name);
 
-                    curExeHelper.Consts[i] = new WistConst(s);
+                    curExeHelper.Consts[i1] = new WistConst(s);
 
                     il.Ldarg(exeHelperArgIndex);
                     il.Ldfld(_constsField);
-                    il.Ldc_I4(i);
+                    il.Ldc_I4(i1);
                     il.Ldelema(typeof(WistConst));
 
                     il.Call(_copyWistStructMethod);
                     break;
                 case WistInstruction.WistOperation.SetField:
-                    il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
+                    il.Ldc_I4(consts1[i1].GetString().GetWistHashCode(_module));
                     il.Call(_methods["SetField"]);
                     break;
                 case WistInstruction.WistOperation.PushField:
-                    il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
+                    il.Ldc_I4(consts1[i1].GetString().GetWistHashCode(_module));
                     il.Call(_methods["GetField"]);
                     break;
                 case WistInstruction.WistOperation.CallStructMethod:
-                    il.Ldc_I4(consts1[i].GetString().GetWistHashCode(_module));
-                    il.Call(_methods[$"CallStructMethod{consts2[i].GetInternalInteger() + 1}"]);
+                    il.Ldc_I4(consts1[i1].GetString().GetWistHashCode(_module));
+                    il.Call(_methods[$"CallStructMethod{consts2[i1].GetInternalInteger() + 1}"]);
                     break;
                 case WistInstruction.WistOperation.InstantiateList:
-                    var len = (int)(consts1[i].GetNumber() + 0.1);
+                    var len = (int)(consts1[i1].GetNumber() + 0.1);
 
                     il.Ldc_I4(len);
                     il.Newarr(typeof(WistConst));
@@ -322,7 +355,7 @@ public sealed class WistCompiler
                     Ldref(il);
                     il.Call(_getRepeatEnumerator);
                     il.Call(_repeatEnumeratorNext);
-                    il.Brfalse(AddOrGetLabel(i));
+                    il.Brfalse(AddOrGetLabel(i1));
                     break;
                 case WistInstruction.WistOperation.Current:
                     Ldref(il);
@@ -332,18 +365,6 @@ public sealed class WistCompiler
                 default:
                     throw new ArgumentOutOfRangeException(inst.Op.ToString());
             }
-        }
-
-        il.Call(_methods["PushNullConst"]);
-        il.Ret();
-
-
-        GroboIL.Label AddOrGetLabel(int i)
-        {
-            var name = consts1[i].GetString();
-            if (!labels.TryGetValue(name, out var label))
-                labels.Add(name, label = il.DefineLabel(name));
-            return label;
         }
     }
 

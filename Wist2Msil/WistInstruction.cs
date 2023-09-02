@@ -7,12 +7,14 @@ using WistConst;
 public struct WistInstruction
 {
     public readonly WistOperation Op;
+    public readonly int Line;
     public WistConst Constant;
     public WistConst Constant2;
 
-    public WistInstruction(WistOperation op, WistConst constant = default, WistConst constant2 = default)
+    public WistInstruction(WistOperation op, int line, WistConst constant = default, WistConst constant2 = default)
     {
         Op = op;
+        Line = line;
         Constant = constant;
         Constant2 = constant2;
     }
