@@ -15,8 +15,8 @@ elseBlock: 'else' block;
 include: 'include' STRING; 
 
 assigment: varAssigment | structFieldAssigment;
-varAssigment: IDENTIFIER '=' expression;
-structFieldAssigment: expression '.' IDENTIFIER '=' expression;
+varAssigment: IDENTIFIER ASSIGMENT_SIGN expression;
+structFieldAssigment: expression '.' IDENTIFIER ASSIGMENT_SIGN expression;
 
 loops: whileLoop | forLoop | repeatLoop;
 
@@ -77,3 +77,4 @@ CMP_OP: '==' | '!=' | '>' | '<' | '<=' | '>=';
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
 WHITE_SPACE: [ \t]+ -> skip;
 SINGLE_LINE_COMMENT: '//' ~[\r\n]* -> skip;
+ASSIGMENT_SIGN: '=' | '+=' | '-=' | '*=' | '/=' | '^=';

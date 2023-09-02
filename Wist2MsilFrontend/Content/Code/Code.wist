@@ -1,13 +1,27 @@
 ﻿include "Includes.wist"
 
 func Start() {
-    repeat 1 with a {
-        l = new List()
-        
-        b0 = l.Add()
-        b1 = l.Add(5)
-        
-        Print(ToStr(b0) + " " + ToStr(b1))
-        Print(ToStr(b0 == none) + " " + ToStr(b1 == null))
+    a = 0
+    a += 5
+    a *= 5
+    a /= 2
+    Print(a)
+    
+    s = new S()
+    s.Add(4)
+    s.Div(3)
+    Print(s._number)
+}
+
+struct S(_number) {
+    func Constructor(self) {
+        self._number = 0 
+        ret self
     }
+    
+    func Add(self, value):
+        self._number += value
+    
+    func Div(self, value):
+        self._number /= value
 }

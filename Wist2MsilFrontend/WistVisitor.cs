@@ -136,13 +136,22 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitVarAssigment(WistGrammarParser.VarAssigmentContext context)
     {
-        var ident = context.IDENTIFIER().GetText();
+        var text = context.ASSIGMENT_SIGN().GetText();
+        var varName = context.IDENTIFIER().GetText();
+
+
+        if (text.Length != 1)
+            _curFunc.Image.LoadLocal(varName);
+
 
         _saveResultLevel++;
         Visit(context.expression());
         _saveResultLevel--;
 
-        _curFunc.Image.SetLocal(ident);
+
+        if (text.Length != 1) EmitMathOp(text[..1]);
+
+        _curFunc.Image.SetLocal(varName);
 
         return null;
     }
@@ -218,7 +227,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
             if (methodInfo == null)
             {
                 _parserErrors.Add(
-                    new WistError($"{fullName} wasn't found ({text}, {context.expression().Length} args)"));
+                    new WistError($"{fullName} func wasn't found ({text}, {context.expression().Length} args)"));
                 throw _parserErrors[^1];
             }
 
@@ -265,12 +274,25 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
             Visit(expressionContext);
         _saveResultLevel--;
 
-        if (context.ADD_OP().GetText() == "+")
-            _curFunc.Image.Add();
-        else
-            _curFunc.Image.Sub();
+        EmitMathOp(context.ADD_OP().GetText());
 
         return null;
+    }
+
+    private void EmitMathOp(string sign)
+    {
+        Action act = sign switch
+        {
+            "+" => _curFunc.Image.Add,
+            "-" => _curFunc.Image.Sub,
+            "*" => _curFunc.Image.Mul,
+            "/" => _curFunc.Image.Div,
+            "%" => _curFunc.Image.Rem,
+            "^" => _curFunc.Image.Pow,
+            _ => throw new ArgumentOutOfRangeException(nameof(sign), sign, null)
+        };
+
+        act();
     }
 
     public override object? VisitMulExpression(WistGrammarParser.MulExpressionContext context)
@@ -280,10 +302,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
             Visit(expressionContext);
         _saveResultLevel--;
 
-        if (context.MUL_OP().GetText() == "*")
-            _curFunc.Image.Mul();
-        else
-            _curFunc.Image.Div();
+        EmitMathOp(context.MUL_OP().GetText());
 
         return null;
     }
@@ -295,7 +314,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
             Visit(expressionContext);
         _saveResultLevel--;
 
-        _curFunc.Image.Rem();
+        EmitMathOp(context.REM_OP().GetText());
 
         return null;
     }
@@ -307,7 +326,7 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
             Visit(expressionContext);
         _saveResultLevel--;
 
-        _curFunc.Image.Pow();
+        EmitMathOp(context.POW_OP().GetText());
 
         return null;
     }
@@ -534,9 +553,31 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
     {
         _saveResultLevel++;
         Visit(context.expression(0));
-        Visit(context.expression(1));
         _saveResultLevel--;
-        _curFunc.Image.SetField(context.IDENTIFIER().GetText());
+
+        var text = context.ASSIGMENT_SIGN().GetText();
+        var fieldName = context.IDENTIFIER().GetText();
+
+        if (text.Length != 1)
+        {
+            _curFunc.Image.Dup();
+            _curFunc.Image.PushField(fieldName);
+
+            _saveResultLevel++;
+            Visit(context.expression(1));
+            _saveResultLevel--;
+            EmitMathOp(text[..1]);
+            _curFunc.Image.SetField(fieldName);
+        }
+        else
+        {
+            _saveResultLevel++;
+            Visit(context.expression(1));
+            _saveResultLevel--;
+            _curFunc.Image.SetField(fieldName);
+        }
+
+
         return null;
     }
 }

@@ -33,7 +33,7 @@ public static class WistConstOperations
     public static WistConst Add(in WistConst a, in WistConst b) =>
         a.Type == WistType.Number
             ? new WistConst(a.GetNumber() + b.GetNumber())
-            : new WistConst(a.GetString() + b.GetString());
+            : new WistConst(ToStr(a) + ToStr(b));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst Sub(in WistConst a, in WistConst b) =>
@@ -58,15 +58,15 @@ public static class WistConstOperations
     {
         return c.Type switch
         {
-            WistType.Bool => c.GetBool().ToString(),
-            WistType.Number => NumberToString(c.GetNumber()),
             WistType.String => c.GetString(),
+            WistType.Number => NumberToString(c.GetNumber()),
+            WistType.Bool => c.GetBool().ToString(),
             WistType.List => string.Join(", ", c.GetWistFastList()),
+            WistType.Struct => "<<Struct>>",
+            WistType.Null => "<<Null>>",
             WistType.None => "<<None>>",
             WistType.InternalInteger => $"i32_{c.GetInternalInteger()}",
             WistType.Pointer => $"ptr_{c.GetPointer()}",
-            WistType.Struct => "<<Struct>>",
-            WistType.Null => "<<Null>>",
             _ => Throw($"Unknown type to convert to string - {c.Type}").ToString()
         };
     }
