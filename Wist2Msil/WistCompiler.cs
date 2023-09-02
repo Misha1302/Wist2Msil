@@ -159,16 +159,15 @@ public sealed class WistCompiler
 #if RELEASE
             try
             {
-                
 #endif
                 HandleOneOp(wistFunc, inst, il, i, exeHelperArgIndex, consts1, labels, locals, curExeHelper, consts2);
 #if RELEASE
             }
-            catch 
+            catch
             {
                 throw new WistCompilerError(inst.Line, wistFunc.Name);
             }
-            
+
 #endif
         }
 

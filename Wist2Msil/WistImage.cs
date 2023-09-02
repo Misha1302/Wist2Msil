@@ -41,7 +41,7 @@ public sealed class WistImage
 
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.CSharpCall, 
+                WistInstruction.WistOperation.CSharpCall,
                 _getCurLine(),
                 new WistConst(m),
                 secondParam
@@ -125,7 +125,7 @@ public sealed class WistImage
     {
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.Instantiate, 
+                WistInstruction.WistOperation.Instantiate,
                 _getCurLine(),
                 new WistConst(mCompilationStruct)
             )
@@ -136,7 +136,7 @@ public sealed class WistImage
     {
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.SetField, 
+                WistInstruction.WistOperation.SetField,
                 _getCurLine(),
                 new WistConst(fieldName)
             )
@@ -147,7 +147,7 @@ public sealed class WistImage
     {
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.PushField, 
+                WistInstruction.WistOperation.PushField,
                 _getCurLine(),
                 new WistConst(fieldName)
             )
@@ -158,7 +158,7 @@ public sealed class WistImage
     {
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.CallStructMethod, 
+                WistInstruction.WistOperation.CallStructMethod,
                 _getCurLine(),
                 new WistConst(mName),
                 WistConst.CreateInternalConst(argsLen)
@@ -176,7 +176,7 @@ public sealed class WistImage
     {
         Instructions.Add(
             new wInst(
-                WistInstruction.WistOperation.InstantiateList, 
+                WistInstruction.WistOperation.InstantiateList,
                 _getCurLine(),
                 new WistConst(length)
             )
