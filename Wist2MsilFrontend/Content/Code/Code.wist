@@ -7,9 +7,15 @@ func Start() {
     a /= 2
     Print(a)
     
+    // next four lines will be ignored
+    123
+    a
+    new S()
+    a + 123 / 0
+    
     s = new S()
     s.Add(4)
-    s.Div(3)
+    s.Div(Infinity())
     Print(s._number)
 }
 
@@ -25,3 +31,5 @@ struct S(_number) {
     func Div(self, value):
         self._number /= value
 }
+
+func Infinity(): ret 1e1000

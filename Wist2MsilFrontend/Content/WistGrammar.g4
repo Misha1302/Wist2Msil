@@ -59,7 +59,11 @@ newStruct: 'new' IDENTIFIER '(' (expression (',' expression)*)? ')';
 
 constant: NUMBER | STRING | BOOL | NULL;
 
-endOfLine: ( '\r'? '\n' | '\r' | ';' );
+endOfLine: END_OF_TEXT_LINE | END_OF_PROGRAM_LINE;
+
+
+END_OF_PROGRAM_LINE: ';';
+END_OF_TEXT_LINE: ( '\r'? '\n' | '\r' );
 
 
 NUMBER: [-]? [0-9] [0-9_]* ('.' [0-9_]*)? ('e' ('+' | '-')? [0-9_]*)?;

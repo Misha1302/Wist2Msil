@@ -128,9 +128,11 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         return null;
     }
 
+
     public override object? VisitEndOfLine(WistGrammarParser.EndOfLineContext context)
     {
-        _curLine++;
+        if (context.END_OF_TEXT_LINE() != null)
+            _curLine++;
         return null;
     }
 
@@ -158,6 +160,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitConstant(WistGrammarParser.ConstantContext context)
     {
+        if (_saveResultLevel == 0) return null;
+
         if (context.NUMBER() != null)
         {
             var value = context.NUMBER().GetText().ToDouble();
@@ -190,6 +194,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitIdentifierExpression(WistGrammarParser.IdentifierExpressionContext context)
     {
+        if (_saveResultLevel == 0) return null;
+
         var locName = context.IDENTIFIER().GetText();
         _curFunc.Image.LoadLocal(locName);
         return null;
@@ -197,6 +203,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitListExpression(WistGrammarParser.ListExpressionContext context)
     {
+        if (_saveResultLevel == 0) return null;
+
         var expressionContexts = context.expression();
         foreach (var expression in expressionContexts)
             Visit(expression);
@@ -269,6 +277,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitAddExpression(WistGrammarParser.AddExpressionContext context)
     {
+        if (_saveResultLevel == 0) return null;
+
         _saveResultLevel++;
         foreach (var expressionContext in context.expression())
             Visit(expressionContext);
@@ -297,6 +307,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitMulExpression(WistGrammarParser.MulExpressionContext context)
     {
+        if (_saveResultLevel == 0) return null;
+
         _saveResultLevel++;
         foreach (var expressionContext in context.expression())
             Visit(expressionContext);
@@ -309,6 +321,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitRemExpression(WistGrammarParser.RemExpressionContext context)
     {
+        if (_saveResultLevel == 0) return null;
+
         _saveResultLevel++;
         foreach (var expressionContext in context.expression())
             Visit(expressionContext);
@@ -321,6 +335,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitPowExpression(WistGrammarParser.PowExpressionContext context)
     {
+        if (_saveResultLevel == 0) return null;
+
         _saveResultLevel++;
         foreach (var expressionContext in context.expression())
             Visit(expressionContext);
@@ -333,6 +349,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitCmpExpression(WistGrammarParser.CmpExpressionContext context)
     {
+        if (_saveResultLevel == 0) return null;
+
         _saveResultLevel++;
         foreach (var expressionContext in context.expression())
             Visit(expressionContext);
@@ -502,7 +520,9 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
         _curFunc.Image.SetLabel(whileStartLabelName);
 
+        _saveResultLevel++;
         Visit(context.expression());
+        _saveResultLevel--;
         _curFunc.Image.GotoIfFalse(whileEndLabelName);
 
         Visit(context.block());
@@ -525,7 +545,9 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
         _curFunc.Image.SetLabel(forStartLabelName);
 
+        _saveResultLevel++;
         Visit(context.expression());
+        _saveResultLevel--;
         _curFunc.Image.GotoIfFalse(forEndLabelName);
 
         Visit(context.block());
@@ -542,6 +564,8 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitStructFieldExpression(WistGrammarParser.StructFieldExpressionContext context)
     {
+        if (_saveResultLevel == 0) return null;
+
         _saveResultLevel++;
         Visit(context.expression());
         _saveResultLevel--;
