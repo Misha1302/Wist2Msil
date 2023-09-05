@@ -15,5 +15,5 @@ public enum WistType : long
     MInfo = 1 << 9,
     RepeatEnumerator = 1 << 10,
     ExeHelper = 1 << 11,
-    ValueType = Number | Bool | Pointer,
+    ValueType = Number | Bool | Pointer
 }

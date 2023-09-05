@@ -396,7 +396,8 @@ public sealed class WistCompiler
         }
     }
 
-    private static Type[] GetParameters(int count) => Enumerable.Repeat(typeof(WistConst), count).Append(typeof(WistExecutionHelper)).ToArray();
+    private static Type[] GetParameters(int count) =>
+        Enumerable.Repeat(typeof(WistConst), count).Append(typeof(WistExecutionHelper)).ToArray();
 
     private static void Ldref(GroboIL il)
     {

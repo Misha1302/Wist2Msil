@@ -30,7 +30,8 @@ public readonly struct WistConst
     private static void SkipInitAll(out nint valueN, out double valueR, out long valueL, out int valueI,
         out bool valueB,
         out WistType type, out WistFastList<WistConst> list, out string str, out WistStruct @struct,
-        out WistCompilationStruct cStruct, out MethodInfo mInfo, out WistRepeatEnumerator repeatEnumerator, out WistExecutionHelper exeHelper)
+        out WistCompilationStruct cStruct, out MethodInfo mInfo, out WistRepeatEnumerator repeatEnumerator,
+        out WistExecutionHelper exeHelper)
     {
         Unsafe.SkipInit(out valueN);
         Unsafe.SkipInit(out valueR);

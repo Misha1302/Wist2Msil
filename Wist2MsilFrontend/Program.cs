@@ -40,11 +40,11 @@ try
 {
 #endif
 
-    var result = compiler.Run(out var compilationTime, out var executionTime);
+var result = compiler.Run(out var compilationTime, out var executionTime);
 
-    Console.WriteLine($"Start function returned {result}");
-    Console.WriteLine($"Compilation took {compilationTime} ms");
-    Console.WriteLine($"Execution took {executionTime} ms");
+Console.WriteLine($"Start function returned {result}");
+Console.WriteLine($"Compilation took {compilationTime} ms");
+Console.WriteLine($"Execution took {executionTime} ms");
 
 #if RELEASE
 }
