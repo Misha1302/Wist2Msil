@@ -19,6 +19,7 @@ public sealed class WistFastList<T> : IEnumerable<T>
     {
         _arr = arr;
         _capacity = arr.Length;
+        Count = _capacity;
     }
 
     public int Count

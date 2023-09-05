@@ -205,4 +205,26 @@ public sealed class WistImage
     }
 
     public void InitGetLineAction(Func<int> getCurLine) => _getCurLine = getCurLine;
+
+    public void InstantiateFunctionPtr(WistFunction f)
+    {
+        Instructions.Add(
+            new wInst(
+                WistInstruction.WistOperation.InstantiateFunctionPtr,
+                _getCurLine(),
+                new WistConst(f.Name.FullName)
+            )
+        );
+    }
+
+    public void CallVariable(int expressionsLength)
+    {
+        Instructions.Add(
+            new wInst(
+                WistInstruction.WistOperation.CallVariable,
+                _getCurLine(),
+                new WistConst(expressionsLength)
+            )
+        );
+    }
 }

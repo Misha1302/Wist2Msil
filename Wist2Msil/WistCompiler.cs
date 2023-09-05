@@ -18,6 +18,8 @@ public sealed class WistCompiler
     private static readonly MethodInfo _getRepeatEnumerator;
     private static readonly MethodInfo _repeatEnumeratorNext;
     private static readonly MethodInfo _repeatEnumeratorCurrent;
+    private static readonly MethodInfo _getExeHelper;
+    private static readonly MethodInfo _getMethodPtr;
     private readonly WistModule _module;
     private WistFastList<WistExecutionHelper> _executionHelpers = null!;
     private WistFastSortedList<WistExecutionHelper> _sortedListOfHelpers = null!;
@@ -57,6 +59,15 @@ public sealed class WistCompiler
 
         _createListMethod =
             typeof(WistConst).GetMethod(nameof(WistConst.CreateList), BindingFlags.Static | BindingFlags.Public) ??
+            throw new NullReferenceException();
+
+        _getExeHelper =
+            typeof(WistConst).GetMethod(nameof(WistConst.GetExeHelper), BindingFlags.Instance | BindingFlags.Public) ??
+            throw new NullReferenceException();
+
+        _getMethodPtr =
+            typeof(WistExecutionHelper).GetMethod(nameof(WistExecutionHelper.GetMethodPtr),
+                BindingFlags.Instance | BindingFlags.Public) ??
             throw new NullReferenceException();
     }
 
@@ -160,7 +171,7 @@ public sealed class WistCompiler
             try
             {
 #endif
-                HandleOneOp(wistFunc, inst, il, i, exeHelperArgIndex, consts1, labels, locals, curExeHelper, consts2);
+            HandleOneOp(wistFunc, inst, il, i, exeHelperArgIndex, consts1, labels, locals, curExeHelper, consts2);
 #if RELEASE
             }
             catch
@@ -334,6 +345,7 @@ public sealed class WistCompiler
                     var arr = il.DeclareLocal(typeof(WistConst[]));
                     il.Stloc(arr);
 
+                    il.MarkLabel(il.DefineLabel("start_of_array_filling"));
                     var value = il.DeclareLocal(typeof(WistConst));
                     for (var j = 0; j < len; j++)
                     {
@@ -361,11 +373,30 @@ public sealed class WistCompiler
                     il.Call(_getRepeatEnumerator);
                     il.Call(_repeatEnumeratorCurrent);
                     break;
+                case WistInstruction.WistOperation.InstantiateFunctionPtr:
+                    var exeHelper = _executionHelpers.FirstOrDefault(
+                        x => x.DynamicMethod.Name == consts1[i1].GetString()
+                    );
+
+                    curExeHelper.Consts[i1] = new WistConst(exeHelper ?? throw new InvalidOperationException());
+                    Push(il, i1, exeHelperArgIndex);
+                    break;
+                case WistInstruction.WistOperation.CallVariable:
+                    Ldref(il);
+                    il.Call(_getExeHelper);
+                    il.Dup();
+                    il.Call(_getMethodPtr);
+
+                    var parameterTypes = GetParameters((int)(consts1[i1].GetNumber() + 0.1));
+                    il.Calli(CallingConventions.Standard, typeof(WistConst), parameterTypes);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(inst.Op.ToString());
             }
         }
     }
+
+    private static Type[] GetParameters(int count) => Enumerable.Repeat(typeof(WistConst), count).Append(typeof(WistExecutionHelper)).ToArray();
 
     private static void Ldref(GroboIL il)
     {

@@ -29,6 +29,8 @@ public sealed unsafe class WistExecutionHelper
         private set;
     }
 
+    public nint GetMethodPtr() => MethodPtr;
+
     public WistConst Run(out long executionTime)
     {
         var fp = GetMethodRuntimeHandle(DynamicMethod).GetFunctionPointer();

@@ -41,6 +41,7 @@ expression
     | newStruct                                                                         #newStructExpression
     | IDENTIFIER '(' (expression (',' expression)*)? ')'                                #funcCallExpression
     | expression '.' IDENTIFIER '(' (expression (',' expression)*)? ')'                 #structFuncCallExpression
+    | expression '(' (expression (',' expression)*)? ')'                                #expressionCallExpression
     | expression '.' IDENTIFIER                                                         #structFieldExpression
     | '[' (expression (',' expression)*)? ']'                                           #listExpression
     | expression POW_OP expression                                                      #powExpression

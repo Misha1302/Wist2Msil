@@ -67,6 +67,7 @@ public static class WistConstOperations
             WistType.None => "<<None>>",
             WistType.InternalInteger => $"i32_{c.GetInternalInteger()}",
             WistType.Pointer => $"ptr_{c.GetPointer()}",
+            WistType.ExeHelper => $"{c.GetExeHelper().DynamicMethod.Name} - {c.GetExeHelper().GetMethodPtr()}",
             _ => Throw($"Unknown type to convert to string - {c.Type}").ToString()
         };
     }

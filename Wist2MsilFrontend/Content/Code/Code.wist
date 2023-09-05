@@ -1,35 +1,12 @@
 ﻿include "Includes.wist"
 
 func Start() {
-    a = 0
-    a += 5
-    a *= 5
-    a /= 2
-    Print(a)
+    fs = new List([Hello1, Hello1, Hello1, Hello1])
+    // Hello1, cuz the method name is 'Hello' and args count is 1
     
-    // next four lines will be ignored
-    123
-    a
-    new S()
-    a + 123 / 0
-    
-    s = new S()
-    s.Add(4)
-    s.Div(Infinity())
-    Print(s._number)
+    repeat fs.GetLen() with x:
+        fs.GetElem(x)(x)
 }
 
-struct S(_number) {
-    func Constructor(self) {
-        self._number = 0 
-        ret self
-    }
-    
-    func Add(self, value):
-        self._number += value
-    
-    func Div(self, value):
-        self._number /= value
-}
-
-func Infinity(): ret 1e1000
+func Hello(i):
+    Print("Hello for " + i + " times")

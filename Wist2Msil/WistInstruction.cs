@@ -52,6 +52,8 @@ public struct WistInstruction
         CallStructMethod,
         InstantiateList,
         Current,
-        GotoIfNext
+        GotoIfNext,
+        InstantiateFunctionPtr,
+        CallVariable
     }
 }

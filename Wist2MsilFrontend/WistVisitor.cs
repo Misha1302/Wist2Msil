@@ -197,6 +197,14 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         if (_saveResultLevel == 0) return null;
 
         var locName = context.IDENTIFIER().GetText();
+
+        var firstOrDefault = _wistFunctions.FirstOrDefault(x => x.Name.FullName == locName);
+        if (firstOrDefault != null)
+        {
+            _curFunc.Image.InstantiateFunctionPtr(firstOrDefault);
+            return null;
+        }
+
         _curFunc.Image.LoadLocal(locName);
         return null;
     }
@@ -216,13 +224,14 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitFuncCallExpression(WistGrammarParser.FuncCallExpressionContext context)
     {
+        var expressions = context.expression();
         _saveResultLevel++;
-        foreach (var expr in context.expression())
+        foreach (var expr in expressions)
             Visit(expr);
         _saveResultLevel--;
 
         var text = context.IDENTIFIER().GetText();
-        var fullName = WistFuncName.CreateFullName(text, context.expression().Length, null);
+        var fullName = WistFuncName.CreateFullName(text, expressions.Length, null);
         var wistFunction = _wistFunctions.FirstOrDefault(x => x.Name.FullName == fullName);
 
         if (wistFunction != null)
@@ -232,15 +241,38 @@ public sealed class WistVisitor : WistGrammarBaseVisitor<object?>
         else
         {
             var methodInfo = _wistLibraryManager.GetMethod(fullName);
-            if (methodInfo == null)
+            if (methodInfo != null)
             {
-                _parserErrors.Add(
-                    new WistError($"{fullName} func wasn't found ({text}, {context.expression().Length} args)"));
-                throw _parserErrors[^1];
+                _curFunc.Image.Call(methodInfo);
             }
-
-            _curFunc.Image.Call(methodInfo);
+            else
+            {
+                _curFunc.Image.LoadLocal(text);
+                _curFunc.Image.CallVariable(expressions.Length);
+            }
         }
+
+        if (_saveResultLevel == 0)
+            _curFunc.Image.Drop();
+
+        return null;
+    }
+
+    public override object? VisitExpressionCallExpression(WistGrammarParser.ExpressionCallExpressionContext context)
+    {
+        var locTempName = Guid.NewGuid().ToString();
+
+        _saveResultLevel++;
+        Visit(context.expression(0));
+        _curFunc.Image.SetLocal(locTempName);
+
+        var expressions = context.expression().Skip(1).ToArray();
+        foreach (var expr in expressions)
+            Visit(expr);
+
+        _saveResultLevel--;
+        _curFunc.Image.LoadLocal(locTempName);
+        _curFunc.Image.CallVariable(expressions.Length);
 
         if (_saveResultLevel == 0)
             _curFunc.Image.Drop();
